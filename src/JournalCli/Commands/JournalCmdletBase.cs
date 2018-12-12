@@ -4,6 +4,8 @@ namespace JournalCli.Commands
 {
     public abstract class JournalCmdletBase : CmdletBase
     {
+        private readonly string _error = $"{nameof(RootDirectory)} was not provided and no default location exists. One or the other is required";
+
         [Parameter]
         public string RootDirectory { get; set; }
 
@@ -13,10 +15,13 @@ namespace JournalCli.Commands
                 return ResolvePath(RootDirectory);
 
             if (!UserSettings.Exists())
-                return ResolvePath(".");
+                throw new PSInvalidOperationException(_error);
 
             var settings = UserSettings.Load();
-            return string.IsNullOrEmpty(settings.DefaultJournalRoot) ? ResolvePath(".") : settings.DefaultJournalRoot;
+            if (string.IsNullOrEmpty(settings.DefaultJournalRoot))
+                throw new PSInvalidOperationException(_error);
+
+            return settings.DefaultJournalRoot;
         }
     }
 }
