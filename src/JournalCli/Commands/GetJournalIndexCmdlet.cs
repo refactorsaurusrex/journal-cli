@@ -28,7 +28,8 @@ namespace JournalCli.Commands
             switch (OrderBy)
             {
                 case var order when order == "Name" && Direction == "Ascending":
-                    WriteObject(index, true);
+                    var ascByName = index.OrderBy(x => x.Tag);
+                    WriteObject(ascByName, true);
                     break;
 
                 case var order when order == "Name" && Direction == "Descending":
