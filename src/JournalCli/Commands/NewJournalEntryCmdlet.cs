@@ -30,7 +30,12 @@ namespace JournalCli.Commands
             if (File.Exists(fullPath))
                 ThrowTerminatingError($"File already exists: '{fullPath}'", ErrorCategory.InvalidOperation);
 
-            File.CreateText(fullPath).Close();
+            using (var fs = File.CreateText(fullPath))
+            {
+                fs.WriteLine($"# {entryDate.ToLongDateString()}");
+                fs.Flush();
+            }
+
             Process.Start(new ProcessStartInfo(fullPath)
             {
                 UseShellExecute = true
