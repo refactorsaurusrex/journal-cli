@@ -14,9 +14,28 @@ namespace JournalCli.Commands
         public string BackupLocation { get; set; }
 
         [Parameter]
+        public string Password { get; set; }
+
+        [Parameter]
         public SwitchParameter SaveLocation { get; set; }
 
+        [Parameter]
+        public SwitchParameter SavePassword { get; set; }
+
         protected override void ProcessRecord()
+        {
+            ResolveBackupLocation();
+            ResolvePassword();
+
+            var fileName = $"{DateTime.Now:yyyy.MM.dd.H.mm.ss.FFF}.zip";
+            var destinationPath = Path.Combine(BackupLocation, fileName);
+            var journalRoot = GetResolvedRootDirectory();
+
+            var zip = new FastZip { CreateEmptyDirectories = true, Password = Password };
+            zip.CreateZip(destinationPath, journalRoot, true, null);
+        }
+
+        private void ResolveBackupLocation()
         {
             if (string.IsNullOrEmpty(BackupLocation))
             {
@@ -39,13 +58,30 @@ namespace JournalCli.Commands
                     settings.Save();
                 }
             }
+        }
 
-            var fileName = $"{DateTime.Now:yyyy.MM.dd.H.mm.ss.FFF}.zip";
-            var destinationPath = Path.Combine(BackupLocation, fileName);
-            var journalRoot = GetResolvedRootDirectory();
+        private void ResolvePassword()
+        {
+            if (string.IsNullOrEmpty(Password))
+            {
+                var settings = UserSettings.Load();
+                if (string.IsNullOrEmpty(settings.BackupPassword))
+                {
+                    Password = null;
+                    return;
+                }
 
-            var zip = new FastZip { CreateEmptyDirectories = true };
-            zip.CreateZip(destinationPath, journalRoot, true, null);
+                Password = settings.BackupPassword;
+            }
+            else
+            {
+                if (SavePassword)
+                {
+                    var settings = UserSettings.Load();
+                    settings.BackupPassword = Password;
+                    settings.Save();
+                }
+            }
         }
     }
 }

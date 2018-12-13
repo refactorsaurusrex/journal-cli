@@ -35,6 +35,8 @@ namespace JournalCli
 
         public string BackupLocation { get; set; }
 
+        public string BackupPassword { get; set; }
+
         public void Save()
         {
             var serializer = new SerializerBuilder().Build();
