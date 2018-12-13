@@ -13,8 +13,8 @@ namespace JournalCli.Commands
             if (!UserSettings.Exists())
                 return;
 
-            var settings = File.ReadAllText(UserSettings.GetStorageLocation());
-            WriteObject(settings);
+            var settings = UserSettings.Load();
+            WriteObject($"Default journal root directory: {settings.DefaultJournalRoot}");
         }
     }
 }

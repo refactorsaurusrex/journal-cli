@@ -6,13 +6,16 @@ namespace JournalCli
 {
     public class UserSettings
     {
-        public static bool Exists() => File.Exists(GetStorageLocation());
+        public static bool Exists() => File.Exists(StorageLocation);
 
-        public static string GetStorageLocation()
+        private static string StorageLocation
         {
-            var currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
-            var path = Path.Combine(currentDirectory, "userSettings");
-            return path;
+            get
+            {
+                var currentDirectory = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+                var path = Path.Combine(currentDirectory, "userSettings");
+                return path;
+            }
         }
 
         public static UserSettings Load()
@@ -22,12 +25,21 @@ namespace JournalCli
 
             var deserializer = new DeserializerBuilder().Build();
 
-            using (var settingsFile = File.OpenText(GetStorageLocation()))
+            using (var settingsFile = File.OpenText(StorageLocation))
             {
                 return deserializer.Deserialize<UserSettings>(settingsFile);
             }
         }
 
         public string DefaultJournalRoot { get; set; }
+
+        public string BackupLocation { get; set; }
+
+        public void Save()
+        {
+            var serializer = new SerializerBuilder().Build();
+            var yaml = serializer.Serialize(this);
+            File.WriteAllText(StorageLocation, yaml);
+        }
     }
 }

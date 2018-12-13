@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System.Management.Automation;
+﻿using System.Management.Automation;
 using JetBrains.Annotations;
-using YamlDotNet.Serialization;
 
 namespace JournalCli.Commands
 {
@@ -14,15 +12,9 @@ namespace JournalCli.Commands
 
         protected override void ProcessRecord()
         {
-            var settings = new UserSettings
-            {
-                DefaultJournalRoot = Location
-            };
-
-            var serializer = new SerializerBuilder().Build();
-            var yaml = serializer.Serialize(settings);
-            var path = UserSettings.GetStorageLocation();
-            File.WriteAllText(path, yaml);
+            var settings = UserSettings.Load();
+            settings.DefaultJournalRoot = Location;
+            settings.Save();
         }
     }
 }
