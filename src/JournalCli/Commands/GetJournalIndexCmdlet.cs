@@ -15,7 +15,7 @@ namespace JournalCli.Commands
 
         [Parameter]
         [ValidateSet("Ascending", "Descending")]
-        public string Direction { get; set; } = "Ascending";
+        public string Direction { get; set; } = "Descending";
 
         [Parameter]
         public SwitchParameter IncludeHeaders { get; set; }
