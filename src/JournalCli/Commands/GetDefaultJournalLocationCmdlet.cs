@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Management.Automation;
+﻿using System.Management.Automation;
 using JetBrains.Annotations;
 
 namespace JournalCli.Commands
@@ -14,7 +13,7 @@ namespace JournalCli.Commands
                 return;
 
             var settings = UserSettings.Load();
-            WriteObject($"Default journal root directory: {settings.DefaultJournalRoot}");
+            WriteObject($"Default journal root directory: '{settings.DefaultJournalRoot}'");
         }
     }
 }
