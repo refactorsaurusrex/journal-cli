@@ -93,5 +93,5 @@ So far, I've written this tool with exactly one user in mind: **me**. That seems
 [tf]: https://www.typeform.com/
 [id]: https://inkdrop.app/
 [id-journal]: https://forum.inkdrop.app/t/save-the-currently-selected-notebook/883/6
-[issues:]: https://github.com/refactorsaurusrex/journal-cli/issues
+[issues]: https://github.com/refactorsaurusrex/journal-cli/issues
 [profile]: https://github.com/refactorsaurusrex
