@@ -32,6 +32,10 @@ namespace JournalCli.Commands
 
             using (var fs = File.CreateText(fullPath))
             {
+                fs.WriteLine("---");
+                fs.WriteLine("tags:");
+                fs.WriteLine("  - ");
+                fs.WriteLine("---");
                 fs.WriteLine($"# {entryDate.ToLongDateString()}");
                 fs.Flush();
             }
