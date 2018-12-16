@@ -1,18 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Repos\journal-cli\src\JournalCli\JournalCli.xml</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\Repos\journal-cli\src\JournalCli\JournalCli.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" />
     <PackageReference Include="SharpZipLib" Version="1.0.0" />
+    <PackageReference Include="XmlDoc2CmdletDoc" Version="0.2.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="YamlDotNet" Version="5.3.0" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet publish --no-build" />
+    <Exec Command="dotnet publish --no-build&#xD;&#xA;xcopy $(OutDir)JournalCli.dll-Help.xml $(OutDir)publish /y" />
   </Target>
 
 </Project>
