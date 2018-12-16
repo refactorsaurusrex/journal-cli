@@ -11,7 +11,7 @@ namespace JournalCli.Commands
     {
         [Parameter]
         [ValidateSet("Count", "Name")]
-        public string OrderBy { get; set; } = "Name";
+        public string OrderBy { get; set; } = "Count";
 
         [Parameter]
         [ValidateSet("Ascending", "Descending")]
