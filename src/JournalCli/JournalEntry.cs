@@ -9,11 +9,11 @@ namespace JournalCli
         public JournalEntry(string filePath, bool includeHeaders)
         {
             FilePath = filePath;
-            var journalReader = new JournalEntryReader(filePath);
-            Tags = journalReader.GetTags();
+            var entryFile = new JournalEntryFile(filePath);
+            Tags = entryFile.GetTags();
 
             if (includeHeaders)
-                Headers = journalReader.GetHeaders();
+                Headers = entryFile.GetHeaders();
         }
 
         public string FilePath { get; }

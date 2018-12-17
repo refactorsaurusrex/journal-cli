@@ -7,10 +7,10 @@ using YamlDotNet.RepresentationModel;
 
 namespace JournalCli
 {
-    public class JournalEntryReader
+    public class JournalEntryFile
     {
         private readonly string _filePath;
-        public JournalEntryReader(string filePath) => _filePath = filePath;
+        public JournalEntryFile(string filePath) => _filePath = filePath;
 
         public ICollection<string> GetHeaders() => File.ReadAllLines(_filePath).Where(x => x.StartsWith("#")).ToList();
 
@@ -43,6 +43,43 @@ namespace JournalCli
                 var tags = (YamlSequenceNode)yamlStream.Documents[0].RootNode["tags"];
                 return tags.Select(x => x.ToString()).ToList();
             }
+        }
+
+        public void WriteTags(ICollection<string> tags, bool createBackup)
+        {
+            if (createBackup)
+            {
+                var backupName = $"{_filePath}.old";
+
+                var i = 0;
+                while (File.Exists(backupName))
+                    backupName = $"{_filePath}({i++}).old";
+
+                File.Copy(_filePath, backupName);
+            }
+
+            var frontMatter = new List<string>
+            {
+                "---",
+                "tags:"
+            };
+
+            frontMatter.AddRange(tags.Distinct().Select(tag => $"  - {tag}"));
+            frontMatter.Add("---");
+
+            var originalEntry = File.ReadAllLines(_filePath).ToList();
+            if (originalEntry[0] == "---")
+            {
+                var startIndex = originalEntry.FindIndex(1, line => line == "---") + 1;
+                var newEntry = frontMatter.Concat(originalEntry.Skip(startIndex));
+                File.WriteAllLines(_filePath, newEntry);
+            }
+            else
+            {
+                var newEntry = frontMatter.Concat(originalEntry);
+                File.WriteAllLines(_filePath, newEntry);
+            }
+
         }
     }
 }
