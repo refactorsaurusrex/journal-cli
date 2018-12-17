@@ -12,5 +12,10 @@ namespace JournalCli.Commands
             var errorRecord = new ErrorRecord(new Exception(message), category.ToString(), category, null);
             ThrowTerminatingError(errorRecord);
         }
+
+        protected void WriteHost(string text, ConsoleColor foregroundColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
+        {
+            Host.UI.WriteLine(foregroundColor, backgroundColor, text);
+        }
     }
 }
