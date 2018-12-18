@@ -18,7 +18,7 @@ Finally, I had a realization. *Typora supports yaml front matter. I can use fron
 
 > This is just a quick summary. Refer to the [wiki](https://github.com/refactorsaurusrex/journal-cli/wiki) for more detailed information. (If the wiki is lacking in some way, check back later. I'll be updating it more frequently than this readme.)
 
-### Create an index of your journal
+## Create an index of your journal
 
 Run `Get-JournalIndex` to scan all your journal files and create an index of your entire journal. This allows you to:
 
@@ -27,7 +27,7 @@ Run `Get-JournalIndex` to scan all your journal files and create an index of you
 - List all journal entries containing specific tags.
 - Show the headers from a subset of journal entries, for an overview of the topics contained in each entry. (Note: This assumes you use headers in your entries.)
 
-### Create new journal entries
+## Create new journal entries
 
 Run a single command to create a new journal entry for today and save the file in the appropriate year and month folders using a specific date-based naming convention. (Example: `2018.12.13.md`) 
 
@@ -37,17 +37,21 @@ Forgot to create an entry for yesterday? No problem. Just pass in a `DateOffset`
 New-JournalEntry -DateOffset -1
 ```
 
-### Create backups
+## Create backups
 
 Create a snapshot of your entire journal and save it to a zip file. Optionally, protect the zip file with a password.
 
-### Open a random journal entry
+## Open a random journal entry
 
 What's the point of keeping a journal if you never re-read your entries? Run `Get-RandomJournalEntry` to open a randomly selected entry.
 
-### List all entries by tag
+## List all entries by tag
 
 Want to see every journal entry that was tagged `work` or `family`? Run `Get-JournalEntriesByTag` and pass in one or more tags.
+
+## Rename and/or consolidate tags
+
+Let's say you have a few dozen entries with the tag `family` and a few dozen more with the tag `family-drama`. Maybe you decide the latter really should be combined with the former. Use the `Rename-JournalTag` function to do exactly that. By default, this function creates backup copies of the original entries - just in case you change your mind. To permanently delete these backups, you can run `Remove-OldFiles`. (The backup files are saved with an `.old` file extension.)
 
 # Getting Started
 
