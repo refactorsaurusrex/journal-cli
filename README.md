@@ -43,11 +43,11 @@ Create a snapshot of your entire journal and save it to a zip file. Optionally, 
 
 ## Open a random journal entry
 
-What's the point of keeping a journal if you never re-read your entries? Run `Get-RandomJournalEntry` to open a randomly selected entry.
+What's the point of keeping a journal if you never re-read your entries? Run `Open-RandomJournalEntry` to open a randomly selected entry. Pass in one or more tag names to narrow down the collection of possible entries.
 
 ## List all entries by tag
 
-Want to see every journal entry that was tagged `work` or `family`? Run `Get-JournalEntriesByTag` and pass in one or more tags.
+Want to see every journal entry that was tagged `work`, `family`, or whatever? Run `Get-JournalEntriesByTag` and pass in one or more tags.
 
 ## Rename and/or consolidate tags
 
@@ -77,7 +77,9 @@ If `journal-cli` actually attracts attention from people other than myself, alte
 
 ## Installation
 
-Soon, you'll be able to install this with [Chocolatey](https://chocolatey.org/). But I haven't gotten to that yet. In the meantime, your best bet is to clone this repo and run it from code. 
+While `journal-cli` targets PowerShell 6, thus making it theoretically cross-platform, I haven't yet made any effort to get it working on Mac or Linux. So, for now, this is Windows only.
+
+I also haven't published the code to any package management feeds yet. Eventually it will be installable from [Chocolatey](https://chocolatey.org/) and the [PowerShellGallery](https://www.powershellgallery.com). For the immediate term, the only way to get the tool is to clone the repo and run the code directly. Super lame, I know, but it won't be this way for long.
 
 ### Usage
 
