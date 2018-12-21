@@ -57,7 +57,7 @@ Let's say you have a few dozen entries with the tag `family` and a few dozen mor
 
 ## Prerequisites
 
-There are only two _real_ requirements in order to use `journal-cli`. First, you need to have a collection of `*.md` files.  They don't even need to be "journal" entries. They can be anything you want... as long as they are text-based and have use the "md" file extension. Second, at least some of those files must include Yaml front matter in the format shown below. The `tags` element is required, but you can create any tag names you want. That's it. 
+There are only two _real_ requirements in order to use `journal-cli`. First, you need to have a collection of `*.md` files.  They don't even need to be "journal" entries. They can be anything you want... as long as they are text-based and have a "md" file extension. Second, at least some of those files must include Yaml front matter in the format shown below. The `tags` element is required, but you can create any tag names you want. That's it. 
 
 > If you use Typora, you can go to the Paragraph menu and select "YAML Front Matter"
 
