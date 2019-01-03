@@ -18,7 +18,7 @@ namespace JournalCli.Commands
             var root = GetResolvedRootDirectory();
             var entryDate = DateTime.Today.AddDays(DateOffset);
             var year = entryDate.Year.ToString();
-            var month = $"{entryDate.Month} {entryDate:MMMM}";
+            var month = $"{entryDate.Month:00} {entryDate:MMMM}";
             var parent = Path.Combine(root, year, month);
 
             if (!Directory.Exists(parent))
