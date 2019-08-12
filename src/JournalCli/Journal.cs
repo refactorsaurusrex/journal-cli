@@ -45,7 +45,7 @@ namespace JournalCli
         {
             var index = new JournalIndex();
 
-            foreach (var file in Directory.EnumerateFiles(rootDirectory, "*.md", SearchOption.AllDirectories))
+            foreach (var file in MarkdownFiles.FindAll(rootDirectory))
             {
                 var entry = new JournalEntry(file, includeHeaders);
                 foreach (var tag in entry.Tags)
