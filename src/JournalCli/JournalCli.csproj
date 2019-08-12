@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <AssemblyName>JournalCli</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -29,7 +31,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet publish --no-build&#xD;&#xA;xcopy $(OutDir)JournalCli.dll-Help.xml $(OutDir)publish /y" />
+    <Exec Command="if $(ConfigurationName) == Debug (&#xD;&#xA;  dotnet publish --no-build --output $(SolutionDir)..\publish\$(ProjectName)&#xD;&#xA;  xcopy $(OutDir)$(ProjectName).dll-Help.xml $(SolutionDir)..\publish\$(ProjectName) /y&#xD;&#xA;)" />
   </Target>
 
 </Project>
