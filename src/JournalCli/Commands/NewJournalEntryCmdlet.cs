@@ -8,6 +8,7 @@ namespace JournalCli.Commands
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.New, "JournalEntry")]
+    [Alias("nj")]
     public class NewJournalEntryCmdlet : JournalCmdletBase
     {
         [Parameter]
