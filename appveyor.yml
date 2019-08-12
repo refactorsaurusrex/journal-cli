@@ -13,4 +13,4 @@ deploy_script:
 - pwsh: Publish-Module -NuGetApiKey $env:psgallery -Path .\publish\JournalCli
 environment:
   psgallery:
-    secure: CH/4X9NuaEG0NizuG9RVhZIt25cja8eS7AwO/E8e8Tb0pNMpVnPnMZvPHhl0WmV7
+    secure: Hlkt9LvEqlXZk4TY5rlpVj6fiSeLV7nmMwV4mjAinWphJUUeR6ZhIaYT0/L31YF/
