@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Repos\journal-cli\src\JournalCli\JournalCli.xml</DocumentationFile>
+    <DocumentationFile></DocumentationFile>
     <NoWarn></NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\Repos\journal-cli\src\JournalCli\JournalCli.xml</DocumentationFile>
+    <DocumentationFile></DocumentationFile>
+    <NoWarn />
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,15 +24,11 @@
     <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.0" />
     <PackageReference Include="SharpZipLib" Version="1.0.0" />
-    <PackageReference Include="XmlDoc2CmdletDoc" Version="0.2.10">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="YamlDotNet" Version="5.3.0" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug (&#xD;&#xA;  dotnet publish --no-build --output $(SolutionDir)..\publish\$(ProjectName)&#xD;&#xA;  xcopy $(OutDir)$(ProjectName).dll-Help.xml $(SolutionDir)..\publish\$(ProjectName) /y&#xD;&#xA;)" />
+    <Exec Command="if $(ConfigurationName) == Debug (&#xD;&#xA;  dotnet publish --no-build --output $(SolutionDir)..\publish\$(ProjectName)&#xD;&#xA;)" />
   </Target>
 
 </Project>
