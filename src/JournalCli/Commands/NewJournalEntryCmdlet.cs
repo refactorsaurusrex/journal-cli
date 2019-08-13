@@ -6,14 +6,32 @@ using JetBrains.Annotations;
 
 namespace JournalCli.Commands
 {
+    /// <summary>
+    /// <para type="synopsis">Creates a new journal entry.</para>
+    /// <para type="description">Creates a new markdown-based journal entry file in the specified root directory.</para>
+    /// <para type="link" uri="https://github.com/refactorsaurusrex/journal-cli/wiki">The journal-cli wiki.</para>
+    /// <example>
+    ///   <para>Create a journal entry for today</para>
+    ///   <code>New-JournalEntry</code>
+    /// </example>
+    /// <example>
+    ///   <para>Create a journal entry for yesterday</para>
+    ///   <code>New-JournalEntry -DateOffset -1</code>
+    /// </example>
+    /// </summary>
     [PublicAPI]
     [Cmdlet(VerbsCommon.New, "JournalEntry")]
     [Alias("nj")]
     public class NewJournalEntryCmdlet : JournalCmdletBase
     {
+        /// <summary>
+        /// <para type="description">An integer representing the number of days to offset from today's date. For example,
+        /// -1 represents yesterday. The default is 0, meaning today.</para>
+        /// </summary>
         [Parameter]
         public int DateOffset { get; set; }
 
+        /// <inheritdoc />
         protected override void ProcessRecord()
         {
             var root = GetResolvedRootDirectory();

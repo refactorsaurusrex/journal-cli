@@ -6,10 +6,27 @@ using JetBrains.Annotations;
 
 namespace JournalCli.Commands
 {
+    /// <summary>
+    /// <para type="synopsis">Creates a complete backup of your journal entries.</para>
+    /// <para type="description">Creates a password-protected zip archive of all files contained in the journal root directory and
+    /// saves it to the specified location.</para>
+    /// <para type="link" uri="https://github.com/refactorsaurusrex/journal-cli/wiki">The journal-cli wiki.</para>
+    /// <example>
+    ///   <code>Backup-Journal</code>
+    ///   <para>Backup your journal using previously saved location and password. Note that this will fail a password and location
+    ///   have not been previously saved.</para>
+    /// </example>
+    /// <example>
+    ///   <code>Backup-Journal -BackupLocation C:\My\Secret\Location -SaveLocation -Password "secret123" -SavePassword</code>
+    ///   <para>Backup your journal to specified location with provided password, and persist location and password for future use.</para>
+    /// </example>
+    /// </summary>
     [PublicAPI]
     [Cmdlet(VerbsData.Backup, "Journal")]
     public class BackupJournalCmdlet : JournalCmdletBase
     {
+        [Parameter]
+        public string Blah { get; set; }
         [Parameter]
         public string BackupLocation { get; set; }
 
@@ -22,6 +39,7 @@ namespace JournalCli.Commands
         [Parameter]
         public SwitchParameter SavePassword { get; set; }
 
+        /// <inheritdoc />
         protected override void ProcessRecord()
         {
             ResolveBackupLocation();
