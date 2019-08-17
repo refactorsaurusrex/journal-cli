@@ -49,11 +49,11 @@ namespace JournalCli
         {
             if (createBackup)
             {
-                var backupName = $"{_filePath}.old";
+                var backupName = $"{_filePath}{Constants.BackupFileExtension}";
 
                 var i = 0;
                 while (File.Exists(backupName))
-                    backupName = $"{_filePath}({i++}).old";
+                    backupName = $"{_filePath}({i++}){Constants.BackupFileExtension}";
 
                 File.Copy(_filePath, backupName);
             }

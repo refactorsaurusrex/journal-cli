@@ -6,12 +6,13 @@ using JetBrains.Annotations;
 namespace JournalCli.Commands
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Remove, "OldFiles", ConfirmImpact = ConfirmImpact.High)]
-    public class RemoveOldFilesCmdlet : JournalCmdletBase
+    [Cmdlet(VerbsCommon.Remove, "BackupJournalFiles", ConfirmImpact = ConfirmImpact.High)]
+    [OutputType(typeof(string))]
+    public class RemoveBackupJournalFilesCmdlet : JournalCmdletBase
     {
-        private const string Warning = "***** Hey, you! *****\r\n" +
-            "This function will find and PERMANENTLY delete all '.old' files found in your journal directory. Consider creating a backup " +
-            "before proceeding, by running 'Backup-Journal'.";
+        private readonly string _warning = "***** Hey, you! *****\r\n" +
+            $"This function will find and PERMANENTLY DELETE all '{Constants.BackupFileExtension}' files found in your journal directory. " +
+            "Consider creating a full backup before proceeding, by running 'Backup-Journal'.";
 
         [Parameter]
         public SwitchParameter DryRun { get; set; }
@@ -19,32 +20,34 @@ namespace JournalCli.Commands
         protected override void ProcessRecord()
         {
             if (!DryRun)
-                WriteHost(Warning, ConsoleColor.Red);
+                WriteHost(_warning, ConsoleColor.Red);
 
-            if (!DryRun && !ShouldContinue("Do you want to continue?", "Deleting .old files..."))
+            // TODO: Move ShouldContinue to base class
+            if (!DryRun && !ShouldContinue("Do you want to continue?", $"Deleting '{Constants.BackupFileExtension}' files..."))
                 return;
 
-            var oldFiles = Directory.GetFiles(GetResolvedRootDirectory(), "*.old", SearchOption.AllDirectories);
+            var backupFiles = Directory.GetFiles(GetResolvedRootDirectory(), $"*{Constants.BackupFileExtension}", SearchOption.AllDirectories);
 
             if (DryRun)
             {
+                // TODO: Move Header writer to base class
                 const string header = "The following files would be deleted:";
                 WriteHost(header, ConsoleColor.Cyan);
                 WriteHost(new string('=', header.Length), ConsoleColor.Cyan);
 
                 var counter = 1;
-                foreach (var oldFile in oldFiles)
-                    WriteHost($"{counter++.ToString().PadLeft(3)}: {oldFile}", ConsoleColor.Cyan);
+                foreach (var backupFile in backupFiles)
+                    WriteHost($"{counter++.ToString().PadLeft(3)}: {backupFile}", ConsoleColor.Cyan);
             }
             else
             {
-                foreach (var oldFile in oldFiles)
+                foreach (var backupFile in backupFiles)
                 {
-                    File.Delete(oldFile);
-                    WriteHost($"Deleted: {oldFile}", ConsoleColor.Red);
+                    File.Delete(backupFile);
+                    WriteHost($"Deleted: {backupFile}", ConsoleColor.Red);
                 }
 
-                WriteHost($"Done! Deleted {oldFiles.Length} file(s).", ConsoleColor.Cyan);
+                WriteHost($"Done! Deleted {backupFiles.Length} file(s).", ConsoleColor.Cyan);
             }
         }
     }
