@@ -14,6 +14,9 @@ namespace JournalCli.Commands
         [Parameter]
         public int DateOffset { get; set; }
 
+        [Parameter]
+        public string[] Tags { get; set; }
+
         protected override void ProcessRecord()
         {
             var root = GetResolvedRootDirectory();
@@ -35,7 +38,17 @@ namespace JournalCli.Commands
             {
                 fs.WriteLine("---");
                 fs.WriteLine("tags:");
-                fs.WriteLine("  - ");
+
+                if (Tags.Length == 0)
+                {
+                    fs.WriteLine("  - ");
+                }
+                else
+                {
+                    foreach (var tag in Tags)
+                        fs.WriteLine($"  - {tag}");
+                }
+
                 fs.WriteLine("---");
                 fs.WriteLine($"# {entryDate.ToLongDateString()}");
                 fs.Flush();
