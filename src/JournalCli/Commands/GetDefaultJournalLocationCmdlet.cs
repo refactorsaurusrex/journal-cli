@@ -14,7 +14,7 @@ namespace JournalCli.Commands
                 return;
 
             var settings = UserSettings.Load();
-            WriteObject($"Default journal root directory: '{settings.DefaultJournalRoot}'");
+            WriteObject(settings.DefaultJournalRoot);
         }
     }
 }
