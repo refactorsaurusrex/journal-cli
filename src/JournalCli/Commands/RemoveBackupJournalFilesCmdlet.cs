@@ -7,7 +7,6 @@ namespace JournalCli.Commands
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Remove, "BackupJournalFiles", ConfirmImpact = ConfirmImpact.High)]
-    [OutputType(typeof(string))]
     public class RemoveBackupJournalFilesCmdlet : JournalCmdletBase
     {
         private readonly string _warning = "***** Hey, you! *****\r\n" +
