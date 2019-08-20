@@ -6,6 +6,7 @@ namespace JournalCli.Commands
 {
     [PublicAPI]
     [Cmdlet(VerbsData.ConvertTo, "Yaml")]
+    [OutputType(typeof(string))]
     public class ConvertToYamlCmdlet : CmdletBase
     {
         [Parameter(Mandatory = true, ValueFromPipeline = true, Position = 0)]

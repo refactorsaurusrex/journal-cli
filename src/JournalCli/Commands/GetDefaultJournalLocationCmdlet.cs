@@ -5,6 +5,7 @@ namespace JournalCli.Commands
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "DefaultJournalLocation")]
+    [OutputType(typeof(string))]
     public class GetDefaultJournalLocationCmdlet : CmdletBase
     {
         protected override void ProcessRecord()
