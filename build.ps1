@@ -1,13 +1,13 @@
 param(
-  [string]$Version = '0.0.0'
+  [string]$Version = ''
 )
 
 $ErrorActionPreference = 'Stop'
-Install-Module WhatsNew
-Import-Module WhatsNew
 
 if ($env:APPVEYOR_BUILD_VERSION) {
   $Version = [regex]::match($env:APPVEYOR_BUILD_VERSION,'[0-9]+\.[0-9]+\.[0-9]+').Groups[0].Value
+} elseif ($Version -eq '') {
+  throw "Missing version parameter"
 }
 
 if (Test-Path "$PSScriptRoot\publish") {
@@ -23,15 +23,12 @@ if ($LASTEXITCODE -ne 0) {
   throw "Failed to publish application."
 }
 
-Get-ChildItem -Filter "$appName.dll-Help.xml" -Recurse -File -Path "$PSScriptRoot\src" |
-  Where-Object { $_.FullName -like "*bin\Release*" } | 
-  Select-Object -First 1 | 
-  Copy-Item -Destination $publishOutputDir -Force
-
 Remove-Item "$publishOutputDir\*.pdb"
 
 Import-Module "$publishOutputDir\$appName.dll"
 $moduleInfo = Get-Module $appName
+Install-Module WhatsNew
+Import-Module WhatsNew
 $cmdletNames = Export-BinaryCmdletNames -ModuleInfo $moduleInfo
 $cmdletAliases = Export-BinaryCmdletAliases -ModuleInfo $moduleInfo
 
@@ -65,3 +62,16 @@ $updateManifestArgs = @{
 New-ModuleManifest @newManifestArgs
 Update-ModuleManifest @updateManifestArgs
 Remove-ModuleManifestComments $manifestPath -NoConfirm
+
+Install-Module platyPS
+Import-Module platyPS
+$docs = "$PSScriptRoot\docs"
+try {
+  git clone https://github.com/refactorsaurusrex/journal-cli.wiki.git $docs
+  Switch-CodeFenceToYamlFrontMatter -Path $docs -NoConfirm
+  New-ExternalHelp -Path $docs -OutputPath $publishOutputDir
+} finally {
+  if (Test-Path $docs) {
+    Remove-Item -Path $docs -Recurse -Force
+  }
+}
