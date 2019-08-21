@@ -68,6 +68,10 @@ Import-Module platyPS
 $docs = "$PSScriptRoot\docs"
 try {
   git clone https://github.com/refactorsaurusrex/journal-cli.wiki.git $docs
+  if ($LASTEXITCODE -ne 0) {
+    throw "Failed to clone wiki."
+  }
+
   Switch-CodeFenceToYamlFrontMatter -Path $docs -NoConfirm
   New-ExternalHelp -Path $docs -OutputPath $publishOutputDir
 } finally {
