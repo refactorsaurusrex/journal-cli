@@ -3,7 +3,7 @@ using Xunit;
 
 namespace JournalCli.Tests
 {
-    public class UnitTest1
+    public class WindowsEncryptedStoreTests
     {
         [Fact]
         public void Test1()
