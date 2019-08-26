@@ -22,8 +22,8 @@ namespace JournalCli.Commands
 
         protected override void ProcessRecord()
         {
-            var root = GetResolvedRootDirectory();
-            var index = Journal.CreateIndex(root, IncludeHeaders);
+            base.ProcessRecord();
+            var index = Journal.CreateIndex(RootDirectory, IncludeHeaders);
 
             switch (OrderBy)
             {

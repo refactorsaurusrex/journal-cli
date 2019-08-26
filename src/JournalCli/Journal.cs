@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
+using SysIO = System.IO;
 
 namespace JournalCli
 {
@@ -28,8 +29,9 @@ namespace JournalCli
 
         public static void OpenRandomEntry(string rootDirectory)
         {
-            var di = new DirectoryInfo(rootDirectory);
-            var entries = di.GetFiles("*.md", SearchOption.AllDirectories).ToList();
+            var fileSystem = new FileSystem();
+            var di = fileSystem.DirectoryInfo.FromDirectoryName(rootDirectory);
+            var entries = di.GetFiles("*.md", SysIO.SearchOption.AllDirectories).ToList();
 
             if (entries.Count == 0)
                 throw new PSInvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
@@ -44,10 +46,11 @@ namespace JournalCli
         public static JournalIndex CreateIndex(string rootDirectory, bool includeHeaders)
         {
             var index = new JournalIndex();
+            var fileSystem = new FileSystem();
 
-            foreach (var file in MarkdownFiles.FindAll(rootDirectory))
+            foreach (var file in MarkdownFiles.FindAll(fileSystem, rootDirectory))
             {
-                var entry = new JournalEntry(file, includeHeaders);
+                var entry = new JournalEntry(fileSystem, file, includeHeaders);
                 foreach (var tag in entry.Tags)
                 {
                     if (index.Contains(tag))

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
+using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
 
@@ -19,22 +19,24 @@ namespace JournalCli.Commands
 
         protected override void ProcessRecord()
         {
-            var root = GetResolvedRootDirectory();
+            base.ProcessRecord();
+            
             var entryDate = DateTime.Today.AddDays(DateOffset);
             var year = entryDate.Year.ToString();
             var month = $"{entryDate.Month:00} {entryDate:MMMM}";
-            var parent = Path.Combine(root, year, month);
+            var fileSystem = new FileSystem();
+            var parent = fileSystem.Path.Combine(RootDirectory, year, month);
 
-            if (!Directory.Exists(parent))
-                Directory.CreateDirectory(parent);
+            if (!fileSystem.Directory.Exists(parent))
+                fileSystem.Directory.CreateDirectory(parent);
 
             var fileName = entryDate.ToString("yyyy.MM.dd.'md'");
-            var fullPath = Path.Combine(parent, fileName);
+            var fullPath = fileSystem.Path.Combine(parent, fileName);
 
-            if (File.Exists(fullPath))
+            if (fileSystem.File.Exists(fullPath))
                 ThrowTerminatingError($"File already exists: '{fullPath}'", ErrorCategory.InvalidOperation);
 
-            using (var fs = File.CreateText(fullPath))
+            using (var fs = fileSystem.File.CreateText(fullPath))
             {
                 fs.WriteLine("---");
                 fs.WriteLine("tags:");

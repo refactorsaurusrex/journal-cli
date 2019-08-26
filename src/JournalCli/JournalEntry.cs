@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.IO.Abstractions;
 
 namespace JournalCli
 {
     public class JournalEntry
     {
-        public JournalEntry(string filePath, bool includeHeaders)
+        private readonly IFileSystem _fileSystem;
+
+        public JournalEntry(IFileSystem fileSystem, string filePath, bool includeHeaders)
         {
+            _fileSystem = fileSystem;
             FilePath = filePath;
-            var entryFile = new JournalEntryFile(filePath);
+            var entryFile = new JournalEntryFile(fileSystem, filePath);
             Tags = entryFile.GetTags();
 
             if (includeHeaders)
@@ -22,6 +25,6 @@ namespace JournalCli
 
         public ICollection<string> Headers { get; set; }
 
-        public override string ToString() => Path.GetFileNameWithoutExtension(FilePath) ?? throw new InvalidOperationException();
+        public override string ToString() => _fileSystem.Path.GetFileNameWithoutExtension(FilePath) ?? throw new InvalidOperationException();
     }
 }

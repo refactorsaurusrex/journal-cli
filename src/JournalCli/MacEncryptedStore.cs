@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO.Abstractions;
 using YamlDotNet.Serialization;
 
 namespace JournalCli
@@ -7,23 +8,23 @@ namespace JournalCli
 
     internal class MacEncryptedStore : EncryptedStore
     {
+        private readonly IFileSystem _fileSystem;
         private readonly string _cryptKeyPath;
         private readonly string _authKeyPath;
-        private readonly string _cipherPath;
 
-        public MacEncryptedStore()
+        public MacEncryptedStore(IFileSystem fileSystem)
         {
-            _cryptKeyPath = Path.Combine(StorageLocation, "ck");
-            _authKeyPath = Path.Combine(StorageLocation, "ak");
-            _cipherPath = Path.Combine(StorageLocation, "c");
+            _fileSystem = fileSystem;
+            _cryptKeyPath = _fileSystem.Path.Combine(StorageLocation, "ck");
+            _authKeyPath = _fileSystem.Path.Combine(StorageLocation, "ak");
 
-            if (!File.Exists(_cryptKeyPath) || !File.Exists(_authKeyPath))
+            if (!_fileSystem.File.Exists(_cryptKeyPath) || !_fileSystem.File.Exists(_authKeyPath))
             {
                 var cryptKey = AuthenticatedEncryption.NewKey();
                 var authKey = AuthenticatedEncryption.NewKey();
 
-                File.WriteAllBytes(_cryptKeyPath, cryptKey);
-                File.WriteAllBytes(_authKeyPath, authKey);
+                _fileSystem.File.WriteAllBytes(_cryptKeyPath, cryptKey);
+                _fileSystem.File.WriteAllBytes(_authKeyPath, authKey);
             }
         }
 
@@ -32,20 +33,29 @@ namespace JournalCli
             var serializer = new SerializerBuilder().Build();
             var yaml = serializer.Serialize(target);
 
-            var cryptKey = File.ReadAllBytes(_cryptKeyPath);
-            var authKey = File.ReadAllBytes(_authKeyPath);
+            var cryptKey = _fileSystem.File.ReadAllBytes(_cryptKeyPath);
+            var authKey = _fileSystem.File.ReadAllBytes(_authKeyPath);
             var cipherText = AuthenticatedEncryption.Encrypt(yaml, cryptKey, authKey);
-            File.WriteAllText(_cipherPath, cipherText);
+            var cipherPath = _fileSystem.Path.Combine(StorageLocation, target.GetType().FullName);
+            _fileSystem.File.WriteAllText(cipherPath, cipherText);
         }
 
         public override T Load<T>()
         {
-            var cryptKey = File.ReadAllBytes(_cryptKeyPath);
-            var authKey = File.ReadAllBytes(_authKeyPath);
-            var cipherText = File.ReadAllText(_cipherPath);
-            var plainText = AuthenticatedEncryption.Decrypt(cipherText, cryptKey, authKey);
-            var deserializer = new DeserializerBuilder().Build();
-            return deserializer.Deserialize<T>(plainText);
+            try
+            {
+                var cryptKey = _fileSystem.File.ReadAllBytes(_cryptKeyPath);
+                var authKey = _fileSystem.File.ReadAllBytes(_authKeyPath);
+                var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).FullName);
+                var cipherText = _fileSystem.File.ReadAllText(cipherPath);
+                var plainText = AuthenticatedEncryption.Decrypt(cipherText, cryptKey, authKey);
+                var deserializer = new DeserializerBuilder().Build();
+                return deserializer.Deserialize<T>(plainText);
+            }
+            catch (Exception)
+            {
+                return new T();
+            }
         }
     }
 }

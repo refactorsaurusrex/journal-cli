@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.IO.Abstractions;
 using System.Security.Cryptography;
 using System.Text;
 using YamlDotNet.Serialization;
@@ -8,13 +8,13 @@ namespace JournalCli
 {
     internal class WindowsEncryptedStore : EncryptedStore
     {
-        private readonly string _cipherPath;
+        private readonly IFileSystem _fileSystem;
         private readonly string _entropyPath;
 
-        public WindowsEncryptedStore()
+        public WindowsEncryptedStore(IFileSystem fileSystem)
         {
-            _cipherPath = Path.Combine(StorageLocation, "c");
-            _entropyPath = Path.Combine(StorageLocation, "e");
+            _fileSystem = fileSystem;
+            _entropyPath = _fileSystem.Path.Combine(StorageLocation, "e");
         }
 
         public override void Save<T>(T target)
@@ -29,24 +29,33 @@ namespace JournalCli
 
             var cipher = ProtectedData.Protect(tokenBytes, entropy, DataProtectionScope.CurrentUser);
 
-            Directory.CreateDirectory(StorageLocation);
-            File.WriteAllBytes(_cipherPath, cipher);
-            File.WriteAllBytes(_entropyPath, entropy);
+            _fileSystem.Directory.CreateDirectory(StorageLocation);
+            var cipherPath = _fileSystem.Path.Combine(StorageLocation, target.GetType().FullName);
+            _fileSystem.File.WriteAllBytes(cipherPath, cipher);
+            _fileSystem.File.WriteAllBytes(_entropyPath, entropy);
         }
 
         public override T Load<T>()
         {
-            if (!File.Exists(_cipherPath) || !File.Exists(_entropyPath))
-                return null;
+            var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).FullName);
+            if (!_fileSystem.File.Exists(cipherPath) || !_fileSystem.File.Exists(_entropyPath))
+                return new T();
 
-            var cipher = File.ReadAllBytes(_cipherPath);
-            var entropy = File.ReadAllBytes(_entropyPath);
+            try
+            {
+                var cipher = _fileSystem.File.ReadAllBytes(cipherPath);
+                var entropy = _fileSystem.File.ReadAllBytes(_entropyPath);
 
-            var resultBytes = ProtectedData.Unprotect(cipher, entropy, DataProtectionScope.CurrentUser);
-            var yaml = Encoding.UTF8.GetString(resultBytes);
+                var resultBytes = ProtectedData.Unprotect(cipher, entropy, DataProtectionScope.CurrentUser);
+                var yaml = Encoding.UTF8.GetString(resultBytes);
 
-            var deserializer = new DeserializerBuilder().Build();
-            return deserializer.Deserialize<T>(yaml);
+                var deserializer = new DeserializerBuilder().Build();
+                return deserializer.Deserialize<T>(yaml);
+            }
+            catch (Exception)
+            {
+                return new T();
+            }
         }
     }
 }

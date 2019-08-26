@@ -12,12 +12,12 @@ namespace JournalCli.Commands
 
         protected override void ProcessRecord()
         {
-            var root = GetResolvedRootDirectory();
+            base.ProcessRecord();
 
             if (Tags.Length == 0)
-                Journal.OpenRandomEntry(root);
+                Journal.OpenRandomEntry(RootDirectory);
             else
-                Journal.OpenRandomEntry(root, Tags);
+                Journal.OpenRandomEntry(RootDirectory, Tags);
         }
     }
 }
