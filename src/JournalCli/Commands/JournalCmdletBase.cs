@@ -12,7 +12,10 @@ namespace JournalCli.Commands
         protected override void ProcessRecord()
         {
             if (!string.IsNullOrEmpty(RootDirectory))
+            {
                 RootDirectory = ResolvePath(RootDirectory);
+                return;
+            }
 
             var encryptedStore = EncryptedStoreFactory.Create();
             var settings = UserSettings.Load(encryptedStore);
