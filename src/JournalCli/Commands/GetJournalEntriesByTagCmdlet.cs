@@ -16,8 +16,8 @@ namespace JournalCli.Commands
 
         protected override void ProcessRecord()
         {
-            var root = GetResolvedRootDirectory();
-            var index = Journal.CreateIndex(root, IncludeHeaders);
+            base.ProcessRecord();
+            var index = Journal.CreateIndex(RootDirectory, IncludeHeaders);
 
             var result = index.Where(x => Tags.Contains(x.Tag));
             WriteObject(result, true);

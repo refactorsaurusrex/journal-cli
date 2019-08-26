@@ -1,23 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Text;
 using YamlDotNet.RepresentationModel;
+using SysIO = System.IO;
 
 namespace JournalCli
 {
     public class JournalEntryFile
     {
+        private readonly IFileSystem _fileSystem;
         private readonly string _filePath;
-        public JournalEntryFile(string filePath) => _filePath = filePath;
 
-        public ICollection<string> GetHeaders() => File.ReadAllLines(_filePath).Where(x => x.StartsWith("#")).ToList();
+        public JournalEntryFile(IFileSystem fileSystem, string filePath)
+        {
+            _fileSystem = fileSystem;
+            _filePath = filePath;
+        }
+
+        public ICollection<string> GetHeaders() => _fileSystem.File.ReadAllLines(_filePath).Where(x => x.StartsWith("#")).ToList();
 
         public ICollection<string> GetTags()
         {
             StringBuilder sb;
-            using (var fs = File.OpenText(_filePath))
+            using (var fs = _fileSystem.File.OpenText(_filePath))
             {
                 var firstLine = fs.ReadLine();
                 if (firstLine != "---")
@@ -36,7 +43,7 @@ namespace JournalCli
             }
 
             var yaml = sb.ToString();
-            using (var reader = new StringReader(yaml))
+            using (var reader = new SysIO.StringReader(yaml))
             {
                 var yamlStream = new YamlStream();
                 yamlStream.Load(reader);
@@ -52,10 +59,10 @@ namespace JournalCli
                 var backupName = $"{_filePath}{Constants.BackupFileExtension}";
 
                 var i = 0;
-                while (File.Exists(backupName))
+                while (_fileSystem.File.Exists(backupName))
                     backupName = $"{_filePath}({i++}){Constants.BackupFileExtension}";
 
-                File.Copy(_filePath, backupName);
+                _fileSystem.File.Copy(_filePath, backupName);
             }
 
             var frontMatter = new List<string>
@@ -67,17 +74,17 @@ namespace JournalCli
             frontMatter.AddRange(tags.Distinct().Select(tag => $"  - {tag}"));
             frontMatter.Add("---");
 
-            var originalEntry = File.ReadAllLines(_filePath).ToList();
+            var originalEntry = _fileSystem.File.ReadAllLines(_filePath).ToList();
             if (originalEntry[0] == "---")
             {
                 var startIndex = originalEntry.FindIndex(1, line => line == "---") + 1;
                 var newEntry = frontMatter.Concat(originalEntry.Skip(startIndex));
-                File.WriteAllLines(_filePath, newEntry);
+                _fileSystem.File.WriteAllLines(_filePath, newEntry);
             }
             else
             {
                 var newEntry = frontMatter.Concat(originalEntry);
-                File.WriteAllLines(_filePath, newEntry);
+                _fileSystem.File.WriteAllLines(_filePath, newEntry);
             }
 
         }

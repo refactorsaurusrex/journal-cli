@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.IO.Abstractions;
 
 namespace JournalCli
 {
@@ -8,12 +8,13 @@ namespace JournalCli
         protected EncryptedStore()
         {
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var path = Path.Combine(appData, "JournalCli");
+            var fileSystem = new FileSystem();
+            var path = fileSystem.Path.Combine(appData, "JournalCli");
             StorageLocation = path;
         }
 
         protected readonly string StorageLocation;
         public abstract void Save<T>(T target);
-        public abstract T Load<T>() where T : class;
+        public abstract T Load<T>() where T : class, new();
     }
 }

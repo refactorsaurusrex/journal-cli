@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using System.IO;
+using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
 
@@ -11,8 +11,10 @@ namespace JournalCli.Commands
     {
         protected override void ProcessRecord()
         {
-            var path = UserSettings.Load().BackupLocation;
-            if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
+            var fileSystem = new FileSystem();
+            var encryptedStore = EncryptedStoreFactory.Create();
+            var path = UserSettings.Load(encryptedStore).BackupLocation;
+            if (!string.IsNullOrEmpty(path) && fileSystem.Directory.Exists(path))
             {
                 Process.Start(new ProcessStartInfo(path)
                 {
@@ -21,7 +23,7 @@ namespace JournalCli.Commands
             }
             else
             {
-                ThrowTerminatingError("Backup location not found", ErrorCategory.InvalidOperation);
+                throw new PSInvalidOperationException("Backup location not found");
             }
         }
     }

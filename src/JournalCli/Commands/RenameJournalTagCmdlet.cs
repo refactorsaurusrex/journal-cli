@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
 using System.Text;
@@ -25,6 +26,8 @@ namespace JournalCli.Commands
 
         protected override void ProcessRecord()
         {
+            base.ProcessRecord();
+
             if (!DryRun && NoBackups)
             {
                 var warning = "***** Hey, you! *****\r\n" +
@@ -36,7 +39,7 @@ namespace JournalCli.Commands
             if (!DryRun && !ShouldContinue("Do you want to continue?", $"Renaming '{OldName}' tags to '{NewName}'..."))
                 return;
 
-            var index = Journal.CreateIndex(GetResolvedRootDirectory(), false);
+            var index = Journal.CreateIndex(RootDirectory, false);
             var journalEntries = index.SingleOrDefault(x => x.Tag == OldName);
 
             if (journalEntries == null)
@@ -64,7 +67,8 @@ namespace JournalCli.Commands
                     continue;
                 }
 
-                var file = new JournalEntryFile(journalEntry.FilePath);
+                var fileSystem = new FileSystem();
+                var file = new JournalEntryFile(fileSystem, journalEntry.FilePath);
                 var currentTags = file.GetTags().ToList();
                 var oldItemIndex = currentTags.IndexOf(OldName);
                 currentTags[oldItemIndex] = NewName;

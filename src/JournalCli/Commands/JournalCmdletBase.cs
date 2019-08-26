@@ -9,19 +9,18 @@ namespace JournalCli.Commands
         [Parameter]
         public string RootDirectory { get; set; }
 
-        protected string GetResolvedRootDirectory()
+        protected override void ProcessRecord()
         {
             if (!string.IsNullOrEmpty(RootDirectory))
-                return ResolvePath(RootDirectory);
+                RootDirectory = ResolvePath(RootDirectory);
 
-            if (!UserSettings.Exists())
-                throw new PSInvalidOperationException(_error);
+            var encryptedStore = EncryptedStoreFactory.Create();
+            var settings = UserSettings.Load(encryptedStore);
 
-            var settings = UserSettings.Load();
             if (string.IsNullOrEmpty(settings.DefaultJournalRoot))
                 throw new PSInvalidOperationException(_error);
 
-            return settings.DefaultJournalRoot;
+            RootDirectory = settings.DefaultJournalRoot;
         }
     }
 }

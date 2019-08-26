@@ -10,10 +10,8 @@ namespace JournalCli.Commands
     {
         protected override void ProcessRecord()
         {
-            if (!UserSettings.Exists())
-                return;
-
-            var settings = UserSettings.Load();
+            var encryptedStore = EncryptedStoreFactory.Create();
+            var settings = UserSettings.Load(encryptedStore);
             WriteObject(settings.DefaultJournalRoot);
         }
     }

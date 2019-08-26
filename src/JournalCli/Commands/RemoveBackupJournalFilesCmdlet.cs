@@ -1,7 +1,8 @@
 ﻿using System;
-using System.IO;
+using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
+using SysIO = System.IO;
 
 namespace JournalCli.Commands
 {
@@ -18,6 +19,8 @@ namespace JournalCli.Commands
 
         protected override void ProcessRecord()
         {
+            base.ProcessRecord();
+
             if (!DryRun)
                 WriteHost(_warning, ConsoleColor.Red);
 
@@ -25,7 +28,8 @@ namespace JournalCli.Commands
             if (!DryRun && !ShouldContinue("Do you want to continue?", $"Deleting '{Constants.BackupFileExtension}' files..."))
                 return;
 
-            var backupFiles = Directory.GetFiles(GetResolvedRootDirectory(), $"*{Constants.BackupFileExtension}", SearchOption.AllDirectories);
+            var fileSystem = new FileSystem();
+            var backupFiles = fileSystem.Directory.GetFiles(RootDirectory, $"*{Constants.BackupFileExtension}", SysIO.SearchOption.AllDirectories);
 
             if (DryRun)
             {
@@ -42,7 +46,7 @@ namespace JournalCli.Commands
             {
                 foreach (var backupFile in backupFiles)
                 {
-                    File.Delete(backupFile);
+                    fileSystem.File.Delete(backupFile);
                     WriteHost($"Deleted: {backupFile}", ConsoleColor.Red);
                 }
 
