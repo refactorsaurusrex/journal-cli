@@ -41,7 +41,7 @@ namespace JournalCli.Commands
                 fs.WriteLine("---");
                 fs.WriteLine("tags:");
 
-                if (Tags.Length == 0)
+                if (Tags == null || Tags.Length == 0)
                 {
                     fs.WriteLine("  - ");
                 }
