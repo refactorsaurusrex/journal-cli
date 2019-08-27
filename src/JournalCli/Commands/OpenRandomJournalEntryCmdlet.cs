@@ -1,4 +1,5 @@
-﻿using System.Management.Automation;
+﻿using System.IO.Abstractions;
+using System.Management.Automation;
 using JetBrains.Annotations;
 
 namespace JournalCli.Commands
@@ -13,11 +14,13 @@ namespace JournalCli.Commands
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
+            var fileSystem = new FileSystem();
+            var journal = Journal.Open(fileSystem, RootDirectory);
 
-            if (Tags.Length == 0)
-                Journal.OpenRandomEntry(RootDirectory);
+            if (Tags == null || Tags.Length == 0)
+                journal.OpenRandomEntry();
             else
-                Journal.OpenRandomEntry(RootDirectory, Tags);
+                journal.OpenRandomEntry(Tags);
         }
     }
 }

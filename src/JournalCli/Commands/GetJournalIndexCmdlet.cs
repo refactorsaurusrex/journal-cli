@@ -1,4 +1,5 @@
-﻿using System.Management.Automation;
+﻿using System.IO.Abstractions;
+using System.Management.Automation;
 using JetBrains.Annotations;
 using System.Linq;
 
@@ -23,7 +24,10 @@ namespace JournalCli.Commands
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
-            var index = Journal.CreateIndex(RootDirectory, IncludeHeaders);
+
+            var fileSystem = new FileSystem();
+            var journal = Journal.Open(fileSystem, RootDirectory);
+            var index = journal.CreateIndex(IncludeHeaders);
 
             switch (OrderBy)
             {
