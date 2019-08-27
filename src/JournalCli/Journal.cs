@@ -9,9 +9,23 @@ namespace JournalCli
 {
     public class Journal
     {
-        public static void OpenRandomEntry(string rootDirectory, string[] tags)
+        private readonly IFileSystem _fileSystem;
+        private readonly string _rootDirectory;
+
+        public static Journal Open(IFileSystem fileSystem, string rootDirectory)
         {
-            var journalIndex = CreateIndex(rootDirectory, false);
+            return new Journal(fileSystem, rootDirectory);
+        }
+
+        private Journal(IFileSystem fileSystem, string rootDirectory)
+        {
+            _fileSystem = fileSystem;
+            _rootDirectory = rootDirectory;
+        }
+
+        public void OpenRandomEntry(string[] tags)
+        {
+            var journalIndex = CreateIndex(false);
             if (journalIndex.Count == 0)
                 throw new PSInvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
 
@@ -27,10 +41,9 @@ namespace JournalCli
             });
         }
 
-        public static void OpenRandomEntry(string rootDirectory)
+        public void OpenRandomEntry()
         {
-            var fileSystem = new FileSystem();
-            var di = fileSystem.DirectoryInfo.FromDirectoryName(rootDirectory);
+            var di = _fileSystem.DirectoryInfo.FromDirectoryName(_rootDirectory);
             var entries = di.GetFiles("*.md", SysIO.SearchOption.AllDirectories).ToList();
 
             if (entries.Count == 0)
@@ -43,14 +56,13 @@ namespace JournalCli
             });
         }
 
-        public static JournalIndex CreateIndex(string rootDirectory, bool includeHeaders)
+        public JournalIndex CreateIndex(bool includeHeaders)
         {
             var index = new JournalIndex();
-            var fileSystem = new FileSystem();
 
-            foreach (var file in MarkdownFiles.FindAll(fileSystem, rootDirectory))
+            foreach (var file in MarkdownFiles.FindAll(_fileSystem, _rootDirectory))
             {
-                var entry = new JournalEntry(fileSystem, file, includeHeaders);
+                var entry = new JournalEntry(_fileSystem, file, includeHeaders);
                 foreach (var tag in entry.Tags)
                 {
                     if (index.Contains(tag))
