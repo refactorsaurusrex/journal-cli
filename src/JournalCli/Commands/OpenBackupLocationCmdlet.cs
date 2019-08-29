@@ -12,7 +12,7 @@ namespace JournalCli.Commands
         protected override void ProcessRecord()
         {
             var fileSystem = new FileSystem();
-            var encryptedStore = EncryptedStoreFactory.Create();
+            var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
             var path = UserSettings.Load(encryptedStore).BackupLocation;
             if (!string.IsNullOrEmpty(path) && fileSystem.Directory.Exists(path))
             {

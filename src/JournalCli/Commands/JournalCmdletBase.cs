@@ -17,7 +17,7 @@ namespace JournalCli.Commands
                 return;
             }
 
-            var encryptedStore = EncryptedStoreFactory.Create();
+            var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
             var settings = UserSettings.Load(encryptedStore);
 
             if (string.IsNullOrEmpty(settings.DefaultJournalRoot))

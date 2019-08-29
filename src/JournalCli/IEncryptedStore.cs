@@ -1,8 +1,9 @@
 ﻿namespace JournalCli
 {
-    internal interface IEncryptedStore
+    internal interface IEncryptedStore<T>
+        where T : class, new()
     {
-        void Save<T>(T target);
-        T Load<T>() where T : class, new();
+        void Save(T target);
+        T Load();
     }
 }

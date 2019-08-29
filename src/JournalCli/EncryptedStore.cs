@@ -3,7 +3,8 @@ using System.IO.Abstractions;
 
 namespace JournalCli
 {
-    internal abstract class EncryptedStore : IEncryptedStore
+    internal abstract class EncryptedStore<T> : IEncryptedStore<T>
+        where T : class, new()
     {
         protected EncryptedStore()
         {
@@ -14,7 +15,7 @@ namespace JournalCli
         }
 
         protected readonly string StorageLocation;
-        public abstract void Save<T>(T target);
-        public abstract T Load<T>() where T : class, new();
+        public abstract void Save(T target);
+        public abstract T Load();
     }
 }

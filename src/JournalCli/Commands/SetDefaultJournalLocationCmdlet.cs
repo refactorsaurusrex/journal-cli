@@ -12,7 +12,7 @@ namespace JournalCli.Commands
 
         protected override void ProcessRecord()
         {
-            var encryptedStore = EncryptedStoreFactory.Create();
+            var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
             var settings = UserSettings.Load(encryptedStore);
             settings.DefaultJournalRoot = Location;
             settings.Save(encryptedStore);

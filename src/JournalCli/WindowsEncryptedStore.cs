@@ -6,7 +6,8 @@ using YamlDotNet.Serialization;
 
 namespace JournalCli
 {
-    internal class WindowsEncryptedStore : EncryptedStore
+    internal class WindowsEncryptedStore<T> : EncryptedStore<T>
+        where T : class, new()
     {
         private readonly IFileSystem _fileSystem;
         private readonly string _entropyPath;
@@ -17,7 +18,7 @@ namespace JournalCli
             _entropyPath = _fileSystem.Path.Combine(StorageLocation, "e");
         }
 
-        public override void Save<T>(T target)
+        public override void Save(T target)
         {
             var serializer = new SerializerBuilder().Build();
             var yaml = serializer.Serialize(target);
@@ -35,7 +36,7 @@ namespace JournalCli
             _fileSystem.File.WriteAllBytes(_entropyPath, entropy);
         }
 
-        public override T Load<T>()
+        public override T Load()
         {
             var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).FullName);
             if (!_fileSystem.File.Exists(cipherPath) || !_fileSystem.File.Exists(_entropyPath))
