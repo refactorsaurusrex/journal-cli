@@ -25,7 +25,7 @@ namespace JournalCli.Commands
             base.ProcessRecord();
 
             var fileSystem = new FileSystem();
-            var encryptedStore = EncryptedStoreFactory.Create();
+            var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
             var settings = UserSettings.Load(encryptedStore);
 
             if (string.IsNullOrWhiteSpace(BackupLocation))

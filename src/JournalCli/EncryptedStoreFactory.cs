@@ -5,13 +5,14 @@ namespace JournalCli
 {
     internal class EncryptedStoreFactory
     {
-        public static IEncryptedStore Create()
+        public static IEncryptedStore<T> Create<T>()
+            where T : class, new()
         {
             var fileSystem = new FileSystem();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return new WindowsEncryptedStore(fileSystem);
+                return new WindowsEncryptedStore<T>(fileSystem);
 
-            return new MacEncryptedStore(fileSystem);
+            return new MacEncryptedStore<T>(fileSystem);
         }
     }
 }

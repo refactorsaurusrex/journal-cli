@@ -6,7 +6,8 @@ namespace JournalCli
 {
     using AuthenticatedEncryption;
 
-    internal class MacEncryptedStore : EncryptedStore
+    internal class MacEncryptedStore<T> : EncryptedStore<T>
+        where T : class, new()
     {
         private readonly IFileSystem _fileSystem;
         private readonly string _cryptKeyPath;
@@ -28,7 +29,7 @@ namespace JournalCli
             }
         }
 
-        public override void Save<T>(T target)
+        public override void Save(T target)
         {
             var serializer = new SerializerBuilder().Build();
             var yaml = serializer.Serialize(target);
@@ -40,7 +41,7 @@ namespace JournalCli
             _fileSystem.File.WriteAllText(cipherPath, cipherText);
         }
 
-        public override T Load<T>()
+        public override T Load()
         {
             try
             {
