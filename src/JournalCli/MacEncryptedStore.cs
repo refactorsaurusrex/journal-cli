@@ -21,6 +21,7 @@ namespace JournalCli
 
             if (!_fileSystem.File.Exists(_cryptKeyPath) || !_fileSystem.File.Exists(_authKeyPath))
             {
+                fileSystem.Directory.CreateDirectory(StorageLocation);
                 var cryptKey = AuthenticatedEncryption.NewKey();
                 var authKey = AuthenticatedEncryption.NewKey();
 

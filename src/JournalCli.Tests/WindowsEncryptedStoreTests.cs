@@ -1,6 +1,7 @@
 using System;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using AutoFixture;
 using FakeItEasy;
 using FluentAssertions;
 using Xunit;
@@ -9,6 +10,8 @@ namespace JournalCli.Tests
 {
     public class WindowsEncryptedStoreTests
     {
+        private readonly Fixture _fixture = new Fixture();
+
         [Fact]
         public void Save_WritesCipherAndEntropyToDisk()
         {
@@ -25,12 +28,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = new MockFileSystem();
             var store = new WindowsEncryptedStore<UserSettings>(fileSystem);
-            var settings = new UserSettings
-            {
-                BackupPassword = "secret",
-                BackupLocation = "C:\\MyJournalBackup",
-                DefaultJournalRoot = "D:\\MyJournal"
-            };
+            var settings = _fixture.Create<UserSettings>();
             store.Save(settings);
 
             var result = store.Load();
@@ -47,12 +45,7 @@ namespace JournalCli.Tests
             fileSystem.AllDirectories.Should().NotContain(dataDirectory);
 
             var store = new WindowsEncryptedStore<UserSettings>(fileSystem);
-            var settings = new UserSettings
-            {
-                BackupPassword = "secret",
-                BackupLocation = "C:\\MyJournalBackup",
-                DefaultJournalRoot = "D:\\MyJournal"
-            };
+            var settings = _fixture.Create<UserSettings>();
             store.Save(settings);
 
             fileSystem.AllDirectories.Should().Contain(dataDirectory);
