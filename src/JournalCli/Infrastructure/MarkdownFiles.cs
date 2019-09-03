@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO.Abstractions;
-using SysIO = System.IO;
 using System.Linq;
+using SysIO = System.IO;
 
-namespace JournalCli
+namespace JournalCli.Infrastructure
 {
     public class MarkdownFiles
     {

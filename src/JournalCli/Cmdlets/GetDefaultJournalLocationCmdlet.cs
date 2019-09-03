@@ -1,5 +1,7 @@
 ﻿using System.Management.Automation;
 using JetBrains.Annotations;
+using JournalCli.Core;
+using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
 {

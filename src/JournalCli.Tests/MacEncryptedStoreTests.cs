@@ -4,6 +4,8 @@ using System.IO.Abstractions.TestingHelpers;
 using AutoFixture;
 using FakeItEasy;
 using FluentAssertions;
+using JournalCli.Core;
+using JournalCli.Infrastructure;
 using Xunit;
 
 namespace JournalCli.Tests

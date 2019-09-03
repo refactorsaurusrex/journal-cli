@@ -6,7 +6,7 @@ using System.Text;
 using YamlDotNet.RepresentationModel;
 using SysIO = System.IO;
 
-namespace JournalCli
+namespace JournalCli.Core
 {
     public class JournalEntryFile
     {

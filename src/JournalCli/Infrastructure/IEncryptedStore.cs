@@ -1,4 +1,4 @@
-﻿namespace JournalCli
+﻿namespace JournalCli.Infrastructure
 {
     internal interface IEncryptedStore<T>
         where T : class, new()

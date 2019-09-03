@@ -2,6 +2,7 @@
 using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
+using JournalCli.Core;
 using SysIO = System.IO;
 
 namespace JournalCli.Cmdlets

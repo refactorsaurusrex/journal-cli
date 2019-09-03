@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using JournalCli.Infrastructure;
 
-namespace JournalCli
+namespace JournalCli.Core
 {
     [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     internal class UserSettings : IEquatable<UserSettings>

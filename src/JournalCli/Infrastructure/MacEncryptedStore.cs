@@ -2,7 +2,7 @@
 using System.IO.Abstractions;
 using YamlDotNet.Serialization;
 
-namespace JournalCli
+namespace JournalCli.Infrastructure
 {
     using AuthenticatedEncryption;
 
