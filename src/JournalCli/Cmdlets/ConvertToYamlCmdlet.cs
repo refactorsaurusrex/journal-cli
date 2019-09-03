@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using YamlDotNet.Serialization;
 
-namespace JournalCli.Commands
+namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsData.ConvertTo, "Yaml")]

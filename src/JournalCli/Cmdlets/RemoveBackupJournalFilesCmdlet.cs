@@ -4,7 +4,7 @@ using System.Management.Automation;
 using JetBrains.Annotations;
 using SysIO = System.IO;
 
-namespace JournalCli.Commands
+namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Remove, "BackupJournalFiles", ConfirmImpact = ConfirmImpact.High)]
