@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace JournalCli
+namespace JournalCli.Core
 {
     [PublicAPI]
     public class JournalIndexEntry

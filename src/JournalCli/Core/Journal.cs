@@ -3,9 +3,10 @@ using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
+using JournalCli.Infrastructure;
 using SysIO = System.IO;
 
-namespace JournalCli
+namespace JournalCli.Core
 {
     public class Journal
     {

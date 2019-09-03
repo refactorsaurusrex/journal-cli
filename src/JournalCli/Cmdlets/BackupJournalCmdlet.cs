@@ -3,6 +3,8 @@ using System.IO.Abstractions;
 using System.Management.Automation;
 using ICSharpCode.SharpZipLib.Zip;
 using JetBrains.Annotations;
+using JournalCli.Core;
+using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
 {

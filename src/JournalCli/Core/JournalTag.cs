@@ -1,4 +1,4 @@
-﻿namespace JournalCli
+﻿namespace JournalCli.Core
 {
     public class JournalTag
     {

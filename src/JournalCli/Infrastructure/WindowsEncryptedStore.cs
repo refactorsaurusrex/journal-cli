@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using YamlDotNet.Serialization;
 
-namespace JournalCli
+namespace JournalCli.Infrastructure
 {
     internal class WindowsEncryptedStore<T> : EncryptedStore<T>
         where T : class, new()

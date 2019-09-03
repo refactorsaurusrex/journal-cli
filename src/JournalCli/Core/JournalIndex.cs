@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace JournalCli
+namespace JournalCli.Core
 {
     public class JournalIndex : KeyedCollection<string, JournalIndexEntry>
     {

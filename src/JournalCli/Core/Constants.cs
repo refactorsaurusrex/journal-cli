@@ -1,4 +1,4 @@
-﻿namespace JournalCli
+﻿namespace JournalCli.Core
 {
     internal static class Constants
     {

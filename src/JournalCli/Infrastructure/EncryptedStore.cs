@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions;
 
-namespace JournalCli
+namespace JournalCli.Infrastructure
 {
     internal abstract class EncryptedStore<T> : IEncryptedStore<T>
         where T : class, new()
