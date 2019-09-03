@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Management.Automation;
 
-namespace JournalCli.Commands
+namespace JournalCli.Cmdlets
 {
     public abstract class CmdletBase : PSCmdlet
     {

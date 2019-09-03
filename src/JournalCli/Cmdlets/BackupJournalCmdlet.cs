@@ -4,7 +4,7 @@ using System.Management.Automation;
 using ICSharpCode.SharpZipLib.Zip;
 using JetBrains.Annotations;
 
-namespace JournalCli.Commands
+namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsData.Backup, "Journal")]

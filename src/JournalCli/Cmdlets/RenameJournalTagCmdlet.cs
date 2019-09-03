@@ -4,7 +4,7 @@ using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
 
-namespace JournalCli.Commands
+namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Rename, "JournalTags", ConfirmImpact = ConfirmImpact.High)]

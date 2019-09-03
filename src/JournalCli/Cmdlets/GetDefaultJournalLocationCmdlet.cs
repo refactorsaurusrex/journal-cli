@@ -1,7 +1,7 @@
 ﻿using System.Management.Automation;
 using JetBrains.Annotations;
 
-namespace JournalCli.Commands
+namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "DefaultJournalLocation")]

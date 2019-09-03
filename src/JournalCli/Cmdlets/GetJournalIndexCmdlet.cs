@@ -1,9 +1,9 @@
 ﻿using System.IO.Abstractions;
+using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
-using System.Linq;
 
-namespace JournalCli.Commands
+namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "JournalIndex")]
