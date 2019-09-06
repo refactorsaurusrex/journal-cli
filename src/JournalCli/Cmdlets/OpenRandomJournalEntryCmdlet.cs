@@ -2,6 +2,7 @@
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
+using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
 {
@@ -16,7 +17,8 @@ namespace JournalCli.Cmdlets
         {
             base.ProcessRecord();
             var fileSystem = new FileSystem();
-            var journal = Journal.Open(fileSystem, RootDirectory);
+            var systemProcess = new SystemProcess();
+            var journal = Journal.Open(fileSystem, systemProcess, RootDirectory);
 
             if (Tags == null || Tags.Length == 0)
                 journal.OpenRandomEntry();
