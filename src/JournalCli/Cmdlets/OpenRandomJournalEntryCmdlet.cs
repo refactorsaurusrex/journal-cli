@@ -19,11 +19,7 @@ namespace JournalCli.Cmdlets
             var fileSystem = new FileSystem();
             var systemProcess = new SystemProcess();
             var journal = Journal.Open(fileSystem, systemProcess, RootDirectory);
-
-            if (Tags == null || Tags.Length == 0)
-                journal.OpenRandomEntry();
-            else
-                journal.OpenRandomEntry(Tags);
+            journal.OpenRandomEntry(Tags);
         }
     }
 }
