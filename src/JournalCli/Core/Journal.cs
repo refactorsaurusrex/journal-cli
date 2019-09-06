@@ -26,29 +26,31 @@ namespace JournalCli.Core
 
         public void OpenRandomEntry(string[] tags)
         {
-            var journalIndex = CreateIndex(false);
-            if (journalIndex.Count == 0)
-                throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
+            if (tags == null || tags.Length == 0)
+            {
+                var di = _fileSystem.DirectoryInfo.FromDirectoryName(_rootDirectory);
+                var entries = di.GetFiles("*.md", SysIO.SearchOption.AllDirectories).ToList();
 
-            var allTaggedEntries = journalIndex.Where(x => tags.Contains(x.Tag)).ToList();
-            var random = new Random();
-            var randomIndex1 = random.Next(0, allTaggedEntries.Count - 1);
-            var entries = allTaggedEntries[randomIndex1].Entries;
-            var randomIndex2 = random.Next(0, entries.Count - 1);
+                if (entries.Count == 0)
+                    throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
 
-            _systemProcess.Start(entries.ElementAt(randomIndex2).FilePath);
-        }
+                var index = new Random().Next(0, entries.Count - 1);
+                _systemProcess.Start(entries[index].FullName);
+            }
+            else
+            {
+                var journalIndex = CreateIndex(false);
+                if (journalIndex.Count == 0)
+                    throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
 
-        public void OpenRandomEntry()
-        {
-            var di = _fileSystem.DirectoryInfo.FromDirectoryName(_rootDirectory);
-            var entries = di.GetFiles("*.md", SysIO.SearchOption.AllDirectories).ToList();
+                var allTaggedEntries = journalIndex.Where(x => tags.Contains(x.Tag)).ToList();
+                var random = new Random();
+                var randomIndex1 = random.Next(0, allTaggedEntries.Count - 1);
+                var entries = allTaggedEntries[randomIndex1].Entries;
+                var randomIndex2 = random.Next(0, entries.Count - 1);
 
-            if (entries.Count == 0)
-                throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
-
-            var index = new Random().Next(0, entries.Count - 1);
-            _systemProcess.Start(entries[index].FullName);
+                _systemProcess.Start(entries.ElementAt(randomIndex2).FilePath);
+            }
         }
 
         public JournalIndex CreateIndex(bool includeHeaders)
