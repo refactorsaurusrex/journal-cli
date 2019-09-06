@@ -1,6 +1,7 @@
 using System;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
 using AutoFixture;
 using FakeItEasy;
 using FluentAssertions;
@@ -12,7 +13,7 @@ namespace JournalCli.Tests
 {
     public class MacEncryptedStoreTests
     {
-        readonly Fixture _fixture = new Fixture();
+        private readonly Fixture _fixture = new Fixture();
 
         [Fact]
         public void Constructor_CreatesKeys_IfNotExists()
@@ -62,6 +63,19 @@ namespace JournalCli.Tests
 
             var result = store.Load();
             result.Should().BeEquivalentTo(new UserSettings());
+        }
+
+        [Fact]
+        public void Save_UsesSavedTypesSimpleNameAsCipherName()
+        {
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            var store = new MacEncryptedStore<UserSettings>(fileSystem);
+            var settings = _fixture.Create<UserSettings>();
+            store.Save(settings);
+
+            fileSystem.AllFiles.Select(f => fileSystem.Path.GetFileName(f)).Should()
+                .Contain("UserSettings", because: "If this name ever changes, it means a breaking change because Load will not find previously saved items.");
         }
     }
 }

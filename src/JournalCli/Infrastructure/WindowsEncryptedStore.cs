@@ -31,14 +31,14 @@ namespace JournalCli.Infrastructure
             var cipher = ProtectedData.Protect(tokenBytes, entropy, DataProtectionScope.CurrentUser);
 
             _fileSystem.Directory.CreateDirectory(StorageLocation);
-            var cipherPath = _fileSystem.Path.Combine(StorageLocation, target.GetType().FullName);
+            var cipherPath = _fileSystem.Path.Combine(StorageLocation, target.GetType().Name);
             _fileSystem.File.WriteAllBytes(cipherPath, cipher);
             _fileSystem.File.WriteAllBytes(_entropyPath, entropy);
         }
 
         public override T Load()
         {
-            var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).FullName);
+            var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).Name);
             if (!_fileSystem.File.Exists(cipherPath) || !_fileSystem.File.Exists(_entropyPath))
                 return new T();
 

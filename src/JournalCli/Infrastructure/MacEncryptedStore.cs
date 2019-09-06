@@ -38,7 +38,7 @@ namespace JournalCli.Infrastructure
             var cryptKey = _fileSystem.File.ReadAllBytes(_cryptKeyPath);
             var authKey = _fileSystem.File.ReadAllBytes(_authKeyPath);
             var cipherText = AuthenticatedEncryption.Encrypt(yaml, cryptKey, authKey);
-            var cipherPath = _fileSystem.Path.Combine(StorageLocation, target.GetType().FullName);
+            var cipherPath = _fileSystem.Path.Combine(StorageLocation, target.GetType().Name);
             _fileSystem.File.WriteAllText(cipherPath, cipherText);
         }
 
@@ -48,7 +48,7 @@ namespace JournalCli.Infrastructure
             {
                 var cryptKey = _fileSystem.File.ReadAllBytes(_cryptKeyPath);
                 var authKey = _fileSystem.File.ReadAllBytes(_authKeyPath);
-                var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).FullName);
+                var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).Name);
                 var cipherText = _fileSystem.File.ReadAllText(cipherPath);
                 var plainText = AuthenticatedEncryption.Decrypt(cipherText, cryptKey, authKey);
                 var deserializer = new DeserializerBuilder().Build();
