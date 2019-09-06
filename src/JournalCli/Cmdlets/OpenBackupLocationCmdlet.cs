@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
@@ -18,10 +17,7 @@ namespace JournalCli.Cmdlets
             var path = UserSettings.Load(encryptedStore).BackupLocation;
             if (!string.IsNullOrEmpty(path) && fileSystem.Directory.Exists(path))
             {
-                Process.Start(new ProcessStartInfo(path)
-                {
-                    UseShellExecute = true
-                });
+                new SystemProcess().Start(path);
             }
             else
             {
