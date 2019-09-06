@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Management.Automation;
 using JournalCli.Infrastructure;
 using SysIO = System.IO;
 
 namespace JournalCli.Core
 {
-    public class Journal
+    internal class Journal
     {
         private readonly IFileSystem _fileSystem;
+        private readonly ISystemProcess _systemProcess;
         private readonly string _rootDirectory;
 
-        public static Journal Open(IFileSystem fileSystem, string rootDirectory)
+        public static Journal Open(IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
         {
-            return new Journal(fileSystem, rootDirectory);
+            return new Journal(fileSystem, systemProcess, rootDirectory);
         }
 
-        private Journal(IFileSystem fileSystem, string rootDirectory)
+        private Journal(IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
         {
             _fileSystem = fileSystem;
+            _systemProcess = systemProcess;
             _rootDirectory = rootDirectory;
         }
 
@@ -28,7 +28,7 @@ namespace JournalCli.Core
         {
             var journalIndex = CreateIndex(false);
             if (journalIndex.Count == 0)
-                throw new PSInvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
+                throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
 
             var allTaggedEntries = journalIndex.Where(x => tags.Contains(x.Tag)).ToList();
             var random = new Random();
@@ -36,10 +36,7 @@ namespace JournalCli.Core
             var entries = allTaggedEntries[randomIndex1].Entries;
             var randomIndex2 = random.Next(0, entries.Count - 1);
 
-            Process.Start(new ProcessStartInfo(entries.ElementAt(randomIndex2).FilePath)
-            {
-                UseShellExecute = true
-            });
+            _systemProcess.Start(entries.ElementAt(randomIndex2).FilePath);
         }
 
         public void OpenRandomEntry()
@@ -48,13 +45,10 @@ namespace JournalCli.Core
             var entries = di.GetFiles("*.md", SysIO.SearchOption.AllDirectories).ToList();
 
             if (entries.Count == 0)
-                throw new PSInvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
+                throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
 
             var index = new Random().Next(0, entries.Count - 1);
-            Process.Start(new ProcessStartInfo(entries[index].FullName)
-            {
-                UseShellExecute = true
-            });
+            _systemProcess.Start(entries[index].FullName);
         }
 
         public JournalIndex CreateIndex(bool includeHeaders)
@@ -79,6 +73,44 @@ namespace JournalCli.Core
             }
 
             return index;
+        }
+
+        public void CreateNewEntry(DateTime entryDate, string[] tags)
+        {
+            var year = entryDate.Year.ToString();
+            var month = $"{entryDate.Month:00} {entryDate:MMMM}";
+            var parent = _fileSystem.Path.Combine(_rootDirectory, year, month);
+
+            if (!_fileSystem.Directory.Exists(parent))
+                _fileSystem.Directory.CreateDirectory(parent);
+
+            var fileName = entryDate.ToString("yyyy.MM.dd.'md'");
+            var fullPath = _fileSystem.Path.Combine(parent, fileName);
+
+            if (_fileSystem.File.Exists(fullPath))
+                throw new InvalidOperationException($"Journal entry already exists: '{fullPath}'");
+
+            using (var fs = _fileSystem.File.CreateText(fullPath))
+            {
+                fs.WriteLine("---");
+                fs.WriteLine("tags:");
+
+                if (tags == null || tags.Length == 0)
+                {
+                    fs.WriteLine("  - ");
+                }
+                else
+                {
+                    foreach (var tag in tags)
+                        fs.WriteLine($"  - {tag}");
+                }
+
+                fs.WriteLine("---");
+                fs.WriteLine($"# {entryDate.ToLongDateString()}");
+                fs.Flush();
+            }
+
+            _systemProcess.Start(fullPath);
         }
     }
 }
