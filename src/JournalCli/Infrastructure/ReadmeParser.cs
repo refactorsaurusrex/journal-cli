@@ -9,6 +9,9 @@ namespace JournalCli.Infrastructure
     {
         public ReadmeParser(string readmeText, LocalDate journalDate)
         {
+            if (string.IsNullOrWhiteSpace(readmeText))
+                throw new ArgumentException($"'{nameof(readmeText)}' cannot be parsed if it is null or empty.", nameof(readmeText));
+
             if (readmeText.Contains(" "))
             {
                 var readmeArray = readmeText.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);

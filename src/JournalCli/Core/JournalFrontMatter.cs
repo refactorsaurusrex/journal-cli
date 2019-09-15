@@ -42,13 +42,23 @@ namespace JournalCli.Core
 
         private JournalFrontMatter() { }
 
-        public JournalFrontMatter(IEnumerable<string> tags, string readme)
+        public JournalFrontMatter(IEnumerable<string> tags, string readme, LocalDate journalDate)
         {
             Tags = tags?.Distinct().ToList();
-            Readme = readme;
+
+            if (string.IsNullOrWhiteSpace(readme))
+            {
+                Readme = null;
+                ReadmeDate = null;
+            }
+            else
+            {
+                var parser = new ReadmeParser(readme, journalDate);
+                Readme = parser.FrontMatterValue;
+                ReadmeDate = parser.ExpirationDate;
+            }
         }
 
-        // TEST: Write test to validate that front matter values will never be incorrectly overwritten.
         public JournalFrontMatter(string yamlFrontMatter, LocalDate journalEntryDate)
         {
             yamlFrontMatter = yamlFrontMatter.Trim();
