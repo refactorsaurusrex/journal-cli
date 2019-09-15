@@ -14,6 +14,7 @@ namespace JournalCli.Infrastructure
         private readonly string _authKeyPath;
 
         public MacEncryptedStore(IFileSystem fileSystem)
+            : base(fileSystem)
         {
             _fileSystem = fileSystem;
             _cryptKeyPath = _fileSystem.Path.Combine(StorageLocation, "ck");

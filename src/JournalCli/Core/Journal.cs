@@ -3,7 +3,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using JournalCli.Infrastructure;
 using NodaTime;
-using SysIO = System.IO;
 
 namespace JournalCli.Core
 {
@@ -14,7 +13,6 @@ namespace JournalCli.Core
         private readonly ISystemProcess _systemProcess;
         private readonly string _rootDirectory;
 
-        // TODO: Can this be refactored so that that IFileSystem isn't needed any longer?
         public static Journal Open(IJournalReaderFactory readerFactory, IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
         {
             return new Journal(readerFactory, fileSystem, systemProcess, rootDirectory);
