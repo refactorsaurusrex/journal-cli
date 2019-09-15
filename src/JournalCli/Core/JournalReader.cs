@@ -4,7 +4,6 @@ using System.IO.Abstractions;
 using System.Linq;
 using JournalCli.Infrastructure;
 using NodaTime;
-using NodaTime.Text;
 
 namespace JournalCli.Core
 {
@@ -19,7 +18,7 @@ namespace JournalCli.Core
             Body = string.Join(Environment.NewLine, lines.Skip(bodyStartIndex));
             FrontMatter = JournalFrontMatter.FromFilePath(fileSystem, filePath);
             EntryName = fileSystem.Path.GetFileNameWithoutExtension(FilePath) ?? throw new InvalidOperationException();
-            EntryDate = LocalDatePattern.CreateWithCurrentCulture("yyyy.MM.dd").Parse(EntryName).Value;
+            EntryDate = JournalEntry.FileNamePattern.Parse(EntryName).Value;
         }
 
         public string Body { get; }

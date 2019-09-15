@@ -36,8 +36,8 @@ namespace JournalCli.Core
             }
 
             var yaml = sb.ToString();
-            // TODO: Write test to verify that journal entry files always represent its date
-            var journalEntryDate = LocalDate.FromDateTime(DateTime.Parse(fileSystem.Path.GetFileNameWithoutExtension(filePath)));
+            // TEST: Write test to verify that journal entry files always represent its date
+            var journalEntryDate = JournalEntry.FileNamePattern.Parse(fileSystem.Path.GetFileNameWithoutExtension(filePath)).Value;
             return new JournalFrontMatter(yaml, journalEntryDate);
         }
 
@@ -49,7 +49,7 @@ namespace JournalCli.Core
             Readme = readme;
         }
 
-        // TODO: Write test to validate that front matter values will never be incorrectly overwritten.
+        // TEST: Write test to validate that front matter values will never be incorrectly overwritten.
         public JournalFrontMatter(string yamlFrontMatter, LocalDate journalEntryDate)
         {
             yamlFrontMatter = yamlFrontMatter.Trim();
@@ -97,7 +97,6 @@ namespace JournalCli.Core
             }
         }
 
-#warning TEST: are these attributes working correctly?
         [YamlMember(Alias = "tags")]
         public ICollection<string> Tags { get; }
 

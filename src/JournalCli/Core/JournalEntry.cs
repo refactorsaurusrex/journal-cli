@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using JournalCli.Infrastructure;
+using NodaTime.Text;
 
 namespace JournalCli.Core
 {
     public class JournalEntry
     {
+        public static LocalDatePattern FileNamePattern { get; } = LocalDatePattern.CreateWithCurrentCulture("yyyy.MM.dd");
+
         public JournalEntry(IJournalReader journalReader)
         {
             FilePath = journalReader.FilePath;
