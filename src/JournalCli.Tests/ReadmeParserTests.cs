@@ -46,5 +46,15 @@ namespace JournalCli.Tests
             var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
             Assert.Throws<FormatException>(() => new ReadmeParser(invalidReadme, journalDate));
         }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        [InlineData(null)]
+        public void This_ThrowsException_WhenReadmeIsNullEmptyOrWhitespace(string invalidReadme)
+        {
+            var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
+            Assert.Throws<ArgumentException>(() => new ReadmeParser(invalidReadme, journalDate));
+        }
     }
 }

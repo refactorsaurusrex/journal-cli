@@ -125,7 +125,7 @@ namespace JournalCli.Core
         {
             var journalWriter = _readerWriterFactory.CreateWriter();
             var entryFilePath = journalWriter.GetJournalEntryFilePath(entryDate);
-            var frontMatter = new JournalFrontMatter(tags, readme);
+            var frontMatter = new JournalFrontMatter(tags, readme, entryDate);
             journalWriter.Create(frontMatter, entryFilePath, entryDate);
             _systemProcess.Start(entryFilePath);
         }
