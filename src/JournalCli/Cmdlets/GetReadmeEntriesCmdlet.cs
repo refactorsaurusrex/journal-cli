@@ -30,8 +30,9 @@ namespace JournalCli.Cmdlets
             base.ProcessRecord();
 
             var fileSystem = new FileSystem();
-            var readerFactory = new JournalReaderFactory(fileSystem);
-            var journal = Journal.Open(readerFactory, fileSystem, new SystemProcess(), RootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, RootDirectory);
+            var markdownFiles = new MarkdownFiles(fileSystem, RootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, new SystemProcess());
 
             var readMeEntries = journal.GetReadmeEntries(EarliestDate, IncludeFuture);
             WriteObject(readMeEntries, true);

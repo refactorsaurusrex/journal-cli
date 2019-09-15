@@ -42,8 +42,9 @@ namespace JournalCli.Cmdlets
 
             var fileSystem = new FileSystem();
             var systemProcess = new SystemProcess();
-            var readerFactory = new JournalReaderFactory(fileSystem);
-            var journal = Journal.Open(readerFactory, fileSystem, systemProcess, RootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, RootDirectory);
+            var markdownFiles = new MarkdownFiles(fileSystem, RootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
             IEnumerable<string> effectedFiles;
 
             if (DryRun)
@@ -52,13 +53,7 @@ namespace JournalCli.Cmdlets
                 WriteHost(header, ConsoleColor.Cyan);
                 WriteHost(new string('=', header.Length), ConsoleColor.Cyan);
 
-                var index = journal.CreateIndex(false);
-                var journalEntries = index.SingleOrDefault(x => x.Tag == OldName);
-
-                if (journalEntries == null)
-                    throw new InvalidOperationException($"No entries found with the tag '{OldName}'");
-
-                effectedFiles = journalEntries.Entries.Select(e => e.FilePath);
+                effectedFiles = journal.RenameTagDryRun(OldName);
             }
             else
             {
@@ -66,8 +61,7 @@ namespace JournalCli.Cmdlets
                 WriteHost(header, ConsoleColor.Red);
                 WriteHost(new string('=', header.Length), ConsoleColor.Red);
 
-                var journalWriter = new JournalWriter(fileSystem);
-                effectedFiles = journalWriter.RenameTag(journal, OldName, NewName, DryRun);
+                effectedFiles = journal.RenameTag(OldName, NewName, NoBackups);
             }
 
             var counter = 1;

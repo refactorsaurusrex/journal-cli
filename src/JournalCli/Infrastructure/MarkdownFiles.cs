@@ -5,22 +5,32 @@ using SysIO = System.IO;
 
 namespace JournalCli.Infrastructure
 {
-    public class MarkdownFiles
+    public class MarkdownFiles : IMarkdownFiles
     {
-        private const SysIO.FileAttributes Attributes = SysIO.FileAttributes.Hidden | SysIO.FileAttributes.System;
+        private readonly IFileSystem _fileSystem;
+        private readonly string _rootDirectory;
+        private const SysIO.FileAttributes ExcludedAttributes = SysIO.FileAttributes.Hidden | SysIO.FileAttributes.System;
 
-        public static List<string> FindAll(IFileSystem fileSystem, string rootDirectory)
+        public MarkdownFiles(IFileSystem fileSystem, string rootDirectory)
         {
-            var root = fileSystem.DirectoryInfo.FromDirectoryName(rootDirectory);
+            _fileSystem = fileSystem;
+            _rootDirectory = rootDirectory;
+        }
+
+        public List<string> FindAll() => FindAll(_rootDirectory);
+
+        private List<string> FindAll(string rootDirectory)
+        {
+            var root = _fileSystem.DirectoryInfo.FromDirectoryName(rootDirectory);
             var allFiles = new List<string>();
 
-            foreach (var dir in root.EnumerateDirectories().Where(d => (d.Attributes & Attributes) == 0))
+            foreach (var dir in root.EnumerateDirectories().Where(d => (d.Attributes & ExcludedAttributes) == 0))
             {
-                var result = FindAll(fileSystem, dir.FullName);
+                var result = FindAll(dir.FullName);
                 allFiles.AddRange(result);
             }
 
-            var files = fileSystem.Directory.GetFiles(rootDirectory, "*.md");
+            var files = _fileSystem.Directory.GetFiles(rootDirectory, "*.md");
             allFiles.AddRange(files);
             return allFiles;
         }
