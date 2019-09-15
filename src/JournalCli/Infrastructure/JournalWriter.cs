@@ -61,7 +61,7 @@ namespace JournalCli.Infrastructure
             if (!_fileSystem.Directory.Exists(parent))
                 _fileSystem.Directory.CreateDirectory(parent);
 
-            var fileName = JournalEntry.FileNamePattern.Format(entryDate);
+            var fileName = $"{JournalEntry.FileNamePattern.Format(entryDate)}.md";
             var fullPath = _fileSystem.Path.Combine(parent, fileName);
 
             if (_fileSystem.File.Exists(fullPath))

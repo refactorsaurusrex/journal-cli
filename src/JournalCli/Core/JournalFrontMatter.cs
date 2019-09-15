@@ -36,7 +36,6 @@ namespace JournalCli.Core
             }
 
             var yaml = sb.ToString();
-            // TEST: Write test to verify that journal entry files always represent its date
             var journalEntryDate = JournalEntry.FileNamePattern.Parse(fileSystem.Path.GetFileNameWithoutExtension(filePath)).Value;
             return new JournalFrontMatter(yaml, journalEntryDate);
         }
@@ -45,7 +44,7 @@ namespace JournalCli.Core
 
         public JournalFrontMatter(IEnumerable<string> tags, string readme)
         {
-            Tags = tags.Distinct().ToList();
+            Tags = tags?.Distinct().ToList();
             Readme = readme;
         }
 
