@@ -1,37 +1,34 @@
 ﻿using System;
-using System.IO.Abstractions;
+using System.Collections.Generic;
 using System.Linq;
 using JournalCli.Infrastructure;
 using NodaTime;
-using NodaTime.Text;
 
 namespace JournalCli.Core
 {
     internal class Journal
     {
-        private readonly IJournalReaderFactory _journalReaderFactory;
-        private readonly IFileSystem _fileSystem;
+        private readonly IJournalReaderWriterFactory _readerWriterFactory;
+        private readonly IMarkdownFiles _markdownFiles;
         private readonly ISystemProcess _systemProcess;
-        private readonly string _rootDirectory;
 
-        public static Journal Open(IJournalReaderFactory readerFactory, IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
+        public static Journal Open(IJournalReaderWriterFactory readerWriterFactory, IMarkdownFiles markdownFiles, ISystemProcess systemProcess)
         {
-            return new Journal(readerFactory, fileSystem, systemProcess, rootDirectory);
+            return new Journal(readerWriterFactory, markdownFiles, systemProcess);
         }
 
-        private Journal(IJournalReaderFactory readerFactory, IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
+        private Journal(IJournalReaderWriterFactory readerWriterFactory, IMarkdownFiles markdownFiles, ISystemProcess systemProcess)
         {
-            _journalReaderFactory = readerFactory;
-            _fileSystem = fileSystem;
+            _readerWriterFactory = readerWriterFactory;
+            _markdownFiles = markdownFiles;
             _systemProcess = systemProcess;
-            _rootDirectory = rootDirectory;
         }
 
         public void OpenRandomEntry(string[] tags)
         {
             if (tags == null || tags.Length == 0)
             {
-                var entries = MarkdownFiles.FindAll(_fileSystem, _rootDirectory);
+                var entries = _markdownFiles.FindAll();
 
                 if (entries.Count == 0)
                     throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
@@ -58,22 +55,54 @@ namespace JournalCli.Core
         public ReadmeJournalEntryCollection GetReadmeEntries(LocalDate maxDate, bool includeFuture)
         {
             var readmeCollection = new ReadmeJournalEntryCollection(maxDate, includeFuture);
-            foreach (var file in MarkdownFiles.FindAll(_fileSystem, _rootDirectory))
+            foreach (var file in _markdownFiles.FindAll())
             {
-                var reader = _journalReaderFactory.CreateReader(file);
+                var reader = _readerWriterFactory.CreateReader(file);
                 readmeCollection.Add(reader);
             }
 
             return readmeCollection;
         }
 
+        public IEnumerable<string> RenameTagDryRun(string oldName)
+        {
+            var index = CreateIndex(false);
+            var journalEntries = index.SingleOrDefault(x => x.Tag == oldName);
+
+            if (journalEntries == null)
+                throw new InvalidOperationException($"No entries found with the tag '{oldName}'");
+
+            return journalEntries.Entries.Select(e => e.FilePath).ToList();
+        }
+
+        public IEnumerable<string> RenameTag(string oldName, string newName, bool createBackups)
+        {
+            var index = CreateIndex(false);
+            var journalEntries = index.SingleOrDefault(x => x.Tag == oldName);
+
+            if (journalEntries == null)
+                throw new InvalidOperationException($"No entries found with the tag '{oldName}'");
+
+            var writer = _readerWriterFactory.CreateWriter();
+            var filePaths = new List<string>();
+            foreach (var journalEntry in journalEntries.Entries)
+            {
+                filePaths.Add(journalEntry.FilePath);
+                var reader = _readerWriterFactory.CreateReader(journalEntry.FilePath);
+                writer.RenameTag(reader, oldName, newName, createBackups);
+            }
+
+            return filePaths;
+        }
+
+        // TODO: Rethink when we will return CompleteJournalEntry vs just JournalEntry
         public JournalIndex CreateIndex(bool includeHeaders)
         {
             var index = new JournalIndex();
 
-            foreach (var file in MarkdownFiles.FindAll(_fileSystem, _rootDirectory))
+            foreach (var file in _markdownFiles.FindAll())
             {
-                var reader = _journalReaderFactory.CreateReader(file);
+                var reader = _readerWriterFactory.CreateReader(file);
                 var entry = new JournalEntry(reader);
                 foreach (var tag in entry.Tags)
                 {
@@ -94,23 +123,11 @@ namespace JournalCli.Core
 
         public void CreateNewEntry(LocalDate entryDate, string[] tags, string readme)
         {
-            var year = entryDate.Year.ToString();
-            var month = $"{entryDate.Month:00} {entryDate:MMMM}";
-            var parent = _fileSystem.Path.Combine(_rootDirectory, year, month);
-
-            if (!_fileSystem.Directory.Exists(parent))
-                _fileSystem.Directory.CreateDirectory(parent);
-
-            var fileName = JournalEntry.FileNamePattern.Format(entryDate);
-            var fullPath = _fileSystem.Path.Combine(parent, fileName);
-
-            if (_fileSystem.File.Exists(fullPath))
-                throw new InvalidOperationException($"Journal entry already exists: '{fullPath}'");
-
-            var journalWriter = new JournalWriter(_fileSystem);
+            var journalWriter = _readerWriterFactory.CreateWriter();
+            var entryFilePath = journalWriter.GetJournalEntryFilePath(entryDate);
             var frontMatter = new JournalFrontMatter(tags, readme);
-            journalWriter.Create(frontMatter, fullPath, entryDate);
-            _systemProcess.Start(fullPath);
+            journalWriter.Create(frontMatter, entryFilePath, entryDate);
+            _systemProcess.Start(entryFilePath);
         }
     }
 }
