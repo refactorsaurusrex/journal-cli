@@ -24,4 +24,10 @@
     <ProjectReference Include="..\JournalCli\JournalCli.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestData\SampleJournalEntry.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
