@@ -25,8 +25,7 @@ namespace JournalCli.Cmdlets
             if (!DryRun)
                 WriteHost(_warning, ConsoleColor.Red);
 
-            // TODO: Move ShouldContinue to base class
-            if (!DryRun && !ShouldContinue("Do you want to continue?", $"Deleting '{Constants.BackupFileExtension}' files..."))
+            if (!DryRun && !AreYouSure($"Deleting '{Constants.BackupFileExtension}' files..."))
                 return;
 
             var fileSystem = new FileSystem();
