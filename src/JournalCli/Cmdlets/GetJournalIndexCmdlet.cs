@@ -29,7 +29,8 @@ namespace JournalCli.Cmdlets
 
             var fileSystem = new FileSystem();
             var systemProcess = new SystemProcess();
-            var journal = Journal.Open(fileSystem, systemProcess, RootDirectory);
+            var readerFactory = new JournalReaderFactory(fileSystem);
+            var journal = Journal.Open(readerFactory, fileSystem, systemProcess, RootDirectory);
             var index = journal.CreateIndex(IncludeHeaders);
 
             switch (OrderBy)

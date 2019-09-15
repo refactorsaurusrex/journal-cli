@@ -22,7 +22,8 @@ namespace JournalCli.Cmdlets
             base.ProcessRecord();
             var fileSystem = new FileSystem();
             var systemProcess = new SystemProcess();
-            var journal = Journal.Open(fileSystem, systemProcess, RootDirectory);
+            var readerFactory = new JournalReaderFactory(fileSystem);
+            var journal = Journal.Open(readerFactory, fileSystem, systemProcess, RootDirectory);
             var index = journal.CreateIndex(IncludeHeaders);
 
             var result = index.Where(x => Tags.Contains(x.Tag));

@@ -8,17 +8,20 @@ namespace JournalCli.Core
 {
     internal class Journal
     {
+        private readonly IJournalReaderFactory _journalReaderFactory;
         private readonly IFileSystem _fileSystem;
         private readonly ISystemProcess _systemProcess;
         private readonly string _rootDirectory;
 
-        public static Journal Open(IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
+        // TODO: Can this be refactored so that that IFileSystem isn't needed any longer?
+        public static Journal Open(IJournalReaderFactory readerFactory, IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
         {
-            return new Journal(fileSystem, systemProcess, rootDirectory);
+            return new Journal(readerFactory, fileSystem, systemProcess, rootDirectory);
         }
 
-        private Journal(IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
+        private Journal(IJournalReaderFactory readerFactory, IFileSystem fileSystem, ISystemProcess systemProcess, string rootDirectory)
         {
+            _journalReaderFactory = readerFactory;
             _fileSystem = fileSystem;
             _systemProcess = systemProcess;
             _rootDirectory = rootDirectory;
@@ -28,6 +31,7 @@ namespace JournalCli.Core
         {
             if (tags == null || tags.Length == 0)
             {
+                // TODO: Why isn't this using the MarkdownFiles type?
                 var di = _fileSystem.DirectoryInfo.FromDirectoryName(_rootDirectory);
                 var entries = di.GetFiles("*.md", SysIO.SearchOption.AllDirectories).ToList();
 
@@ -59,7 +63,8 @@ namespace JournalCli.Core
 
             foreach (var file in MarkdownFiles.FindAll(_fileSystem, _rootDirectory))
             {
-                var entry = new JournalEntry(_fileSystem, file, includeHeaders);
+                var reader = _journalReaderFactory.CreateReader(file);
+                var entry = new JournalEntry(reader);
                 foreach (var tag in entry.Tags)
                 {
                     if (index.Contains(tag))
