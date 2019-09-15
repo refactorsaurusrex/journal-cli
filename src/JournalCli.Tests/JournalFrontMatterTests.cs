@@ -9,15 +9,15 @@ namespace JournalCli.Tests
     public class JournalFrontMatterTests
     {
         [Theory]
-        [InlineData("Tags:\r\n  - one\r\n  - one", "Tags:\r\n  - one", 1)]
-        [InlineData("Tags:\r\n  - one\r\n  - one\r\n  - two", "Tags:\r\n  - one\r\n  - two", 2)]
+        [InlineData("Tags:\r\n  - one\r\n  - one", "tags:\r\n  - one", 1)]
+        [InlineData("Tags:\r\n  - one\r\n  - one\r\n  - two", "tags:\r\n  - one\r\n  - two", 2)]
         public void This_RemovesDuplicateTags_WhenPresent(string duplicateTags, string expectedYaml, int expectedCount)
         {
             var journalDate = new LocalDate(2019, 9, 8);
             var frontMatter = new JournalFrontMatter(duplicateTags, journalDate);
 
             frontMatter.Tags.Count.Should().Be(expectedCount);
-            frontMatter.ToString().Should().BeEquivalentTo(expectedYaml);
+            frontMatter.ToString().Should().Be(expectedYaml);
         }
 
         [Fact]
@@ -29,19 +29,19 @@ namespace JournalCli.Tests
             var text = frontMatter.ToString();
 
             // Should include nothing but the originally supplied tags.
-            text.Should().BeEquivalentTo(yaml);
+            text.Should().Be(yaml.ToLowerInvariant());
         }
 
         [Theory]
-        [InlineData("Tags:\r\n  - one\r\n  - two", "---\r\nTags:\r\n  - one\r\n  - two\r\n---")]
-        [InlineData("Tags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017", "---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 8-1-2017\r\n---")]
-        [InlineData("Tags:\r\n  - Thing\r\nReadme: 2 years", "---\r\nTags:\r\n  - Thing\r\nReadme: 2 years\r\n---")]
+        [InlineData("Tags:\r\n  - one\r\n  - two", "---\r\ntags:\r\n  - one\r\n  - two\r\n---")]
+        [InlineData("Tags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017", "---\r\ntags:\r\n  - one\r\n  - two\r\nreadme: 8-1-2017\r\n---")]
+        [InlineData("Tags:\r\n  - Thing\r\nReadme: 2 years", "---\r\ntags:\r\n  - Thing\r\nreadme: 2 years\r\n---")]
         public void ToString_ReturnsValidFrontMatter_Always(string input, string expectedResult)
         {
             var journalDate = new LocalDate(2019, 9, 8);
             var frontMatter = new JournalFrontMatter(input, journalDate);
             var text = frontMatter.ToString(true);
-            text.Should().BeEquivalentTo(expectedResult);
+            text.Should().Be(expectedResult);
         }
 
         [Theory]
@@ -50,7 +50,7 @@ namespace JournalCli.Tests
         {
             var journalDate = new LocalDate(2019, 9, 8);
             var frontMatter = new JournalFrontMatter(input, journalDate);
-            frontMatter.ToString().Should().BeEquivalentTo(toString);
+            frontMatter.ToString().Should().Be(toString);
             frontMatter.Readme.Should().Be(expectedReadmeString);
             frontMatter.Tags.Should().BeEquivalentTo(expectedTags);
         }
@@ -59,15 +59,15 @@ namespace JournalCli.Tests
         {
             yield return new object[]
             {
-                "---\r\nTags:\r\n  - one\r\n  - two\r\n---", "Tags:\r\n  - one\r\n  - two", null, new List<string> { "one", "two" }
+                "---\r\nTags:\r\n  - one\r\n  - two\r\n---", "tags:\r\n  - one\r\n  - two", null, new List<string> { "one", "two" }
             };
             yield return new object[]
             {
-                "---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017\r\n---", "Tags:\r\n  - one\r\n  - two\r\nReadme: 8-1-2017", "8-1-2017", new List<string> { "one", "two" }
+                "---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017\r\n---", "tags:\r\n  - one\r\n  - two\r\nreadme: 8-1-2017", "8-1-2017", new List<string> { "one", "two" }
             };
             yield return new object[]
             {
-                "---\r\nTags:\r\n  - Thing\r\nReadme: 2 years\r\n---", "Tags:\r\n  - Thing\r\nReadme: 2 years", "2 years", new List<string> { "Thing" }
+                "---\r\nTags:\r\n  - Thing\r\nReadme: 2 years\r\n---", "tags:\r\n  - Thing\r\nreadme: 2 years", "2 years", new List<string> { "Thing" }
             };
         }
     }
