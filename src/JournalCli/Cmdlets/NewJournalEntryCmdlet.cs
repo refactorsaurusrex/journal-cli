@@ -5,6 +5,7 @@ using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
+using NodaTime;
 
 namespace JournalCli.Cmdlets
 {
@@ -26,7 +27,7 @@ namespace JournalCli.Cmdlets
         {
             base.ProcessRecord();
             
-            var entryDate = DateTime.Today.AddDays(DateOffset);
+            var entryDate = Today.Date();
             var fileSystem = new FileSystem();
             var readerFactory = new JournalReaderFactory(fileSystem);
             var journal = Journal.Open(readerFactory, fileSystem, new SystemProcess(), RootDirectory);

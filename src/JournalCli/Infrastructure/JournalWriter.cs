@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using JournalCli.Core;
+using NodaTime;
 
 namespace JournalCli.Infrastructure
 {
@@ -12,12 +13,12 @@ namespace JournalCli.Infrastructure
 
         public JournalWriter(IFileSystem fileSystem) => _fileSystem = fileSystem;
 
-        public void Create(IJournalFrontMatter journalFrontMatter, string filePath, DateTime entryDate)
+        public void Create(IJournalFrontMatter journalFrontMatter, string filePath, LocalDate entryDate)
         {
             using (var fs = _fileSystem.File.CreateText(filePath))
             {
                 fs.WriteLine(journalFrontMatter.ToString(asFrontMatter: true));
-                fs.WriteLine($"# {entryDate.ToLongDateString()}");
+                fs.WriteLine($"# {entryDate.ToString()}");
                 fs.Flush();
             }
         }

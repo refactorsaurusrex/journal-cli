@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using JournalCli.Infrastructure;
 using NodaTime;
+using NodaTime.Text;
 
 namespace JournalCli.Core
 {
@@ -91,7 +92,7 @@ namespace JournalCli.Core
             return index;
         }
 
-        public void CreateNewEntry(DateTime entryDate, string[] tags, string readme)
+        public void CreateNewEntry(LocalDate entryDate, string[] tags, string readme)
         {
             var year = entryDate.Year.ToString();
             var month = $"{entryDate.Month:00} {entryDate:MMMM}";
@@ -100,7 +101,7 @@ namespace JournalCli.Core
             if (!_fileSystem.Directory.Exists(parent))
                 _fileSystem.Directory.CreateDirectory(parent);
 
-            var fileName = entryDate.ToString("yyyy.MM.dd.'md'");
+            var fileName = JournalEntry.FileNamePattern.Format(entryDate);
             var fullPath = _fileSystem.Path.Combine(parent, fileName);
 
             if (_fileSystem.File.Exists(fullPath))
