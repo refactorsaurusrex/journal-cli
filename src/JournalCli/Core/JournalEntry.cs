@@ -1,30 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
+﻿using System.Collections.Generic;
+using JournalCli.Infrastructure;
 
 namespace JournalCli.Core
 {
     public class JournalEntry
     {
-        private readonly IFileSystem _fileSystem;
-
-        public JournalEntry(IFileSystem fileSystem, string filePath, bool includeHeaders)
+        public JournalEntry(IJournalReader journalReader)
         {
-            _fileSystem = fileSystem;
-            FilePath = filePath;
-            var entryFile = new JournalEntryFile(fileSystem, filePath);
-            Tags = entryFile.GetTags();
-
-            if (includeHeaders)
-                Headers = entryFile.GetHeaders();
+            FilePath = journalReader.FilePath;
+            Tags = journalReader.FrontMatter.Tags;
+            EntryName = journalReader.EntryName;
         }
 
         public string FilePath { get; }
 
-        public ICollection<string> Tags { get; set; }
+        public string EntryName { get; }
 
-        public ICollection<string> Headers { get; set; }
+        public ICollection<string> Tags { get; }
 
-        public override string ToString() => _fileSystem.Path.GetFileNameWithoutExtension(FilePath) ?? throw new InvalidOperationException();
+        public override string ToString() => EntryName;
     }
 }

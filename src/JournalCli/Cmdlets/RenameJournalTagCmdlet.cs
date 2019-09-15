@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
@@ -41,42 +42,39 @@ namespace JournalCli.Cmdlets
 
             var fileSystem = new FileSystem();
             var systemProcess = new SystemProcess();
-            var journal = Journal.Open(fileSystem, systemProcess, RootDirectory);
-            var index = journal.CreateIndex(false);
-            var journalEntries = index.SingleOrDefault(x => x.Tag == OldName);
-
-            if (journalEntries == null)
-                throw new PSInvalidOperationException($"No entries found with the tag '{OldName}'");
+            var readerFactory = new JournalReaderFactory(fileSystem);
+            var journal = Journal.Open(readerFactory, fileSystem, systemProcess, RootDirectory);
+            IEnumerable<string> effectedFiles;
 
             if (DryRun)
             {
                 const string header = "Tags in these file(s) would be renamed:";
                 WriteHost(header, ConsoleColor.Cyan);
                 WriteHost(new string('=', header.Length), ConsoleColor.Cyan);
+
+                var index = journal.CreateIndex(false);
+                var journalEntries = index.SingleOrDefault(x => x.Tag == OldName);
+
+                if (journalEntries == null)
+                    throw new InvalidOperationException($"No entries found with the tag '{OldName}'");
+
+                effectedFiles = journalEntries.Entries.Select(e => e.FilePath);
             }
             else
             {
                 const string header = "Tags in these file(s) have been renamed:";
                 WriteHost(header, ConsoleColor.Red);
                 WriteHost(new string('=', header.Length), ConsoleColor.Red);
+
+                var journalWriter = new JournalWriter(fileSystem);
+                effectedFiles = journalWriter.RenameTag(journal, OldName, NewName, DryRun);
             }
 
             var counter = 1;
-            foreach (var journalEntry in journalEntries.Entries)
+            var consoleColor = DryRun ? ConsoleColor.Cyan : ConsoleColor.Red;
+            foreach (var file in effectedFiles)
             {
-                if (DryRun)
-                {
-                    WriteHost($"{counter++.ToString().PadLeft(3)}) {journalEntry.FilePath}", ConsoleColor.Cyan);
-                    continue;
-                }
-
-                var file = new JournalEntryFile(fileSystem, journalEntry.FilePath);
-                var currentTags = file.GetTags().ToList();
-                var oldItemIndex = currentTags.IndexOf(OldName);
-                currentTags[oldItemIndex] = NewName;
-
-                file.WriteTags(currentTags, !NoBackups);
-                WriteHost($"{counter++.ToString().PadLeft(3)}) {journalEntry.FilePath}", ConsoleColor.Red);
+                WriteHost($"{counter++.ToString().PadLeft(3)}) {file}", consoleColor);
             }
         }
     }
