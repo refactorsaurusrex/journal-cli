@@ -2,6 +2,7 @@
 using System.IO.Abstractions;
 using System.Linq;
 using JournalCli.Infrastructure;
+using NodaTime;
 using SysIO = System.IO;
 
 namespace JournalCli.Core
@@ -57,6 +58,18 @@ namespace JournalCli.Core
             }
         }
 
+        public ReadmeJournalEntryCollection GetReadmeEntries(LocalDate maxDate, bool includeFuture)
+        {
+            var readmeCollection = new ReadmeJournalEntryCollection(maxDate, includeFuture);
+            foreach (var file in MarkdownFiles.FindAll(_fileSystem, _rootDirectory))
+            {
+                var reader = _journalReaderFactory.CreateReader(file);
+                readmeCollection.Add(reader);
+            }
+
+            return readmeCollection;
+        }
+
         public JournalIndex CreateIndex(bool includeHeaders)
         {
             var index = new JournalIndex();
@@ -82,7 +95,7 @@ namespace JournalCli.Core
             return index;
         }
 
-        public void CreateNewEntry(DateTime entryDate, string[] tags)
+        public void CreateNewEntry(DateTime entryDate, string[] tags, string readme)
         {
             var year = entryDate.Year.ToString();
             var month = $"{entryDate.Month:00} {entryDate:MMMM}";
@@ -97,26 +110,9 @@ namespace JournalCli.Core
             if (_fileSystem.File.Exists(fullPath))
                 throw new InvalidOperationException($"Journal entry already exists: '{fullPath}'");
 
-            using (var fs = _fileSystem.File.CreateText(fullPath))
-            {
-                fs.WriteLine("---");
-                fs.WriteLine("tags:");
-
-                if (tags == null || tags.Length == 0)
-                {
-                    fs.WriteLine("  - ");
-                }
-                else
-                {
-                    foreach (var tag in tags)
-                        fs.WriteLine($"  - {tag}");
-                }
-
-                fs.WriteLine("---");
-                fs.WriteLine($"# {entryDate.ToLongDateString()}");
-                fs.Flush();
-            }
-
+            var journalWriter = new JournalWriter(_fileSystem);
+            var frontMatter = new JournalFrontMatter(tags, readme);
+            journalWriter.Create(frontMatter, fullPath, entryDate);
             _systemProcess.Start(fullPath);
         }
     }

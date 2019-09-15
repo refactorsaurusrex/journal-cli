@@ -19,13 +19,18 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public string[] Tags { get; set; }
 
+        [Parameter]
+        public string Readme { get; set; }
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
             
             var entryDate = DateTime.Today.AddDays(DateOffset);
-            var journal = Journal.Open(new FileSystem(), new SystemProcess(), RootDirectory);
-            journal.CreateNewEntry(entryDate, Tags);
+            var fileSystem = new FileSystem();
+            var readerFactory = new JournalReaderFactory(fileSystem);
+            var journal = Journal.Open(readerFactory, fileSystem, new SystemProcess(), RootDirectory);
+            journal.CreateNewEntry(entryDate, Tags, Readme);
         }
     }
 }
