@@ -6,10 +6,9 @@ namespace JournalCli.Infrastructure
     internal abstract class EncryptedStore<T> : IEncryptedStore<T>
         where T : class, new()
     {
-        protected EncryptedStore()
+        protected EncryptedStore(IFileSystem fileSystem)
         {
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var fileSystem = new FileSystem();
             var path = fileSystem.Path.Combine(appData, "JournalCli");
             StorageLocation = path;
         }

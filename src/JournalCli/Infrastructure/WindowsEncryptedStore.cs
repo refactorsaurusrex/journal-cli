@@ -13,6 +13,7 @@ namespace JournalCli.Infrastructure
         private readonly string _entropyPath;
 
         public WindowsEncryptedStore(IFileSystem fileSystem)
+            : base(fileSystem)
         {
             _fileSystem = fileSystem;
             _entropyPath = _fileSystem.Path.Combine(StorageLocation, "e");
