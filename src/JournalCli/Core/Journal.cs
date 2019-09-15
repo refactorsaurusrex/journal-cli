@@ -32,15 +32,13 @@ namespace JournalCli.Core
         {
             if (tags == null || tags.Length == 0)
             {
-                // TODO: Why isn't this using the MarkdownFiles type?
-                var di = _fileSystem.DirectoryInfo.FromDirectoryName(_rootDirectory);
-                var entries = di.GetFiles("*.md", SysIO.SearchOption.AllDirectories).ToList();
+                var entries = MarkdownFiles.FindAll(_fileSystem, _rootDirectory);
 
                 if (entries.Count == 0)
                     throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
 
                 var index = new Random().Next(0, entries.Count - 1);
-                _systemProcess.Start(entries[index].FullName);
+                _systemProcess.Start(entries[index]);
             }
             else
             {
