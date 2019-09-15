@@ -103,13 +103,13 @@ namespace JournalCli.Core
         public string Readme { get; }
 
         [YamlIgnore]
-        public LocalDate ReadmeDate { get; }
+        public LocalDate? ReadmeDate { get; }
 
         public string ToString(bool asFrontMatter)
         {
             var serializer = new SerializerBuilder().Build();
             var yaml = serializer.Serialize(this).Replace("- ", "  - ").Trim();
-            return asFrontMatter ? $"{BlockIndicator}{Environment.NewLine}{yaml}{Environment.NewLine}{BlockIndicator}" : yaml;
+            return asFrontMatter ? $"{BlockIndicator}{Environment.NewLine}{yaml}{Environment.NewLine}{BlockIndicator}{Environment.NewLine}" : yaml;
         }
 
         public override string ToString() => ToString(false);

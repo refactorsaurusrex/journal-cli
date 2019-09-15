@@ -33,9 +33,9 @@ namespace JournalCli.Tests
         }
 
         [Theory]
-        [InlineData("Tags:\r\n  - one\r\n  - two", "---\r\ntags:\r\n  - one\r\n  - two\r\n---")]
-        [InlineData("Tags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017", "---\r\ntags:\r\n  - one\r\n  - two\r\nreadme: 8-1-2017\r\n---")]
-        [InlineData("Tags:\r\n  - Thing\r\nReadme: 2 years", "---\r\ntags:\r\n  - Thing\r\nreadme: 2 years\r\n---")]
+        [InlineData("Tags:\r\n  - one\r\n  - two", "---\r\ntags:\r\n  - one\r\n  - two\r\n---\r\n")]
+        [InlineData("Tags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017", "---\r\ntags:\r\n  - one\r\n  - two\r\nreadme: 8-1-2017\r\n---\r\n")]
+        [InlineData("Tags:\r\n  - Thing\r\nReadme: 2 years", "---\r\ntags:\r\n  - Thing\r\nreadme: 2 years\r\n---\r\n")]
         public void ToString_ReturnsValidFrontMatter_Always(string input, string expectedResult)
         {
             var journalDate = new LocalDate(2019, 9, 8);
