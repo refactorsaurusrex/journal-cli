@@ -45,10 +45,8 @@ namespace JournalCli.Infrastructure
                 _fileSystem.File.Copy(journalReader.FilePath, backupName);
             }
 
-            var frontMatter = new JournalFrontMatter(currentTags, journalReader.FrontMatter.Readme);
-            var originalEntry = _fileSystem.File.ReadAllText(journalReader.FilePath);
-            // TEST: Ensure newEntry is as expected
-            var newEntry = frontMatter + originalEntry;
+            var frontMatter = new JournalFrontMatter(currentTags, journalReader.FrontMatter.Readme, journalReader.EntryDate);
+            var newEntry = frontMatter.ToString(asFrontMatter: true) + journalReader.Body;
             _fileSystem.File.WriteAllText(journalReader.FilePath, newEntry);
         }
 
