@@ -31,8 +31,8 @@ namespace JournalCli.Infrastructure
 
         private static void ValidateCount(int count)
         {
-            if (count < 1)
-                throw new ArgumentException($"'{nameof(count)}' must be greater than or equal to 1.", nameof(count));
+            if (count < 0)
+                throw new ArgumentException($"'{nameof(count)}' must be greater than or equal to 0.", nameof(count));
         }
 
         private static LocalDate SubtractFromToday(Period period)

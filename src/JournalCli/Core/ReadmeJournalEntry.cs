@@ -1,4 +1,5 @@
 ﻿using JournalCli.Infrastructure;
+using NodaTime;
 
 namespace JournalCli.Core
 {
@@ -7,9 +8,10 @@ namespace JournalCli.Core
         public ReadmeJournalEntry(IJournalReader journalReader)
             : base(journalReader)
         {
-            ReadmeDate = journalReader.FrontMatter.Readme;
+            // ReSharper disable once PossibleInvalidOperationException
+            ReadmeDate = journalReader.FrontMatter.ReadmeDate.Value;
         }
 
-        public string ReadmeDate { get; }
+        public LocalDate ReadmeDate { get; }
     }
 }

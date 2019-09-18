@@ -1,9 +1,7 @@
 using System;
-using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using AutoFixture;
-using FakeItEasy;
 using FluentAssertions;
 using JournalCli.Core;
 using JournalCli.Infrastructure;

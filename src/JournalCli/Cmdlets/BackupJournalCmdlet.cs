@@ -41,14 +41,10 @@ namespace JournalCli.Cmdlets
             }
 
             if (!string.IsNullOrWhiteSpace(Password))
-            {
                 settings.BackupPassword = Password;
-            }
 
             if (SaveParameters)
-            {
                 encryptedStore.Save(settings);
-            }
 
             if (!fileSystem.Directory.Exists(BackupLocation))
                 fileSystem.Directory.CreateDirectory(BackupLocation);

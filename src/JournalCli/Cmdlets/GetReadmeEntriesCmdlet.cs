@@ -9,7 +9,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "ReadMeEntries")]
-    [OutputType(typeof(ReadmeJournalEntry[]))]
+    [OutputType(typeof(ReadmeJournalEntryCollection))]
     public class GetReadmeEntriesCmdlet : JournalCmdletBase
     {
         [Parameter(DontShow = true)]

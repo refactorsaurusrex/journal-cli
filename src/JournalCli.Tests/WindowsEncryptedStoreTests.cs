@@ -65,6 +65,19 @@ namespace JournalCli.Tests
         }
 
         [Fact]
+        public void Load_ReturnsEmptyObject_WhenExceptionIsEncountered()
+        {
+            var fileSystem = A.Fake<IFileSystem>();
+            A.CallTo(() => fileSystem.File.ReadAllBytes(A<string>._)).Throws<UnauthorizedAccessException>();
+            A.CallTo(() => fileSystem.File.Exists(A<string>._)).Returns(true);
+            var store = new WindowsEncryptedStore<UserSettings>(fileSystem);
+            var settings = store.Load();
+
+            settings.Should().NotBeNull();
+            settings.Should().BeEquivalentTo(new UserSettings());
+        }
+
+        [Fact]
         public void Save_UsesSavedTypesSimpleNameAsCipherName()
         {
             var fileSystem = new MockFileSystem();

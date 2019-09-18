@@ -32,6 +32,7 @@ namespace JournalCli.Tests
             var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
             var parser = new ReadmeParser(readmeValue, journalDate);
             parser.FormattedExpirationDate.Should().BeEquivalentTo(expectedResult);
+            parser.ExpirationDate.Should().Be(LocalDate.FromDateTime(DateTime.Parse(expectedResult)));
         }
 
         [Theory]
@@ -41,17 +42,27 @@ namespace JournalCli.Tests
         [InlineData("asdf")]
         [InlineData("this is a test")]
         [InlineData("!@#$%^")]
-        public void This_ThrowsException_WhenReadmeIsInvalid(string invalidReadme)
+        [InlineData("2.8 years")]
+        public void This_ThrowsFormatException_WhenReadmeFormatIsInvalid(string invalidReadme)
         {
             var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
             Assert.Throws<FormatException>(() => new ReadmeParser(invalidReadme, journalDate));
         }
 
         [Theory]
+        [InlineData("1 thing")]
+        [InlineData("13 horses")]
+        public void This_ThrowsNotSupportedException_WhenInvalidDurationProvided(string invalidReadme)
+        {
+            var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
+            Assert.Throws<NotSupportedException>(() => new ReadmeParser(invalidReadme, journalDate));
+        }
+
+        [Theory]
         [InlineData("")]
         [InlineData("   ")]
         [InlineData(null)]
-        public void This_ThrowsException_WhenReadmeIsNullEmptyOrWhitespace(string invalidReadme)
+        public void This_ThrowsArgumentException_WhenReadmeIsNullEmptyOrWhitespace(string invalidReadme)
         {
             var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
             Assert.Throws<ArgumentException>(() => new ReadmeParser(invalidReadme, journalDate));

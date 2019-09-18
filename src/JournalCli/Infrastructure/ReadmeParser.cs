@@ -58,7 +58,6 @@ namespace JournalCli.Infrastructure
             }
         }
 
-        // TEST: Test that ExpirationDate is correct value
         public LocalDate ExpirationDate { get; }
 
         public string FormattedExpirationDate { get; }

@@ -25,7 +25,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestData\SampleJournalEntry.md">
+    <None Update="TestData\EntryWithoutFrontMatter.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\EmptyEntry.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\EntryWithTags.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\EntryWithTagsAndReadme.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
