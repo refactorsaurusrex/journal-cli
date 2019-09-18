@@ -115,8 +115,17 @@ namespace JournalCli.Core
         [YamlIgnore]
         public LocalDate? ReadmeDate { get; }
 
+        /// <inheritdoc />
+        public bool IsEmpty() => string.IsNullOrWhiteSpace(Readme) && (Tags == null || Tags.Count == 0);
+
+        /// <inheritdoc />
+        public bool HasTags() => Tags != null && Tags.Count > 0;
+
         public string ToString(bool asFrontMatter)
         {
+            if (IsEmpty())
+                return "";
+
             var serializer = new SerializerBuilder().Build();
             var yaml = serializer.Serialize(this).Replace("- ", "  - ").Trim();
             return asFrontMatter ? $"{BlockIndicator}{Environment.NewLine}{yaml}{Environment.NewLine}{BlockIndicator}{Environment.NewLine}" : yaml;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using JournalCli.Core;
@@ -22,7 +21,7 @@ namespace JournalCli.Infrastructure
         {
             using (var fs = _fileSystem.File.CreateText(filePath))
             {
-                fs.WriteLine(journalFrontMatter.ToString(asFrontMatter: true));
+                fs.Write(journalFrontMatter.ToString(asFrontMatter: true));
                 fs.WriteLine($"# {entryDate.ToString()}");
                 fs.Flush();
             }
@@ -30,8 +29,21 @@ namespace JournalCli.Infrastructure
 
         public void RenameTag(IJournalReader journalReader, string oldTag, string newTag, bool createBackup)
         {
+            if (string.IsNullOrWhiteSpace(oldTag) || string.IsNullOrWhiteSpace(newTag))
+                throw new ArgumentNullException($"'{nameof(oldTag)}' cannot be null, empty, or whitespace.", nameof(oldTag));
+
+            if (string.IsNullOrWhiteSpace(newTag))
+                throw new ArgumentNullException($"'{nameof(newTag)}' cannot be null, empty, or whitespace.", nameof(newTag));
+
+            if (!journalReader.FrontMatter.HasTags())
+                throw new InvalidOperationException("No tags exist in this journal.");
+
             var currentTags = journalReader.FrontMatter.Tags.ToList();
             var oldItemIndex = currentTags.IndexOf(oldTag);
+
+            if (oldItemIndex < 0)
+                throw new InvalidOperationException($"The tag '{oldTag}' does not exist.");
+
             currentTags[oldItemIndex] = newTag;
 
             if (createBackup)

@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
@@ -9,6 +10,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "JournalEntriesByTag")]
+    [OutputType(typeof(IEnumerable<JournalIndexEntry>))]
     public class GetJournalEntriesByTagCmdlet : JournalCmdletBase
     {
         [Parameter(Mandatory = true)]

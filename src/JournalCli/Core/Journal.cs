@@ -24,7 +24,7 @@ namespace JournalCli.Core
             _systemProcess = systemProcess;
         }
 
-        public void OpenRandomEntry(string[] tags)
+        public void OpenRandomEntry(params string[] tags)
         {
             if (tags == null || tags.Length == 0)
             {
@@ -43,6 +43,9 @@ namespace JournalCli.Core
                     throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
 
                 var allTaggedEntries = journalIndex.Where(x => tags.Contains(x.Tag)).ToList();
+                if (allTaggedEntries.Count == 0)
+                    throw new InvalidOperationException("No entries were found with any of the tags provided.");
+
                 var random = new Random();
                 var randomIndex1 = random.Next(0, allTaggedEntries.Count - 1);
                 var entries = allTaggedEntries[randomIndex1].Entries;
@@ -52,9 +55,9 @@ namespace JournalCli.Core
             }
         }
 
-        public ReadmeJournalEntryCollection GetReadmeEntries(LocalDate maxDate, bool includeFuture)
+        public ReadmeJournalEntryCollection GetReadmeEntries(LocalDate earliestDate, bool includeFuture)
         {
-            var readmeCollection = new ReadmeJournalEntryCollection(maxDate, includeFuture);
+            var readmeCollection = new ReadmeJournalEntryCollection(earliestDate, includeFuture);
             foreach (var file in _markdownFiles.FindAll())
             {
                 var reader = _readerWriterFactory.CreateReader(file);
@@ -104,6 +107,10 @@ namespace JournalCli.Core
             {
                 var reader = _readerWriterFactory.CreateReader(file);
                 var entry = new JournalEntry(reader);
+
+                if (entry.Tags == null || entry.Tags.Count == 0)
+                    continue;
+
                 foreach (var tag in entry.Tags)
                 {
                     if (index.Contains(tag))

@@ -7,6 +7,7 @@ using SysIO = System.IO;
 
 namespace JournalCli.Cmdlets
 {
+    // TODO: This will be deprecated once git is integrated
     [PublicAPI]
     [Cmdlet(VerbsCommon.Remove, "BackupJournalFiles", ConfirmImpact = ConfirmImpact.High)]
     public class RemoveBackupJournalFilesCmdlet : JournalCmdletBase

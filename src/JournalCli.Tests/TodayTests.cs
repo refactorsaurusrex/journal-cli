@@ -41,5 +41,23 @@ namespace JournalCli.Tests
 
             result.Should().Be(expected);
         }
+
+        [Fact]
+        public void MinusDays_ThrowsArgumentException_WhenCountIsLessThanOne()
+        {
+            Assert.Throws<ArgumentException>(() => Today.MinusDays(-1));
+        }
+
+        [Fact]
+        public void MinusMonths_ThrowsArgumentException_WhenCountIsLessThanOne()
+        {
+            Assert.Throws<ArgumentException>(() => Today.MinusMonths(-1));
+        }
+
+        [Fact]
+        public void MinusYears_ThrowsArgumentException_WhenCountIsLessThanOne()
+        {
+            Assert.Throws<ArgumentException>(() => Today.MinusYears(-1));
+        }
     }
 }
