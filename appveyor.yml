@@ -8,6 +8,8 @@ skip_tags: true
 image: Visual Studio 2017
 build_script:
 - pwsh: '& ".\build.ps1"'
+test_script:
+- dotnet test .\src\JournalCli.Tests\JournalCli.Tests.csproj -c Release
 deploy_script:
 - pwsh: Publish-Module -NuGetApiKey $env:psgallery -Path .\publish\JournalCli
 environment:
