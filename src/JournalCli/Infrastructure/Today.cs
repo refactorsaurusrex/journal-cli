@@ -10,35 +10,50 @@ namespace JournalCli.Infrastructure
 
         public static LocalDate MinusDays(int count)
         {
-            ValidateCount(count);
             var periodBuilder = new PeriodBuilder { Days = count };
             return SubtractFromToday(periodBuilder.Build());
         }
 
         public static LocalDate MinusMonths(int count)
         {
-            ValidateCount(count);
             var periodBuilder = new PeriodBuilder { Months = count };
             return SubtractFromToday(periodBuilder.Build());
         }
 
         public static LocalDate MinusYears(int count)
         {
-            ValidateCount(count);
             var periodBuilder = new PeriodBuilder { Years = count };
             return SubtractFromToday(periodBuilder.Build());
         }
 
-        private static void ValidateCount(int count)
+        public static LocalDate PlusDays(int count)
         {
-            if (count < 0)
-                throw new ArgumentException($"'{nameof(count)}' must be greater than or equal to 0.", nameof(count));
+            var periodBuilder = new PeriodBuilder { Days = count };
+            return AddToToday(periodBuilder.Build());
+        }
+
+        public static LocalDate PlusMonths(int count)
+        {
+            var periodBuilder = new PeriodBuilder { Months = count };
+            return AddToToday(periodBuilder.Build());
+        }
+
+        public static LocalDate PlusYears(int count)
+        {
+            var periodBuilder = new PeriodBuilder { Years = count };
+            return AddToToday(periodBuilder.Build());
         }
 
         private static LocalDate SubtractFromToday(Period period)
         {
             var now = LocalDate.FromDateTime(DateTime.Now);
             return now.Minus(period);
+        }
+
+        private static LocalDate AddToToday(Period period)
+        {
+            var now = LocalDate.FromDateTime(DateTime.Now);
+            return now.Plus(period);
         }
     }
 }

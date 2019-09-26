@@ -28,7 +28,7 @@ namespace JournalCli.Cmdlets
             var ioFactory = new JournalReaderWriterFactory(fileSystem, RootDirectory);
             var markdownFiles = new MarkdownFiles(fileSystem, RootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, new SystemProcess());
-            var entryDate = Today.MinusDays(DateOffset);
+            var entryDate = Today.PlusDays(DateOffset);
             journal.CreateNewEntry(entryDate, Tags, Readme);
         }
     }
