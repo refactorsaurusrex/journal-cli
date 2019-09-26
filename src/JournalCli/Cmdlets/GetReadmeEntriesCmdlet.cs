@@ -8,7 +8,7 @@ using JournalCli.Infrastructure;
 namespace JournalCli.Cmdlets
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Get, "ReadMeEntries")]
+    [Cmdlet(VerbsCommon.Get, "ReadmeEntries")]
     [OutputType(typeof(ReadmeJournalEntryCollection))]
     public class GetReadmeEntriesCmdlet : JournalCmdletBase
     {
