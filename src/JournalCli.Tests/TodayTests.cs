@@ -9,55 +9,82 @@ namespace JournalCli.Tests
 {
     public class TodayTests
     {
-        [Fact]
-        public void MinusDays_ReturnsExpectedDate()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(-11)]
+        [InlineData(151)]
+        public void MinusDays_ReturnsExpectedDate(int count)
         {
-            var fixture = new Fixture();
-            var count = fixture.Create<int>();
             var result = Today.MinusDays(count);
             var expected = LocalDate.FromDateTime(DateTime.Now.AddDays(count * -1).Date);
 
             result.Should().Be(expected);
         }
 
-        [Fact]
-        public void MinusMonths_ReturnsExpectedDate()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(-11)]
+        [InlineData(151)]
+        public void MinusMonths_ReturnsExpectedDate(int count)
         {
-            var fixture = new Fixture();
-            var count = fixture.Create<int>();
             var result = Today.MinusMonths(count);
             var expected = LocalDate.FromDateTime(DateTime.Now.AddMonths(count * -1).Date);
 
             result.Should().Be(expected);
         }
 
-        [Fact]
-        public void MinusYears_ReturnsExpectedDate()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(-11)]
+        [InlineData(151)]
+        public void MinusYears_ReturnsExpectedDate(int count)
         {
-            var fixture = new Fixture();
-            var count = fixture.Create<int>();
             var result = Today.MinusYears(count);
             var expected = LocalDate.FromDateTime(DateTime.Now.AddYears(count * -1).Date);
 
             result.Should().Be(expected);
         }
 
-        [Fact]
-        public void MinusDays_ThrowsArgumentException_WhenCountIsLessThanOne()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(-11)]
+        [InlineData(151)]
+        public void PlusDays_ReturnsExpectedDate(int count)
         {
-            Assert.Throws<ArgumentException>(() => Today.MinusDays(-1));
+            var result = Today.PlusDays(count);
+            var expected = LocalDate.FromDateTime(DateTime.Now.AddDays(count).Date);
+
+            result.Should().Be(expected);
         }
 
-        [Fact]
-        public void MinusMonths_ThrowsArgumentException_WhenCountIsLessThanOne()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(-11)]
+        [InlineData(151)]
+        public void PlusMonths_ReturnsExpectedDate(int count)
         {
-            Assert.Throws<ArgumentException>(() => Today.MinusMonths(-1));
+            var result = Today.PlusMonths(count);
+            var expected = LocalDate.FromDateTime(DateTime.Now.AddMonths(count).Date);
+
+            result.Should().Be(expected);
         }
 
-        [Fact]
-        public void MinusYears_ThrowsArgumentException_WhenCountIsLessThanOne()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(-11)]
+        [InlineData(151)]
+        public void PlusYears_ReturnsExpectedDate(int count)
         {
-            Assert.Throws<ArgumentException>(() => Today.MinusYears(-1));
+            var result = Today.PlusYears(count);
+            var expected = LocalDate.FromDateTime(DateTime.Now.AddYears(count).Date);
+
+            result.Should().Be(expected);
         }
     }
 }
