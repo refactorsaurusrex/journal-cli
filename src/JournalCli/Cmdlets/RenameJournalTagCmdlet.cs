@@ -60,7 +60,9 @@ namespace JournalCli.Cmdlets
                 WriteHost(header, ConsoleColor.Red);
                 WriteHost(new string('=', header.Length), ConsoleColor.Red);
 
-                effectedFiles = journal.RenameTag(OldName, NewName, NoBackups);
+                Commit(GitCommitType.PreRenameTag);
+                effectedFiles = journal.RenameTag(OldName, NewName);
+                Commit(GitCommitType.PostRenameTag);
             }
 
             var counter = 1;

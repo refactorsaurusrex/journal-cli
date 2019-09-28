@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Management.Automation;
+using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
 {
