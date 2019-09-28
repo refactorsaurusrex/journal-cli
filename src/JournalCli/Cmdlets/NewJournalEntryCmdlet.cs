@@ -29,7 +29,10 @@ namespace JournalCli.Cmdlets
             var markdownFiles = new MarkdownFiles(fileSystem, RootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, new SystemProcess());
             var entryDate = Today.PlusDays(DateOffset);
+
+            Commit(GitCommitType.PreNewJournalEntry);
             journal.CreateNewEntry(entryDate, Tags, Readme);
+            Commit(GitCommitType.PostNewJournalEntry);
         }
     }
 }
