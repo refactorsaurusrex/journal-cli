@@ -46,11 +46,11 @@ namespace JournalCli.Cmdlets
             if (SaveParameters)
                 encryptedStore.Save(settings);
 
-            if (!fileSystem.Directory.Exists(BackupLocation))
-                fileSystem.Directory.CreateDirectory(BackupLocation);
+            if (!fileSystem.Directory.Exists(settings.BackupLocation))
+                fileSystem.Directory.CreateDirectory(settings.BackupLocation);
 
             var fileName = $"{DateTime.Now:yyyy.MM.dd.H.mm.ss.FFF}.zip";
-            var destinationPath = fileSystem.Path.Combine(BackupLocation, fileName);
+            var destinationPath = fileSystem.Path.Combine(settings.BackupLocation, fileName);
 
             var zip = new FastZip { CreateEmptyDirectories = true, Password = settings.BackupPassword };
             zip.CreateZip(destinationPath, RootDirectory, true, null);
