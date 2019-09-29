@@ -105,7 +105,7 @@ namespace JournalCli.Tests
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            Assert.Throws<InvalidOperationException>(() => journal.RenameTag("superman", "megaman", false));
+            Assert.Throws<InvalidOperationException>(() => journal.RenameTag("superman", "megaman"));
         }
 
         [Fact]
@@ -120,31 +120,13 @@ namespace JournalCli.Tests
             var originalIndex = journal.CreateIndex(false);
             var blahCount = originalIndex["blah"].Count;
 
-            var renamedFiles = journal.RenameTag("blah", "landscapes", false);
+            var renamedFiles = journal.RenameTag("blah", "landscapes");
 
             var index = journal.CreateIndex(false);
             var landscapeCount = index["landscapes"].Count;
             landscapeCount.Should().Be(blahCount);
             renamedFiles.Count().Should().Be(blahCount);
             index.Select(x => x.Tag).Should().OnlyContain(s => new List<string> { "landscapes", "doh" }.Contains(s));
-            fileSystem.AllFiles.Count(x => x.EndsWith(Constants.BackupFileExtension)).Should().Be(0);
-        }
-
-        [Fact]
-        public void RenameTag_CreateBackupFiles_WhenRequested()
-        {
-            var fileSystem = CreateVirtualJournal(2017, 2019);
-            const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
-            var systemProcess = A.Fake<ISystemProcess>();
-            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
-            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            var originalIndex = journal.CreateIndex(false);
-            var blahCount = originalIndex["blah"].Count;
-
-            journal.RenameTag("blah", "landscapes", true);
-
-            fileSystem.AllFiles.Count(x => x.EndsWith(Constants.BackupFileExtension)).Should().Be(blahCount);
         }
 
         [Fact]
@@ -161,7 +143,7 @@ namespace JournalCli.Tests
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
             journal.RenameTagDryRun("blah");
-            A.CallTo(() => writer.RenameTag(A<IJournalReader>._, A<string>._, A<string>._, A<bool>._)).MustNotHaveHappened();
+            A.CallTo(() => writer.RenameTag(A<IJournalReader>._, A<string>._, A<string>._)).MustNotHaveHappened();
         }
 
         [Fact]

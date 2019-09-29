@@ -78,7 +78,7 @@ namespace JournalCli.Core
             return journalEntries.Entries.Select(e => e.FilePath).ToList();
         }
 
-        public IEnumerable<string> RenameTag(string oldName, string newName, bool createBackups)
+        public IEnumerable<string> RenameTag(string oldName, string newName)
         {
             var index = CreateIndex(false);
             var journalEntries = index.SingleOrDefault(x => x.Tag == oldName);
@@ -92,7 +92,7 @@ namespace JournalCli.Core
             {
                 filePaths.Add(journalEntry.FilePath);
                 var reader = _readerWriterFactory.CreateReader(journalEntry.FilePath);
-                writer.RenameTag(reader, oldName, newName, createBackups);
+                writer.RenameTag(reader, oldName, newName);
             }
 
             return filePaths;

@@ -15,9 +15,6 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public SwitchParameter DryRun { get; set; }
 
-        [Parameter]
-        public SwitchParameter NoBackups { get; set; }
-
         [Parameter(Mandatory = true)]
         public string OldName { get; set; }
 
@@ -27,14 +24,6 @@ namespace JournalCli.Cmdlets
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
-
-            if (!DryRun && NoBackups)
-            {
-                var warning = "***** Hey, you! *****\r\n" +
-                    $"This function will rename all '{OldName}' tags to '{NewName}' and you've disabled local backups. " + 
-                    "Consider creating a full backup before proceeding, by running 'Backup-Journal'.";
-                WriteHost(warning, ConsoleColor.Red);
-            }
 
             if (!DryRun && !ShouldContinue("Do you want to continue?", $"Renaming '{OldName}' tags to '{NewName}'..."))
                 return;
