@@ -53,8 +53,8 @@ namespace JournalCli.Infrastructure
 
         public string GetJournalEntryFilePath(LocalDate entryDate)
         {
-            var year = entryDate.Year.ToString();
-            var month = $"{entryDate.Month:00} {entryDate:MMMM}";
+            var year = JournalEntry.YearDirectoryPattern.Format(entryDate);
+            var month = JournalEntry.MonthDirectoryPattern.Format(entryDate);
             var parent = _fileSystem.Path.Combine(_rootDirectory, year, month);
 
             if (!_fileSystem.Directory.Exists(parent))
