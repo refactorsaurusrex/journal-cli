@@ -23,7 +23,7 @@ namespace JournalCli.Tests
             var originalReader = new JournalReader(fileSystem, filePath);
             originalReader.FrontMatter.Tags.Should().OnlyContain(x => new List<string> { "doh", "blah" }.Contains(x));
 
-            writer.RenameTag(originalReader, "blah", "horseman", createBackup: false);
+            writer.RenameTag(originalReader, "blah", "horseman");
             var newReader = new JournalReader(fileSystem, filePath);
 
             newReader.Body.Should().Be(originalReader.Body);
@@ -39,7 +39,7 @@ namespace JournalCli.Tests
             var fileSystem = new MockFileSystem();
             var writer = new JournalWriter(fileSystem, "J:\\Current");
             var reader = A.Fake<IJournalReader>();
-            Assert.Throws<ArgumentNullException>(() => writer.RenameTag(reader, oldTag, "valid-value", false));
+            Assert.Throws<ArgumentNullException>(() => writer.RenameTag(reader, oldTag, "valid-value"));
         }
 
         [Theory]
@@ -51,7 +51,7 @@ namespace JournalCli.Tests
             var fileSystem = new MockFileSystem();
             var writer = new JournalWriter(fileSystem, "J:\\Current");
             var reader = A.Fake<IJournalReader>();
-            Assert.Throws<ArgumentNullException>(() => writer.RenameTag(reader, "valid-value", newTag, false));
+            Assert.Throws<ArgumentNullException>(() => writer.RenameTag(reader, "valid-value", newTag));
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace JournalCli.Tests
             var ioFactory = new JournalReaderWriterFactory(fileSystem, "J:\\Current");
             var writer = ioFactory.CreateWriter();
             var reader = ioFactory.CreateReader(fileSystem.AllFiles.First(x => x.EndsWith(".md")));
-            Assert.Throws<InvalidOperationException>(() => writer.RenameTag(reader, "oldTag", "newTag", false));
+            Assert.Throws<InvalidOperationException>(() => writer.RenameTag(reader, "oldTag", "newTag"));
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace JournalCli.Tests
             var ioFactory = new JournalReaderWriterFactory(fileSystem, "J:\\Current");
             var writer = ioFactory.CreateWriter();
             var reader = ioFactory.CreateReader(entryPath);
-            Assert.Throws<InvalidOperationException>(() => writer.RenameTag(reader, "oldTag", "newTag", false));
+            Assert.Throws<InvalidOperationException>(() => writer.RenameTag(reader, "oldTag", "newTag"));
         }
     }
 }

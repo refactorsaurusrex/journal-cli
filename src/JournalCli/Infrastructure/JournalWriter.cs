@@ -27,7 +27,7 @@ namespace JournalCli.Infrastructure
             }
         }
 
-        public void RenameTag(IJournalReader journalReader, string oldTag, string newTag, bool createBackup)
+        public void RenameTag(IJournalReader journalReader, string oldTag, string newTag)
         {
             if (string.IsNullOrWhiteSpace(oldTag) || string.IsNullOrWhiteSpace(newTag))
                 throw new ArgumentNullException($"'{nameof(oldTag)}' cannot be null, empty, or whitespace.", nameof(oldTag));
@@ -45,17 +45,6 @@ namespace JournalCli.Infrastructure
                 throw new InvalidOperationException($"The tag '{oldTag}' does not exist.");
 
             currentTags[oldItemIndex] = newTag;
-
-            if (createBackup)
-            {
-                var backupName = $"{journalReader.FilePath}{Constants.BackupFileExtension}";
-
-                var i = 0;
-                while (_fileSystem.File.Exists(backupName))
-                    backupName = $"{journalReader.FilePath}({i++}){Constants.BackupFileExtension}";
-
-                _fileSystem.File.Copy(journalReader.FilePath, backupName);
-            }
 
             var frontMatter = new JournalFrontMatter(currentTags, journalReader.FrontMatter.Readme, journalReader.EntryDate);
             var newEntry = frontMatter.ToString(asFrontMatter: true) + journalReader.Body;
