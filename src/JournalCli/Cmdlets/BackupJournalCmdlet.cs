@@ -52,7 +52,7 @@ namespace JournalCli.Cmdlets
             var fileName = $"{DateTime.Now:yyyy.MM.dd.H.mm.ss.FFF}.zip";
             var destinationPath = fileSystem.Path.Combine(BackupLocation, fileName);
 
-            var zip = new FastZip { CreateEmptyDirectories = true, Password = Password };
+            var zip = new FastZip { CreateEmptyDirectories = true, Password = settings.BackupPassword };
             zip.CreateZip(destinationPath, RootDirectory, true, null);
         }
     }
