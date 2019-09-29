@@ -75,7 +75,7 @@ namespace JournalCli.Core
             if (journalEntries == null)
                 throw new InvalidOperationException($"No entries found with the tag '{oldName}'");
 
-            return journalEntries.Entries.Select(e => e.FilePath).ToList();
+            return journalEntries.Entries.Select(e => e.EntryName).ToList();
         }
 
         public IEnumerable<string> RenameTag(string oldName, string newName)
@@ -87,15 +87,15 @@ namespace JournalCli.Core
                 throw new InvalidOperationException($"No entries found with the tag '{oldName}'");
 
             var writer = _readerWriterFactory.CreateWriter();
-            var filePaths = new List<string>();
+            var entryNames = new List<string>();
             foreach (var journalEntry in journalEntries.Entries)
             {
-                filePaths.Add(journalEntry.FilePath);
+                entryNames.Add(journalEntry.EntryName);
                 var reader = _readerWriterFactory.CreateReader(journalEntry.FilePath);
                 writer.RenameTag(reader, oldName, newName);
             }
 
-            return filePaths;
+            return entryNames;
         }
 
         // TODO: Rethink when we will return CompleteJournalEntry vs just JournalEntry

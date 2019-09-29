@@ -9,7 +9,7 @@ using JournalCli.Infrastructure;
 namespace JournalCli.Cmdlets
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Rename, "JournalTags", ConfirmImpact = ConfirmImpact.High)]
+    [Cmdlet(VerbsCommon.Rename, "JournalTag", ConfirmImpact = ConfirmImpact.High)]
     public class RenameJournalTagCmdlet : JournalCmdletBase
     {
         [Parameter]
@@ -25,38 +25,40 @@ namespace JournalCli.Cmdlets
         {
             base.ProcessRecord();
 
-            if (!DryRun && !ShouldContinue("Do you want to continue?", $"Renaming '{OldName}' tags to '{NewName}'..."))
-                return;
+            if (!DryRun)
+            {
+                WriteHeader($"You're about to replace all tags named '{OldName}' with the new name '{NewName}'.", ConsoleColor.Red);
+                if (!AreYouSure($"Rename '{OldName}' to '{NewName}'."))
+                    return;
+            }
 
             var fileSystem = new FileSystem();
             var systemProcess = new SystemProcess();
             var ioFactory = new JournalReaderWriterFactory(fileSystem, RootDirectory);
             var markdownFiles = new MarkdownFiles(fileSystem, RootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            IEnumerable<string> effectedFiles;
+            IEnumerable<string> effectedEntries;
 
             if (DryRun)
             {
-                const string header = "Tags in these file(s) would be renamed:";
-                WriteHost(header, ConsoleColor.Cyan);
-                WriteHost(new string('=', header.Length), ConsoleColor.Cyan);
+                const string header = "Tags in the following entries would be renamed:";
+                WriteHeader(header, ConsoleColor.DarkGreen);
 
-                effectedFiles = journal.RenameTagDryRun(OldName);
+                effectedEntries = journal.RenameTagDryRun(OldName);
             }
             else
             {
-                const string header = "Tags in these file(s) have been renamed:";
-                WriteHost(header, ConsoleColor.Red);
-                WriteHost(new string('=', header.Length), ConsoleColor.Red);
+                const string header = "Tags in the following entries have been renamed:";
+                WriteHeader(header, ConsoleColor.Yellow);
 
                 Commit(GitCommitType.PreRenameTag);
-                effectedFiles = journal.RenameTag(OldName, NewName);
+                effectedEntries = journal.RenameTag(OldName, NewName);
                 Commit(GitCommitType.PostRenameTag);
             }
 
             var counter = 1;
-            var consoleColor = DryRun ? ConsoleColor.Cyan : ConsoleColor.Red;
-            foreach (var file in effectedFiles)
+            var consoleColor = DryRun ? ConsoleColor.DarkGreen : ConsoleColor.Yellow;
+            foreach (var file in effectedEntries)
             {
                 WriteHost($"{counter++.ToString().PadLeft(3)}) {file}", consoleColor);
             }
