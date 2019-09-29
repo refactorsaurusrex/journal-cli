@@ -20,7 +20,6 @@ namespace JournalCli.Cmdlets
 
         protected override void ProcessRecord()
         {
-            // TODO: Can this logic be move to the constructor so it's not done for each record processed?
             if (!string.IsNullOrEmpty(RootDirectory))
             {
                 RootDirectory = ResolvePath(RootDirectory);
