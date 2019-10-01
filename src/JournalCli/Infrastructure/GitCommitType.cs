@@ -5,6 +5,7 @@
         PreNewJournalEntry,
         PostNewJournalEntry,
         PreRenameTag,
-        PostRenameTag
+        PostRenameTag,
+        Manual
     }
 }
