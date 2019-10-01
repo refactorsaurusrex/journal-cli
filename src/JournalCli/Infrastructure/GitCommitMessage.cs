@@ -18,6 +18,8 @@ namespace JournalCli.Infrastructure
                     return "PRE: " + RenameTag;
                 case GitCommitType.PostRenameTag:
                     return "POST: " + RenameTag;
+                case GitCommitType.Manual:
+                    return "Manual snapshot";
             }
         }
 

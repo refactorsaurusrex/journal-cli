@@ -1,5 +1,6 @@
 ﻿using System.Management.Automation;
 using JetBrains.Annotations;
+using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
 {
@@ -7,14 +8,18 @@ namespace JournalCli.Cmdlets
     [Cmdlet(VerbsData.Save, "JournalSnapshot")]
     public class SaveJournalSnapshotCmdlet : JournalCmdletBase
     {
-        [Parameter(Mandatory = true, Position = 0)]
+        [Parameter(Position = 0)]
         [ValidateLength(5, 60)]
         public string Message { get; set; }
 
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
-            Commit(Message);
+
+            if (string.IsNullOrEmpty(Message))
+                Commit(Message);
+            else
+                Commit(GitCommitType.Manual);
         }
     }
 }
