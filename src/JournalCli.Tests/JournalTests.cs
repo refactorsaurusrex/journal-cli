@@ -58,7 +58,7 @@ namespace JournalCli.Tests
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
             journal.CreateNewEntry(new LocalDate(2019, 7, 19), new List<string>{ "horse", "Dog", "panda" }.ToArray(), null);
 
-            const string tags = "tags:\r\n  - horse\r\n  - Dog\r\n  - panda";
+            const string tags = "tags:\r\n  - Dog\r\n  - horse\r\n  - panda";
             var entryText = fileSystem.GetFile("J:\\Current\\2019\\07 July\\2019.07.19.md").TextContents;
             entryText.Should().Contain(tags);
             entryText.Should().NotContain("readme:");
