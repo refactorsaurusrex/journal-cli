@@ -44,7 +44,7 @@ namespace JournalCli.Core
 
         public JournalFrontMatter(IEnumerable<string> tags, string readme, LocalDate journalDate)
         {
-            Tags = tags?.Distinct().ToList();
+            Tags = tags?.Distinct().OrderBy(x => x).ToList();
 
             if (string.IsNullOrWhiteSpace(readme))
             {
@@ -93,7 +93,7 @@ namespace JournalCli.Core
                 if (tagsKey != null)
                 {
                     var tags = (YamlSequenceNode)yamlStream.Documents[0].RootNode[tagsKey];
-                    Tags = tags.Select(x => x.ToString()).Distinct().ToList();
+                    Tags = tags.Select(x => x.ToString()).Distinct().OrderBy(x => x).ToList();
                 }
 
                 if (readMeKey != null)
