@@ -4,18 +4,19 @@ using JetBrains.Annotations;
 namespace JournalCli.Core
 {
     [PublicAPI]
-    public class JournalIndexEntry
+    public class JournalIndexEntry<T>
+        where T : class, IJournalEntry
     {
-        public JournalIndexEntry(string tag, params JournalEntry[] entries)
+        public JournalIndexEntry(string tag, params T[] entries)
         {
             Tag = tag;
-            Entries = new List<JournalEntry>(entries);
+            Entries = new List<T>(entries);
         }
 
         public string Tag { get; }
 
         public int Count => Entries.Count;
 
-        public ICollection<JournalEntry> Entries { get; }
+        public ICollection<T> Entries { get; }
     }
 }

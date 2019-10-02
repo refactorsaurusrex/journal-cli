@@ -18,7 +18,7 @@ namespace JournalCli.Core
             Body = string.Join(Environment.NewLine, lines.Skip(bodyStartIndex));
             FrontMatter = JournalFrontMatter.FromFilePath(fileSystem, filePath);
             EntryName = fileSystem.Path.GetFileNameWithoutExtension(FilePath) ?? throw new InvalidOperationException();
-            EntryDate = JournalEntry.FileNamePattern.Parse(EntryName).Value;
+            EntryDate = Journal.FileNamePattern.Parse(EntryName).Value;
         }
 
         public string Body { get; }
@@ -32,5 +32,22 @@ namespace JournalCli.Core
         public string EntryName { get; }
 
         public LocalDate EntryDate { get; }
+
+        public T ToJournalEntry<T>() where T : class, IJournalEntry
+        {
+            switch (typeof(T))
+            {
+                default:
+                    throw new NotSupportedException($"Unable to create instance of {typeof(T).Name}.");
+                case var t when t == typeof(JournalEntryFile):
+                    return new JournalEntryFile(this) as T;
+                case var t when t == typeof(MetaJournalEntry):
+                    return new MetaJournalEntry(this) as T;
+                case var t when t == typeof(ReadmeJournalEntry):
+                    return new ReadmeJournalEntry(this) as T;
+                case var t when t == typeof(CompleteJournalEntry):
+                    return new CompleteJournalEntry(this) as T;
+            }
+        }
     }
 }

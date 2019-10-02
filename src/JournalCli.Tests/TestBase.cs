@@ -52,7 +52,7 @@ namespace JournalCli.Tests
                     foreach (var day in Enumerable.Range(1, 28))
                     {
                         var dt = new LocalDate(year, month, day);
-                        var filePath = fileSystem.Path.Combine(currentPath, dt.ToString($"{JournalEntry.FileNamePattern.PatternText}'.md'", CultureInfo.CurrentCulture));
+                        var filePath = fileSystem.Path.Combine(currentPath, dt.ToString($"{Journal.FileNamePattern.PatternText}'.md'", CultureInfo.CurrentCulture));
                         var index = _random.Next(0, JournalSampleLength);
                         fileSystem.AddFile(filePath, new MockFileData(JournalSamples[index]));
                         if (index == 2)

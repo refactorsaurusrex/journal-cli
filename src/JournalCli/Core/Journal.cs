@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using JournalCli.Infrastructure;
 using NodaTime;
+using NodaTime.Text;
 
 namespace JournalCli.Core
 {
     internal class Journal
     {
+        public static LocalDatePattern FileNamePattern { get; } = LocalDatePattern.CreateWithCurrentCulture("yyyy.MM.dd");
+        public static LocalDatePattern MonthDirectoryPattern { get; } = LocalDatePattern.CreateWithCurrentCulture("MM MMMM");
+        public static LocalDatePattern YearDirectoryPattern { get; } = LocalDatePattern.CreateWithCurrentCulture("yyyy");
+
         private readonly IJournalReaderWriterFactory _readerWriterFactory;
         private readonly IMarkdownFiles _markdownFiles;
         private readonly ISystemProcess _systemProcess;
@@ -38,7 +43,7 @@ namespace JournalCli.Core
             }
             else
             {
-                var journalIndex = CreateIndex(false);
+                var journalIndex = CreateIndex<JournalEntryFile>();
                 if (journalIndex.Count == 0)
                     throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
 
@@ -69,7 +74,7 @@ namespace JournalCli.Core
 
         public IEnumerable<string> RenameTagDryRun(string oldName)
         {
-            var index = CreateIndex(false);
+            var index = CreateIndex<JournalEntryFile>();
             var journalEntries = index.SingleOrDefault(x => x.Tag == oldName);
 
             if (journalEntries == null)
@@ -80,7 +85,7 @@ namespace JournalCli.Core
 
         public IEnumerable<string> RenameTag(string oldName, string newName)
         {
-            var index = CreateIndex(false);
+            var index = CreateIndex<JournalEntryFile>();
             var journalEntries = index.SingleOrDefault(x => x.Tag == oldName);
 
             if (journalEntries == null)
@@ -98,15 +103,15 @@ namespace JournalCli.Core
             return entryNames;
         }
 
-        // TODO: Rethink when we will return CompleteJournalEntry vs just JournalEntry
-        public JournalIndex CreateIndex(bool includeHeaders)
+        public JournalIndex<T> CreateIndex<T>()
+            where T : class, IJournalEntry
         {
-            var index = new JournalIndex();
+            var index = new JournalIndex<T>();
 
             foreach (var file in _markdownFiles.FindAll())
             {
                 var reader = _readerWriterFactory.CreateReader(file);
-                var entry = new JournalEntry(reader);
+                var entry = reader.ToJournalEntry<T>();
 
                 if (entry.Tags == null || entry.Tags.Count == 0)
                     continue;
@@ -119,7 +124,7 @@ namespace JournalCli.Core
                     }
                     else
                     {
-                        var journalIndexEntry = new JournalIndexEntry(tag, entry);
+                        var journalIndexEntry = new JournalIndexEntry<T>(tag, entry);
                         index.Add(journalIndexEntry);
                     }
                 }

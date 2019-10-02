@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
@@ -9,7 +10,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "JournalIndex")]
-    [OutputType(typeof(JournalIndex))]
+    [OutputType(typeof(JournalIndex<MetaJournalEntry>))]
     public class GetJournalIndexCmdlet : JournalCmdletBase
     {
         [Parameter]
@@ -21,6 +22,7 @@ namespace JournalCli.Cmdlets
         public string Direction { get; set; } = "Descending";
 
         [Parameter]
+        [Obsolete]
         public SwitchParameter IncludeHeaders { get; set; }
 
         protected override void ProcessRecord()
@@ -32,7 +34,7 @@ namespace JournalCli.Cmdlets
             var ioFactory = new JournalReaderWriterFactory(fileSystem, RootDirectory);
             var markdownFiles = new MarkdownFiles(fileSystem, RootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            var index = journal.CreateIndex(IncludeHeaders);
+            var index = journal.CreateIndex<MetaJournalEntry>();
 
             switch (OrderBy)
             {

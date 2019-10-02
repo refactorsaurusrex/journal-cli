@@ -2,8 +2,9 @@
 
 namespace JournalCli.Core
 {
-    public class JournalIndex : KeyedCollection<string, JournalIndexEntry>
+    public class JournalIndex<T> : KeyedCollection<string, JournalIndexEntry<T>>
+        where T : class, IJournalEntry
     {
-        protected override string GetKeyForItem(JournalIndexEntry item) => item.Tag;
+        protected override string GetKeyForItem(JournalIndexEntry<T> item) => item.Tag;
     }
 }

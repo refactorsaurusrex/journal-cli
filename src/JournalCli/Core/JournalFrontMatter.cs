@@ -36,7 +36,7 @@ namespace JournalCli.Core
             }
 
             var yaml = sb.ToString();
-            var journalEntryDate = JournalEntry.FileNamePattern.Parse(fileSystem.Path.GetFileNameWithoutExtension(filePath)).Value;
+            var journalEntryDate = Journal.FileNamePattern.Parse(fileSystem.Path.GetFileNameWithoutExtension(filePath)).Value;
             return new JournalFrontMatter(yaml, journalEntryDate);
         }
 
