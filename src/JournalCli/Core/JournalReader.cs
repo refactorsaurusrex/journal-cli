@@ -13,7 +13,15 @@ namespace JournalCli.Core
         {
             FilePath = filePath;
             var lines = fileSystem.File.ReadAllLines(FilePath).ToList();
-            Headers = lines.Where(x => x.StartsWith("#")).ToList();
+
+            var headers = lines.Where(x => x.StartsWith("#")).ToList();
+            var h1 = headers.FirstOrDefault()?.Replace("# ", "");
+
+            if (h1 != null && headers.Count > 1 && DateTime.TryParse(h1, out _))
+                Headers = lines.Where(x => x.StartsWith("#")).Skip(1).ToList();
+            else
+                Headers = lines.Where(x => x.StartsWith("#")).ToList();
+
             var bodyStartIndex = lines.FindLastIndex(s => s == JournalFrontMatter.BlockIndicator) + 1;
             Body = string.Join(Environment.NewLine, lines.Skip(bodyStartIndex));
             FrontMatter = JournalFrontMatter.FromFilePath(fileSystem, filePath);
