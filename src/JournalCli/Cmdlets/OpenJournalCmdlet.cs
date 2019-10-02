@@ -22,8 +22,8 @@ namespace JournalCli.Cmdlets
             
             var fileSystem = new FileSystem();
             string path;
-            var year = JournalEntry.YearDirectoryPattern.Format(Today.Date());
-            var month = JournalEntry.MonthDirectoryPattern.Format(Today.Date());
+            var year = Journal.YearDirectoryPattern.Format(Today.Date());
+            var month = Journal.MonthDirectoryPattern.Format(Today.Date());
 
             switch (To)
             {

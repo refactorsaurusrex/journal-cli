@@ -3,18 +3,18 @@ using JournalCli.Infrastructure;
 
 namespace JournalCli.Core
 {
-    public class CompleteJournalEntry : IJournalEntry
+    public class MetaJournalEntry : IJournalEntry
     {
-        public CompleteJournalEntry(IJournalReader reader)
+        public MetaJournalEntry(IJournalReader reader)
         {
-            Body = reader.Body.Trim();
+            Headers = reader.Headers;
             Tags = reader.FrontMatter.Tags;
             EntryName = reader.EntryName;
         }
 
         public string EntryName { get; }
         public ICollection<string> Tags { get; }
+        public ICollection<string> Headers { get; }
         public override string ToString() => EntryName;
-        public string Body { get; }
     }
 }

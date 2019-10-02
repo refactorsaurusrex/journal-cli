@@ -12,5 +12,6 @@ namespace JournalCli.Infrastructure
         string FilePath { get; }
         string EntryName { get; }
         LocalDate EntryDate { get; }
+        T ToJournalEntry<T>() where T : class, IJournalEntry;
     }
 }

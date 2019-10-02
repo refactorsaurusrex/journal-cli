@@ -80,10 +80,8 @@ namespace JournalCli.Tests
             entryText.Should().NotContain("tags:");
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void CreateIndex_IncludesAllTags_Always(bool includeHeaders)
+        [Fact]
+        public void CreateIndex_IncludesAllTags_Always()
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
@@ -91,7 +89,7 @@ namespace JournalCli.Tests
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            var index = journal.CreateIndex(includeHeaders);
+            var index = journal.CreateIndex<MetaJournalEntry>();
 
             index.Select(x => x.Tag).Should().OnlyContain(s => new List<string> { "blah", "doh" }.Contains(s));
         }
@@ -117,12 +115,12 @@ namespace JournalCli.Tests
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            var originalIndex = journal.CreateIndex(false);
+            var originalIndex = journal.CreateIndex<MetaJournalEntry>();
             var blahCount = originalIndex["blah"].Count;
 
             var renamedFiles = journal.RenameTag("blah", "landscapes");
 
-            var index = journal.CreateIndex(false);
+            var index = journal.CreateIndex<MetaJournalEntry>();
             var landscapeCount = index["landscapes"].Count;
             landscapeCount.Should().Be(blahCount);
             renamedFiles.Count().Should().Be(blahCount);
@@ -155,7 +153,7 @@ namespace JournalCli.Tests
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            var index = journal.CreateIndex(false);
+            var index = journal.CreateIndex<MetaJournalEntry>();
 
             var blahCount = index["blah"].Count;
             journal.RenameTagDryRun("blah").Should().HaveCount(blahCount);
