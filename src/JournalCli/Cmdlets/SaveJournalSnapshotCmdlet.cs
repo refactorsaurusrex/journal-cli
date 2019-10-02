@@ -16,7 +16,7 @@ namespace JournalCli.Cmdlets
         {
             base.ProcessRecord();
 
-            if (string.IsNullOrEmpty(Message))
+            if (!string.IsNullOrEmpty(Message))
                 Commit(Message);
             else
                 Commit(GitCommitType.Manual);
