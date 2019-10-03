@@ -104,7 +104,7 @@ namespace JournalCli.Core
             return entryNames;
         }
 
-        public JournalIndex<T> CreateIndex<T>()
+        public JournalIndex<T> CreateIndex<T>(params string[] requiredTags)
             where T : class, IJournalEntry
         {
             var index = new JournalIndex<T>();
@@ -115,6 +115,9 @@ namespace JournalCli.Core
                 var entry = reader.ToJournalEntry<T>();
 
                 if (entry.Tags == null || entry.Tags.Count == 0)
+                    continue;
+
+                if (requiredTags.Length > 0 && !entry.Tags.ContainsAll(requiredTags))
                     continue;
 
                 foreach (var tag in entry.Tags)
