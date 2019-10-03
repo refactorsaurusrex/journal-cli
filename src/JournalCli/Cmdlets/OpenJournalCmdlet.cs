@@ -39,7 +39,7 @@ namespace JournalCli.Cmdlets
             }
 
             if (!fileSystem.Directory.Exists(path))
-                throw new PSInvalidOperationException("No directory currently exists for the selected periods.");
+                throw new PSInvalidOperationException("No directory currently exists for the selected period.");
 
             var systemProcess = new SystemProcess();
             systemProcess.Start(path);
