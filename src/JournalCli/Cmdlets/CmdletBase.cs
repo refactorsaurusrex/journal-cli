@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Management.Automation;
 using JournalCli.Infrastructure;
 
@@ -28,8 +27,7 @@ namespace JournalCli.Cmdlets
             var headerWidth = Math.Min(75, windowWidth);
 
             WriteHost(new string('=', headerWidth), color);
-            var wrapped = LineWrap(title, 75);
-            WriteHost(wrapped, color);
+            WriteHost(title.Wrap(75), color);
             WriteHost(new string('=', headerWidth), color);
         }
 
@@ -38,23 +36,5 @@ namespace JournalCli.Cmdlets
             Host.UI.WriteLine(foregroundColor, backgroundColor, text);
         }
 
-        private static string LineWrap(string text, int width)
-        {
-            if (text.Length <= width)
-                return text;
-
-            const char delimiter = ' ';
-            var words = text.Split(delimiter);
-            var allLines = words.Skip(1).Aggregate(words.Take(1).ToList(), (lines, word) =>
-            {
-                if (lines.Last().Length + word.Length >= width - 1) // Minus 1, to allow for newline char
-                    lines.Add(word);
-                else
-                    lines[lines.Count - 1] += delimiter + word;
-                return lines;
-            });
-
-            return string.Join(Environment.NewLine, allLines.ToArray());
-        }
     }
 }
