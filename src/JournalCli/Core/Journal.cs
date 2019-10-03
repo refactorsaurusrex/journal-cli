@@ -10,6 +10,7 @@ namespace JournalCli.Core
     internal class Journal
     {
         public static LocalDatePattern FileNamePattern { get; } = LocalDatePattern.CreateWithCurrentCulture("yyyy.MM.dd");
+        public static LocalDatePattern FileNameWithExtensionPattern { get; } = LocalDatePattern.CreateWithCurrentCulture("yyyy.MM.dd'.md'");
         public static LocalDatePattern MonthDirectoryPattern { get; } = LocalDatePattern.CreateWithCurrentCulture("MM MMMM");
         public static LocalDatePattern YearDirectoryPattern { get; } = LocalDatePattern.CreateWithCurrentCulture("yyyy");
 
