@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 using JournalCli.Infrastructure;
 
 namespace JournalCli.Core
@@ -7,7 +10,7 @@ namespace JournalCli.Core
     {
         public CompleteJournalEntry(IJournalReader reader)
         {
-            Body = reader.Body.Trim();
+            WrapBody(reader.Body);
             Tags = reader.FrontMatter.Tags;
             EntryName = reader.EntryName;
         }
@@ -15,6 +18,32 @@ namespace JournalCli.Core
         public string EntryName { get; }
         public ICollection<string> Tags { get; }
         public override string ToString() => EntryName;
-        public string Body { get; }
+        public string Body { get; private set; }
+
+        private void WrapBody(string body)
+        {
+            var lines = body.Trim().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var wrapped = new StringBuilder();
+
+            foreach (var line in lines)
+            {
+                if (line.StartsWith("#"))
+                {
+                    wrapped.AppendLine(line);
+                    wrapped.AppendLine();
+                }
+                else if (!Regex.IsMatch(line, @"^[A-Za-z]"))
+                {
+                    wrapped.AppendLine(line.Wrap());
+                }
+                else
+                {
+                    wrapped.AppendLine(line.Wrap());
+                    wrapped.AppendLine();
+                }
+            }
+
+            Body = wrapped.ToString();
+        }
     }
 }
