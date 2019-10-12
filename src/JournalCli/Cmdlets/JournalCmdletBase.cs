@@ -48,16 +48,6 @@ namespace JournalCli.Cmdlets
             CommitCore(message);
         }
 
-        protected void RevertHead()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected void RevertLast(GitCommitType commitType)
-        {
-            throw new NotImplementedException();
-        }
-
         private void CommitCore(string message)
         {
             using (var repo = new Git.Repository(RootDirectory))
