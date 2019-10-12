@@ -6,6 +6,11 @@ $ErrorActionPreference = 'Stop'
 
 if ($env:APPVEYOR_BUILD_VERSION) {
   $Version = [regex]::match($env:APPVEYOR_BUILD_VERSION,'[0-9]+\.[0-9]+\.[0-9]+').Groups[0].Value
+  $lastPublishedVersion = [Version]::new((Find-Module -Name JournalCli | Select-Object -ExpandProperty Version))
+  if ([Version]::new($Version) -le $lastPublishedVersion) {
+    throw "Version must be greater than the last published version, which is 'v$lastPublishedVersion'."
+  }
+  Write-Host "Last published version: 'v$lastPublishedVersion'. Current version: 'v$Version'"
 } elseif ($Version -eq '') {
   throw "Missing version parameter"
 }
