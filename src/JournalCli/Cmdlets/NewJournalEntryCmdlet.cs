@@ -25,8 +25,8 @@ namespace JournalCli.Cmdlets
             base.ProcessRecord();
 
             var fileSystem = new FileSystem();
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, RootDirectory);
-            var markdownFiles = new MarkdownFiles(fileSystem, RootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
+            var markdownFiles = new MarkdownFiles(fileSystem, Location);
             var journal = Journal.Open(ioFactory, markdownFiles, new SystemProcess());
             var entryDate = Today.PlusDays(DateOffset);
 

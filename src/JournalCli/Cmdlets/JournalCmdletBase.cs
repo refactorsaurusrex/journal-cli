@@ -8,7 +8,7 @@ namespace JournalCli.Cmdlets
 {
     public abstract class JournalCmdletBase : CmdletBase
     {
-        private readonly string _error = $"{nameof(RootDirectory)} was not provided and no default location exists. One or the other is required";
+        private const string Error = "Journal location was not provided and no default location exists. One or the other is required";
 
         protected JournalCmdletBase()
         {
@@ -16,13 +16,21 @@ namespace JournalCli.Cmdlets
         }
 
         [Parameter]
+        [Obsolete("'RootDirectory' is obsolete. Use 'Location' instead.")]
         public string RootDirectory { get; set; }
+
+        [Parameter]
+        public string Location { get; set; }
 
         protected override void ProcessRecord()
         {
-            if (!string.IsNullOrEmpty(RootDirectory))
+            // Just temporary until RootDirectory is removed.
+            if (string.IsNullOrEmpty(Location) && !string.IsNullOrEmpty(RootDirectory))
+                Location = RootDirectory;
+
+            if (!string.IsNullOrEmpty(Location))
             {
-                RootDirectory = ResolvePath(RootDirectory);
+                Location = ResolvePath(Location);
                 return;
             }
 
@@ -30,9 +38,9 @@ namespace JournalCli.Cmdlets
             var settings = UserSettings.Load(encryptedStore);
 
             if (string.IsNullOrEmpty(settings.DefaultJournalRoot))
-                throw new PSInvalidOperationException(_error);
+                throw new PSInvalidOperationException(Error);
 
-            RootDirectory = settings.DefaultJournalRoot;
+            Location = settings.DefaultJournalRoot;
         }
 
         protected void Commit(GitCommitType commitType)
@@ -50,7 +58,7 @@ namespace JournalCli.Cmdlets
 
         private void CommitCore(string message)
         {
-            using (var repo = new Git.Repository(RootDirectory))
+            using (var repo = new Git.Repository(Location))
             {
                 var statusOptions = new Git.StatusOptions
                 {
@@ -77,11 +85,11 @@ namespace JournalCli.Cmdlets
 
         private void ValidateGitRepo()
         {
-            if (Git.Repository.IsValid(RootDirectory))
+            if (Git.Repository.IsValid(Location))
                 return;
 
-            Git.Repository.Init(RootDirectory);
-            using (var repo = new Git.Repository(RootDirectory))
+            Git.Repository.Init(Location);
+            using (var repo = new Git.Repository(Location))
             {
                 Git.Commands.Stage(repo, "*");
 

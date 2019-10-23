@@ -35,7 +35,7 @@ namespace JournalCli.Cmdlets
                 var date = Journal.FileNameWithExtensionPattern.Parse(EntryName).Value;
                 var year = date.ToString(Journal.YearDirectoryPattern.PatternText, CultureInfo.CurrentCulture);
                 var month = date.ToString(Journal.MonthDirectoryPattern.PatternText, CultureInfo.CurrentCulture);
-                path = fileSystem.Path.Combine(RootDirectory, year, month, EntryName);
+                path = fileSystem.Path.Combine(Location, year, month, EntryName);
             }
             else if (ParameterSetName == "Date")
             {
@@ -43,7 +43,7 @@ namespace JournalCli.Cmdlets
                 var year = date.ToString(Journal.YearDirectoryPattern.PatternText, CultureInfo.CurrentCulture);
                 var month = date.ToString(Journal.MonthDirectoryPattern.PatternText, CultureInfo.CurrentCulture);
                 var name = LocalDate.FromDateTime(Date).ToJournalEntryFileName();
-                path = fileSystem.Path.Combine(RootDirectory, year, month, name);
+                path = fileSystem.Path.Combine(Location, year, month, name);
             }
             else
             {
