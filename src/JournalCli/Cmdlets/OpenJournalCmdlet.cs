@@ -28,13 +28,13 @@ namespace JournalCli.Cmdlets
             switch (To)
             {
                 case "CurrentMonth":
-                    path = fileSystem.Path.Combine(RootDirectory, year, month);
+                    path = fileSystem.Path.Combine(Location, year, month);
                     break;
                 case "CurrentYear":
-                    path = fileSystem.Path.Combine(RootDirectory, year);
+                    path = fileSystem.Path.Combine(Location, year);
                     break;
                 default:
-                    path = fileSystem.Path.Combine(RootDirectory);
+                    path = fileSystem.Path.Combine(Location);
                     break;
             }
 
