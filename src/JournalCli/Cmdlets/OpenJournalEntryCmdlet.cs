@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
@@ -15,6 +14,9 @@ namespace JournalCli.Cmdlets
     {
         // TODO: open entry via date or natural language input
 
+        [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Entry")]
+        public IJournalEntry Entry { get; set; }
+
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Name")]
         public string EntryName { get; set; }
 
@@ -26,32 +28,37 @@ namespace JournalCli.Cmdlets
             base.ProcessRecord();
 
             var fileSystem = new FileSystem();
+            var journalWriter = new JournalWriter(fileSystem, Location);
             string path;
 
-            if (ParameterSetName == "Name")
+            switch (ParameterSetName)
             {
-                if (!EntryName.EndsWith(".md"))
-                    EntryName += ".md";
-                var date = Journal.FileNameWithExtensionPattern.Parse(EntryName).Value;
-                var year = date.ToString(Journal.YearDirectoryPattern.PatternText, CultureInfo.CurrentCulture);
-                var month = date.ToString(Journal.MonthDirectoryPattern.PatternText, CultureInfo.CurrentCulture);
-                path = fileSystem.Path.Combine(Location, year, month, EntryName);
-            }
-            else if (ParameterSetName == "Date")
-            {
-                var date = LocalDate.FromDateTime(Date);
-                var year = date.ToString(Journal.YearDirectoryPattern.PatternText, CultureInfo.CurrentCulture);
-                var month = date.ToString(Journal.MonthDirectoryPattern.PatternText, CultureInfo.CurrentCulture);
-                var name = LocalDate.FromDateTime(Date).ToJournalEntryFileName();
-                path = fileSystem.Path.Combine(Location, year, month, name);
-            }
-            else
-            {
-                throw new NotSupportedException();
+                case "Name":
+                    {
+                        var entryDate = EntryName.EndsWith(".md") ?
+                            Journal.FileNameWithExtensionPattern.Parse(EntryName).Value :
+                            Journal.FileNamePattern.Parse(EntryName).Value;
+                        path = journalWriter.GetJournalEntryFilePath(entryDate);
+                        break;
+                    }
+                case "Date":
+                    {
+                        var entryDate = LocalDate.FromDateTime(Date);
+                        path = journalWriter.GetJournalEntryFilePath(entryDate);
+                        break;
+                    }
+                case "Entry":
+                    {
+                        var entryDate = Journal.FileNamePattern.Parse(Entry.EntryName).Value;
+                        path = journalWriter.GetJournalEntryFilePath(entryDate);
+                        break;
+                    }
+                default:
+                    throw new NotSupportedException();
             }
 
             if (!fileSystem.File.Exists(path))
-                throw new PSInvalidOperationException("That journal entry doesn't currently exist.");
+                throw new PSInvalidOperationException("The provided journal entry does not exist.");
 
             var systemProcess = new SystemProcess();
             systemProcess.Start(path);

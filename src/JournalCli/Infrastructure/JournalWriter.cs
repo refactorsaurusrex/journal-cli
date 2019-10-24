@@ -62,11 +62,9 @@ namespace JournalCli.Infrastructure
 
             var fileName = entryDate.ToJournalEntryFileName();
             var fullPath = _fileSystem.Path.Combine(parent, fileName);
-
-            if (_fileSystem.File.Exists(fullPath))
-                throw new InvalidOperationException($"Journal entry already exists: '{fullPath}'");
-
             return fullPath;
         }
+
+        public bool EntryExists(string path) => _fileSystem.File.Exists(path);
     }
 }
