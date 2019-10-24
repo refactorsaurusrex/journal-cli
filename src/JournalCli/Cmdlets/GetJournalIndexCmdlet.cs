@@ -10,7 +10,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "JournalIndex")]
-    [OutputType(typeof(JournalIndex<MetaJournalEntry>))]
+    [OutputType(typeof(JournalIndex<>))]
     public class GetJournalIndexCmdlet : JournalCmdletBase
     {
         [Parameter]
@@ -22,8 +22,11 @@ namespace JournalCli.Cmdlets
         public string Direction { get; set; } = "Descending";
 
         [Parameter]
-        [Obsolete]
+        [Obsolete("IncludeHeaders has been deprecated and is no longer in use.")]
         public SwitchParameter IncludeHeaders { get; set; }
+
+        [Parameter]
+        public SwitchParameter IncludeBodies { get; set; }
 
         protected override void ProcessRecord()
         {
@@ -34,7 +37,17 @@ namespace JournalCli.Cmdlets
             var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
             var markdownFiles = new MarkdownFiles(fileSystem, Location);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            var index = journal.CreateIndex<MetaJournalEntry>();
+
+            if (IncludeBodies)
+                WriteResults<CompleteJournalEntry>(journal);
+            else
+                WriteResults<MetaJournalEntry>(journal);
+        }
+
+        private void WriteResults<T>(Journal journal)
+            where T : class, IJournalEntry
+        {
+            var index = journal.CreateIndex<T>();
 
             switch (OrderBy)
             {
@@ -59,5 +72,6 @@ namespace JournalCli.Cmdlets
                     break;
             }
         }
+
     }
 }
