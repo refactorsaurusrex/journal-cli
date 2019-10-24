@@ -141,6 +141,10 @@ namespace JournalCli.Core
         {
             var journalWriter = _readerWriterFactory.CreateWriter();
             var entryFilePath = journalWriter.GetJournalEntryFilePath(entryDate);
+
+            if (journalWriter.EntryExists(entryFilePath))
+                throw new InvalidOperationException($"Journal entry already exists: '{entryFilePath}'");
+
             var frontMatter = new JournalFrontMatter(tags, readme, entryDate);
             journalWriter.Create(frontMatter, entryFilePath, entryDate);
             _systemProcess.Start(entryFilePath);
