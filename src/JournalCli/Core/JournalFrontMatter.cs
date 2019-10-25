@@ -124,7 +124,7 @@ namespace JournalCli.Core
         public string ToString(bool asFrontMatter)
         {
             if (IsEmpty())
-                return "";
+                return asFrontMatter ? $"{BlockIndicator}{Environment.NewLine}{Environment.NewLine}{BlockIndicator}{Environment.NewLine}" : "";
 
             var serializer = new SerializerBuilder().Build();
             var yaml = serializer.Serialize(this).Replace("- ", "  - ").Trim();

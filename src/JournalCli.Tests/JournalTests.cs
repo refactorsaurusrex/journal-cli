@@ -34,7 +34,7 @@ namespace JournalCli.Tests
         [InlineData(new string[] { }, null)]
         [InlineData(null, "")]
         [InlineData(null, null)]
-        public void CreateNewEntry_ExcludesFrontMatter_WhenNoTagsOrReadmeAreProvided(string[] tags, string readme)
+        public void CreateNewEntry_AddsEmptyFrontMatter_WhenNoTagsOrReadmeAreProvided(string[] tags, string readme)
         {
             var fileSystem = new MockFileSystem();
             const string rootDirectory = "J:\\Current";
@@ -44,7 +44,7 @@ namespace JournalCli.Tests
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
             journal.CreateNewEntry(new LocalDate(2019, 7, 19), tags, readme);
 
-            fileSystem.GetFile("J:\\Current\\2019\\07 July\\2019.07.19.md").TextContents.Should().Be("# Friday, July 19, 2019\r\n");
+            fileSystem.GetFile("J:\\Current\\2019\\07 July\\2019.07.19.md").TextContents.Should().Be("---\r\n\r\n---\r\n# Friday, July 19, 2019\r\n");
         }
 
         [Fact]
