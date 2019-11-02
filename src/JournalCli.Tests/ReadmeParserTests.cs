@@ -12,6 +12,7 @@ namespace JournalCli.Tests
     {
         [Theory]
         [InlineData("9/7/2019", "9-7-2019")]
+        [InlineData("9/7/19", "9-7-2019")]
         [InlineData("9.7.2019", "9-7-2019")]
         [InlineData("09/07/2019", "9-7-2019")]
         [InlineData("9/07/2019", "9-7-2019")]
