@@ -34,7 +34,7 @@ namespace JournalCli.Tests
 
         [Theory]
         [InlineData("Tags:\r\n  - one\r\n  - two", "---\r\ntags:\r\n  - one\r\n  - two\r\n---\r\n")]
-        [InlineData("Tags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017", "---\r\ntags:\r\n  - one\r\n  - two\r\nreadme: 8-1-2017\r\n---\r\n")]
+        [InlineData("Tags:\r\n  - one\r\n  - two\r\nReadme: 8-1-2017", "---\r\ntags:\r\n  - one\r\n  - two\r\nreadme: 8/1/2017\r\n---\r\n")]
         [InlineData("Tags:\r\n  - Thing\r\nReadme: 2 years", "---\r\ntags:\r\n  - Thing\r\nreadme: 2 years\r\n---\r\n")]
         public void ToString_ReturnsValidFrontMatter_Always(string input, string expectedResult)
         {
@@ -63,7 +63,7 @@ namespace JournalCli.Tests
             };
             yield return new object[]
             {
-                "---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017\r\n---", "tags:\r\n  - one\r\n  - two\r\nreadme: 8-1-2017", "8-1-2017", new List<string> { "one", "two" }
+                "---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 8/1/2017\r\n---", "tags:\r\n  - one\r\n  - two\r\nreadme: 8/1/2017", "8/1/2017", new List<string> { "one", "two" }
             };
             yield return new object[]
             {
