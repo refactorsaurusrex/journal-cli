@@ -46,7 +46,7 @@ namespace JournalCli.Infrastructure
                 }
 
                 ExpirationDate = expiration;
-                FormattedExpirationDate = expiration.ToString("M-d-yyyy", CultureInfo.CurrentCulture);
+                FormattedExpirationDate = expiration.ToString("d", CultureInfo.CurrentCulture);
                 FrontMatterValue = $"{duration} {period}";
             }
             else
@@ -54,7 +54,7 @@ namespace JournalCli.Infrastructure
                 readmeText = readmeText.Replace('\\', '/'); // Just in case these were used.
                 var dt = DateTime.Parse(readmeText);
                 ExpirationDate = LocalDate.FromDateTime(dt);
-                FrontMatterValue = FormattedExpirationDate = dt.ToString("M-d-yyyy", CultureInfo.CurrentCulture);
+                FrontMatterValue = FormattedExpirationDate = ExpirationDate.ToString("d", CultureInfo.CurrentCulture);
             }
         }
 
