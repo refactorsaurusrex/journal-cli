@@ -63,6 +63,7 @@ namespace JournalCli.Infrastructure
         [Obsolete("What is this needed for?")]
         public string FormattedExpirationDate { get; }
 
+        // TEST: Test that this is correct according to a variety of cultures
         public string FrontMatterValue { get; }
     }
 }
