@@ -12,6 +12,7 @@ namespace JournalCli.Cmdlets
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "JournalEntriesByTag", DefaultParameterSetName = "Any")]
     [OutputType(typeof(IEnumerable<JournalIndexEntry<MetaJournalEntry>>))]
+    [Alias("gjt")]
     public class GetJournalEntriesByTagCmdlet : JournalCmdletBase
     {
         [Parameter(Mandatory = true)]

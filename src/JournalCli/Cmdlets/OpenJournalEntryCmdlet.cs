@@ -10,6 +10,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Open, "JournalEntry")]
+    [Alias("oje")]
     public class OpenJournalEntryCmdlet : JournalCmdletBase
     {
         // TODO: open entry via date or natural language input

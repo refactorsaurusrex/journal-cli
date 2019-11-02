@@ -8,6 +8,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Open, "RandomJournalEntry")]
+    [Alias("orj")]
     public class OpenRandomJournalEntryCmdlet : JournalCmdletBase
     {
         [Parameter]

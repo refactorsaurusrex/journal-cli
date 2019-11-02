@@ -6,6 +6,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsData.Save, "JournalSnapshot")]
+    [Alias("sjs")]
     public class SaveJournalSnapshotCmdlet : JournalCmdletBase
     {
         [Parameter(Position = 0)]
