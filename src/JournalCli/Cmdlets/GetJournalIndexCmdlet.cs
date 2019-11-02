@@ -11,6 +11,7 @@ namespace JournalCli.Cmdlets
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "JournalIndex")]
     [OutputType(typeof(JournalIndex<>))]
+    [Alias("gji")]
     public class GetJournalIndexCmdlet : JournalCmdletBase
     {
         [Parameter]

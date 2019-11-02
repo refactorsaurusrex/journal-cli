@@ -10,6 +10,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsData.Backup, "Journal")]
+    [Alias("bj")]
     public class BackupJournalCmdlet : JournalCmdletBase
     {
         [Parameter]
