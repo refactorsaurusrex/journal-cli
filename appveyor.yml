@@ -15,3 +15,6 @@ deploy_script:
 environment:
   psgallery:
     secure: Hlkt9LvEqlXZk4TY5rlpVj6fiSeLV7nmMwV4mjAinWphJUUeR6ZhIaYT0/L31YF/
+skip_commits:
+  files:
+    - '**/*.md'
