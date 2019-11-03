@@ -12,7 +12,7 @@ My next stop was [Inkdrop][id]. It's not designed with journaling in mind, but I
 
 Finally, I had a realization. *Typora supports yaml front matter. I can use front matter to add tags to each file and create a command line tool to parse the tags from each journal file!* Thus, `journal-cli` was born.
 
-\* I now generally refer to that "Austin chick" as "wife".
+\* I now generally refer to that chick from Austin as "wife".
 
 # Sooo... what can it do? 
 
