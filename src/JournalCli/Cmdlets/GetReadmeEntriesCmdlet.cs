@@ -8,7 +8,7 @@ using JournalCli.Infrastructure;
 namespace JournalCli.Cmdlets
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Get, "ReadmeEntries")]
+    [Cmdlet(VerbsCommon.Get, "ReadmeEntries", DefaultParameterSetName = "All")]
     [OutputType(typeof(ReadmeJournalEntryCollection))]
     public class GetReadmeEntriesCmdlet : JournalCmdletBase
     {
@@ -42,7 +42,7 @@ namespace JournalCli.Cmdlets
         {
             get
             {
-                if (All)
+                if (All || ParameterSetName == "All")
                     return new NodaTime.LocalDate();
 
                 switch (Period)
