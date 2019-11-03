@@ -1,6 +1,6 @@
 # What is this?
 
-`journal-cli` is a command line tool for people who want to journal with markdown files, love command lines tools, and are highly averse to storing intimidate information in the cloud unless it's encrypted.
+`journal-cli` is a command line tool for people who want to journal with markdown files, love command lines tools, and are highly averse to storing intimate information in the cloud unless it's encrypted.
 
 # Background
 
@@ -12,7 +12,7 @@ My next stop was [Inkdrop][id]. It's not designed with journaling in mind, but I
 
 Finally, I had a realization. *Typora supports yaml front matter. I can use front matter to add tags to each file and create a command line tool to parse the tags from each journal file!* Thus, `journal-cli` was born.
 
-\* The "Austin chick" later became my wife. 
+\* I now generally refer to that "Austin chick" as "wife".
 
 # Sooo... what can it do? 
 
@@ -60,7 +60,7 @@ Every `journal-cli` command that alters the state of your journal automatically 
 
 # How do I get it?
 
-Check out the [Getting Started](https://journalcli.me/docs/getting-started) guide. Run `Get-Command -Module JournalCli` to display a list of all available commands and  `Get-Help <function_name>` for syntax and usage notes for a specific command.
+Check out the [Getting Started](https://journalcli.me/docs/getting-started) guide, which includes installation instructions.
 
 # A word about performance
 
