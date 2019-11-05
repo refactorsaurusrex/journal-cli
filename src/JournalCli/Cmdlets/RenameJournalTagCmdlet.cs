@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
@@ -25,43 +26,36 @@ namespace JournalCli.Cmdlets
         {
             base.ProcessRecord();
 
-            if (!DryRun)
-            {
-                WriteHeader($"You're about to replace all tags named '{OldName}' with the new name '{NewName}'.", ConsoleColor.Red);
-                if (!AreYouSure($"Rename '{OldName}' to '{NewName}'."))
-                    return;
-            }
+            if (!DryRun && !YesOrNo($"Are you sure you want to rename all '{OldName}' tags to '{NewName}'?"))
+                return;
 
             var fileSystem = new FileSystem();
             var systemProcess = new SystemProcess();
             var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
             var markdownFiles = new MarkdownFiles(fileSystem, Location);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            IEnumerable<string> effectedEntries;
+            ICollection<string> effectedEntries;
 
             if (DryRun)
             {
-                const string header = "Tags in the following entries would be renamed:";
-                WriteHeader(header, ConsoleColor.DarkGreen);
-
                 effectedEntries = journal.RenameTagDryRun(OldName);
+                var count = effectedEntries.Count == 1 ? "1 entry:" : $"{effectedEntries.Count} entries:";
+                var warning = $"All instances of the tag '{OldName}' would be replaced with '{NewName}' in the following {count} ";
+                WriteHostInverted(warning);
             }
             else
             {
-                const string header = "Tags in the following entries have been renamed:";
-                WriteHeader(header, ConsoleColor.Yellow);
-
                 Commit(GitCommitType.PreRenameTag);
                 effectedEntries = journal.RenameTag(OldName, NewName);
                 Commit(GitCommitType.PostRenameTag);
+
+                var notice = $"The tag '{OldName}' has been successfully replaced with '{NewName}' in all {effectedEntries.Count} entries.";
+                WriteHostInverted(notice);
             }
 
-            var counter = 1;
-            var consoleColor = DryRun ? ConsoleColor.DarkGreen : ConsoleColor.Yellow;
-            foreach (var file in effectedEntries)
-            {
-                WriteHost($"{counter++.ToString().PadLeft(3)}) {file}", ConsoleColor.Black, consoleColor);
-            }
+            // Project into a new sequence of POCOs, instead of a list of strings. This allow users to manipulate the content
+            // with `Format-Wide -Column 6` for example.
+            WriteObject(effectedEntries.Select(x => new { EntryName = x }), true);
         }
     }
 }

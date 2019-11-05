@@ -73,7 +73,7 @@ namespace JournalCli.Core
             return readmeCollection;
         }
 
-        public IEnumerable<string> RenameTagDryRun(string oldName)
+        public ICollection<string> RenameTagDryRun(string oldName)
         {
             var index = CreateIndex<JournalEntryFile>();
             var journalEntries = index.SingleOrDefault(x => x.Tag == oldName);
@@ -84,7 +84,7 @@ namespace JournalCli.Core
             return journalEntries.Entries.Select(e => e.EntryName).ToList();
         }
 
-        public IEnumerable<string> RenameTag(string oldName, string newName)
+        public ICollection<string> RenameTag(string oldName, string newName)
         {
             var index = CreateIndex<JournalEntryFile>();
             var journalEntries = index.SingleOrDefault(x => x.Tag == oldName);
