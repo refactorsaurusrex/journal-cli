@@ -60,7 +60,7 @@ namespace JournalCli.Cmdlets
             var consoleColor = DryRun ? ConsoleColor.DarkGreen : ConsoleColor.Yellow;
             foreach (var file in effectedEntries)
             {
-                WriteHost($"{counter++.ToString().PadLeft(3)}) {file}", consoleColor);
+                WriteHost($"{counter++.ToString().PadLeft(3)}) {file}", ConsoleColor.Black, consoleColor);
             }
         }
     }
