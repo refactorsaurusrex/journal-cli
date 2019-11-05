@@ -27,12 +27,25 @@ namespace JournalCli.Cmdlets
             var fileSystem = new FileSystem();
             var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
             var markdownFiles = new MarkdownFiles(fileSystem, Location);
-            var journal = Journal.Open(ioFactory, markdownFiles, new SystemProcess());
+            var systemProcess = new SystemProcess();
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
             var entryDate = Today.PlusDays(DateOffset);
 
             Commit(GitCommitType.PreNewJournalEntry);
-            journal.CreateNewEntry(entryDate, Tags, Readme);
-            Commit(GitCommitType.PostNewJournalEntry);
+
+            try
+            {
+                journal.CreateNewEntry(entryDate, Tags, Readme);
+                Commit(GitCommitType.PostNewJournalEntry);
+            }
+            catch (JournalEntryAlreadyExistsException e)
+            {
+                var question = $"An entry for {entryDate} already exists. Do you want to open it instead?";
+                if (YesOrNo(question))
+                {
+                    systemProcess.Start(e.EntryFilePath);
+                }
+            }
         }
     }
 }
