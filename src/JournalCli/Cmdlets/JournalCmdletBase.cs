@@ -58,6 +58,10 @@ namespace JournalCli.Cmdlets
 
         private void CommitCore(string message)
         {
+#if DEBUG
+            if (System.Diagnostics.Debugger.IsAttached)
+                return;
+#endif
             using (var repo = new Git.Repository(Location))
             {
                 var statusOptions = new Git.StatusOptions
