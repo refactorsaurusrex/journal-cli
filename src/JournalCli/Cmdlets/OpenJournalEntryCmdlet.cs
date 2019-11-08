@@ -24,6 +24,9 @@ namespace JournalCli.Cmdlets
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Date")]
         public DateTime Date { get; set; }
 
+        [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "DateOffset")]
+        public int DateOffset { get; set; }
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
@@ -48,6 +51,12 @@ namespace JournalCli.Cmdlets
                         path = journalWriter.GetJournalEntryFilePath(entryDate);
                         break;
                     }
+                case "DateOffset":
+                {
+                    var entryDate = Today.PlusDays(DateOffset);
+                    path = journalWriter.GetJournalEntryFilePath(entryDate);
+                    break;
+                }
                 case "Entry":
                     {
                         var entryDate = Journal.FileNamePattern.Parse(Entry.EntryName).Value;
