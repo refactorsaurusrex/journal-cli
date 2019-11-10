@@ -1,6 +1,6 @@
 # What is this?
 
-`journal-cli` is a command line tool for people who want to journal with markdown files, love command lines tools, and are highly averse to storing intimate information in the cloud unless it's encrypted.
+`journal-cli` is a command line tool for people who want to journal with markdown files, love command line tools, and are highly averse to storing intimate information in the cloud unless it's encrypted.
 
 # Background
 
