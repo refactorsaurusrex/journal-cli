@@ -4,7 +4,6 @@ using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Reflection;
-using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
 {
@@ -88,8 +87,19 @@ namespace JournalCli.Cmdlets
         /// the shortcut for "one", 'T' for "two", and 'H' for "three".</param>
         protected int Choice(string caption, string message, int defaultChoice, params string[] choices)
         {
-            var choiceDescriptions = choices.Select(c => new ChoiceDescription(c)).ToList();
-            return Host.UI.PromptForChoice(caption, message, new Collection<ChoiceDescription>(choiceDescriptions), defaultChoice);
+            var origBackground = Host.UI.RawUI.BackgroundColor;
+            var origForeground = Host.UI.RawUI.ForegroundColor;
+
+            Host.UI.RawUI.ForegroundColor = origBackground;
+            Host.UI.RawUI.BackgroundColor = origForeground;
+
+            var choiceDescriptions = choices.Select(c => new ChoiceDescription(c) { HelpMessage = $"Choose {c.Replace("&", "")}." }).ToList();
+            var result = Host.UI.PromptForChoice(caption, message, new Collection<ChoiceDescription>(choiceDescriptions), defaultChoice);
+
+            Host.UI.RawUI.ForegroundColor = origForeground;
+            Host.UI.RawUI.BackgroundColor = origBackground;
+
+            return result;
         }
     }
 }
