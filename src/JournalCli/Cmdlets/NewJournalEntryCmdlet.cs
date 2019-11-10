@@ -3,6 +3,7 @@ using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
+using NodaTime;
 
 namespace JournalCli.Cmdlets
 {
@@ -30,6 +31,16 @@ namespace JournalCli.Cmdlets
             var systemProcess = new SystemProcess();
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
             var entryDate = Today.PlusDays(DateOffset);
+
+            var hour = Now.Time().Hour;
+            if (hour >= 0 && hour <= 4)
+            {
+                var dayPrior = entryDate.Minus(Period.FromDays(1));
+                var question = $"Did you mean to create an entry for '{dayPrior}' or '{entryDate}'?";
+                var result = Choice("It's after midnight!", question, 0, dayPrior.DayOfWeek.ToChoiceString(), entryDate.DayOfWeek.ToChoiceString());
+                if (result == 0)
+                    entryDate = dayPrior;
+            }
 
             Commit(GitCommitType.PreNewJournalEntry);
 

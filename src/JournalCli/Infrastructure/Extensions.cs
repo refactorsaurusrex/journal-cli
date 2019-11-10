@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using JournalCli.Core;
@@ -30,6 +31,30 @@ namespace JournalCli.Infrastructure
             });
 
             return string.Join(Environment.NewLine, allLines.ToArray());
+        }
+
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
+        public static string ToChoiceString(this IsoDayOfWeek dayOfWeek)
+        {
+            switch (dayOfWeek)
+            {
+                case IsoDayOfWeek.Monday:
+                    return "&Monday";
+                case IsoDayOfWeek.Tuesday:
+                    return "&Tuesday";
+                case IsoDayOfWeek.Wednesday:
+                    return "&Wednesday";
+                case IsoDayOfWeek.Thursday:
+                    return "T&hursday";
+                case IsoDayOfWeek.Friday:
+                    return "&Friday";
+                case IsoDayOfWeek.Saturday:
+                    return "S&aturday";
+                case IsoDayOfWeek.Sunday:
+                    return "S&unday";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(dayOfWeek), dayOfWeek, null);
+            }
         }
     }
 }
