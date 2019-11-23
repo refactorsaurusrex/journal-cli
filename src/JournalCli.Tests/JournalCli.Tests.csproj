@@ -31,6 +31,9 @@
     <None Update="TestData\EmptyEntry.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="TestData\EntryWithoutTags.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="TestData\EntryWithTags.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
