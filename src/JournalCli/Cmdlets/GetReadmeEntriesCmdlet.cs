@@ -29,6 +29,25 @@ namespace JournalCli.Cmdlets
         {
             base.ProcessRecord();
 
+            if (ParameterSetName == "Range")
+            {
+                if (Duration == 0)
+                {
+                    const string message = "Zero is not a valid value when specifying a range. Try again with a Duration value of 1 or larger.";
+                    throw new PSArgumentOutOfRangeException(nameof(Duration), Duration, message);
+                }
+
+                if (Duration < 0)
+                {
+                    const string message = "If that was an attempt to look at FUTURE readme entries, nice try. ;) Although I discourage " +
+                        "looking at readme entries before they've expired (doing so seems to violate the spirit of writing a note " +
+                        "to your future self), I built a special switch for this use case. It's undocumented, but if you include " +
+                        "the -IncludeFuture switch, you'll get what you're after. Have fun!";
+                    WriteWarning(message);
+                    throw new PSArgumentOutOfRangeException(nameof(Duration), Duration, "Duration must be greater than or equal to 1.");
+                }
+            }
+
             var fileSystem = new FileSystem();
             var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
             var markdownFiles = new MarkdownFiles(fileSystem, Location);
