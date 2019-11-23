@@ -32,12 +32,14 @@ namespace JournalCli.Cmdlets
             var fileSystem = new FileSystem();
             var journalWriter = new JournalWriter(fileSystem, Location);
             string path;
+            LocalDate entryDate;
 
             switch (ParameterSetName)
             {
                 case "Name":
-                    {
-                        var entryDate = EntryName.EndsWith(".md") ?
+                    
+                {
+                        entryDate = EntryName.EndsWith(".md") ?
                             Journal.FileNameWithExtensionPattern.Parse(EntryName).Value :
                             Journal.FileNamePattern.Parse(EntryName).Value;
                         path = journalWriter.GetJournalEntryFilePath(entryDate);
@@ -45,19 +47,19 @@ namespace JournalCli.Cmdlets
                     }
                 case "Date":
                     {
-                        var entryDate = LocalDate.FromDateTime(Date);
+                        entryDate = LocalDate.FromDateTime(Date);
                         path = journalWriter.GetJournalEntryFilePath(entryDate);
                         break;
                     }
                 case "DateOffset":
                 {
-                    var entryDate = Today.PlusDays(DateOffset);
+                    entryDate = Today.PlusDays(DateOffset);
                     path = journalWriter.GetJournalEntryFilePath(entryDate);
                     break;
                 }
                 case "Entry":
                     {
-                        var entryDate = Journal.FileNamePattern.Parse(Entry.EntryName).Value;
+                        entryDate = Journal.FileNamePattern.Parse(Entry.EntryName).Value;
                         path = journalWriter.GetJournalEntryFilePath(entryDate);
                         break;
                     }
@@ -66,7 +68,7 @@ namespace JournalCli.Cmdlets
             }
 
             if (!fileSystem.File.Exists(path))
-                throw new PSInvalidOperationException("The provided journal entry does not exist.");
+                throw new PSInvalidOperationException($"An entry does not exist for '{entryDate}'.");
 
             var systemProcess = new SystemProcess();
             systemProcess.Start(path);
