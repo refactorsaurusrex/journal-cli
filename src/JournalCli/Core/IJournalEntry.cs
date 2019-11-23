@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JournalCli.Infrastructure;
 
 namespace JournalCli.Core
 {
@@ -7,5 +8,6 @@ namespace JournalCli.Core
         string EntryName { get; }
         ICollection<string> Tags { get; }
         string ToString();
+        IJournalReader GetReader();
     }
 }

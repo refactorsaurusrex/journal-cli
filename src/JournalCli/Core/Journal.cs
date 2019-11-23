@@ -104,7 +104,7 @@ namespace JournalCli.Core
             return entryNames;
         }
 
-        public JournalIndex<T> CreateIndex<T>(params string[] requiredTags)
+        public JournalIndex<T> CreateIndex<T>(DateRange range = null, string[] requiredTags = null)
             where T : class, IJournalEntry
         {
             var index = new JournalIndex<T>();
@@ -112,12 +112,15 @@ namespace JournalCli.Core
             foreach (var file in _markdownFiles.FindAll())
             {
                 var reader = _readerWriterFactory.CreateReader(file);
-                var entry = reader.ToJournalEntry<T>();
+                if (range != null && !range.Includes(reader.EntryDate))
+                    continue;
 
+                var entry = reader.ToJournalEntry<T>();
+                
                 if (entry.Tags == null || entry.Tags.Count == 0)
                     continue;
 
-                if (requiredTags.Length > 0 && !entry.Tags.ContainsAll(requiredTags))
+                if (requiredTags != null && requiredTags.Length > 0 && !entry.Tags.ContainsAll(requiredTags))
                     continue;
 
                 foreach (var tag in entry.Tags)
@@ -145,8 +148,76 @@ namespace JournalCli.Core
             if (journalWriter.EntryExists(entryFilePath))
                 throw new JournalEntryAlreadyExistsException(entryFilePath);
 
-            var frontMatter = new JournalFrontMatter(tags, readme, entryDate);
+            var parser = new ReadmeParser(readme, entryDate);
+            var frontMatter = new JournalFrontMatter(tags, parser);
             journalWriter.Create(frontMatter, entryFilePath, entryDate);
+            _systemProcess.Start(entryFilePath);
+        }
+
+        public IEnumerable<string> GetRecentEntries(int limit)
+        {
+            var files = _markdownFiles.FindAll()
+                .Select(x => new JournalEntryFile(_readerWriterFactory.CreateReader(x)))
+                .OrderByDescending(x => x.EntryDate)
+                .Select(x => x.EntryName);
+
+            return limit >= 1 ? files.Take(limit) : files;
+        }
+
+        public void CreateCompiledEntry(DateRange range, string[] tags, bool allTagsRequired, bool overwrite)
+        {
+            List<JournalEntryFile> entries;
+            if (allTagsRequired)
+            {
+                entries = CreateIndex<JournalEntryFile>(range, tags)
+                    .SelectMany(x => x.Entries)
+                    .OrderBy(x => x)
+                    .Distinct()
+                    .ToList();
+            }
+            else
+            {
+                entries = CreateIndex<JournalEntryFile>(range)
+                    .Where(x => tags.Contains(x.Tag))
+                    .SelectMany(x => x.Entries)
+                    .OrderBy(x => x)
+                    .Distinct()
+                    .ToList();
+            }
+
+            if (range == null)
+                range = new DateRange(entries.First().EntryDate, entries.Last().EntryDate);
+
+            var journalWriter = _readerWriterFactory.CreateWriter();
+            var entryFilePath = journalWriter.GetCompiledJournalEntryFilePath(range);
+
+            if (journalWriter.EntryExists(entryFilePath) && !overwrite)
+                throw new JournalEntryAlreadyExistsException(entryFilePath);
+
+            var aggregatedTags = entries.SelectMany(x => x.Tags).Distinct();
+            var content = string.Join(Environment.NewLine, entries.Select(x => x.Body));
+
+            var frontMatter = new JournalFrontMatter(aggregatedTags);
+            journalWriter.CreateCompiled(frontMatter, entryFilePath, content);
+            _systemProcess.Start(entryFilePath);
+        }
+
+        public void CreateCompiledEntry(IEnumerable<IJournalEntry> entries, bool overwrite)
+        {
+            var convertedEntries = entries.Select(x => new JournalEntryFile(x.GetReader())).OrderBy(x => x.EntryDate).ToList();
+            var range = new DateRange(convertedEntries.First().EntryDate, convertedEntries.Last().EntryDate);
+
+            var journalWriter = _readerWriterFactory.CreateWriter();
+            var entryFilePath = journalWriter.GetCompiledJournalEntryFilePath(range);
+
+            if (journalWriter.EntryExists(entryFilePath) && !overwrite)
+                throw new JournalEntryAlreadyExistsException(entryFilePath);
+
+            var aggregatedTags = convertedEntries.SelectMany(x => x.Tags).Distinct();
+            var content = string.Join(Environment.NewLine, convertedEntries.Select(x => x.Body));
+
+            var frontMatter = new JournalFrontMatter(aggregatedTags);
+            journalWriter.CreateCompiled(frontMatter, entryFilePath, content);
             _systemProcess.Start(entryFilePath);
         }
     }

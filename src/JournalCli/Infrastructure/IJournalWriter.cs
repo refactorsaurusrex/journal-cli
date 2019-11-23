@@ -9,5 +9,7 @@ namespace JournalCli.Infrastructure
         void RenameTag(IJournalReader journalReader, string oldTag, string newTag);
         string GetJournalEntryFilePath(LocalDate entryDate);
         bool EntryExists(string path);
+        string GetCompiledJournalEntryFilePath(DateRange range);
+        void CreateCompiled(IJournalFrontMatter journalFrontMatter, string filePath, string content);
     }
 }

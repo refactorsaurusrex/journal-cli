@@ -8,8 +8,11 @@ namespace JournalCli.Core
 {
     public class CompleteJournalEntry : IJournalEntry
     {
+        private readonly IJournalReader _reader;
+
         public CompleteJournalEntry(IJournalReader reader)
         {
+            _reader = reader;
             WrapBody(reader.Body);
             Tags = reader.FrontMatter.Tags;
             EntryName = reader.EntryName;
@@ -19,7 +22,7 @@ namespace JournalCli.Core
         public ICollection<string> Tags { get; }
         public override string ToString() => EntryName;
         public string Body { get; private set; }
-
+        public IJournalReader GetReader() => _reader;
         private void WrapBody(string body)
         {
             var lines = body.Trim().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
