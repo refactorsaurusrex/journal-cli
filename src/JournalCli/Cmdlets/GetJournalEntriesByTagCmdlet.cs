@@ -62,7 +62,7 @@ namespace JournalCli.Cmdlets
         private void WriteAllTagResults<T>(Journal journal)
             where T : class, IJournalEntry
         {
-            var allIndex = journal.CreateIndex<T>(Tags).OrderByDescending(x => x.Entries.Count);
+            var allIndex = journal.CreateIndex<T>(requiredTags: Tags).OrderByDescending(x => x.Entries.Count);
             WriteObject(allIndex, true);
         }
 

@@ -27,6 +27,16 @@ namespace JournalCli.Infrastructure
             }
         }
 
+        public void CreateCompiled(IJournalFrontMatter journalFrontMatter, string filePath, string content)
+        {
+            using (var fs = _fileSystem.File.CreateText(filePath))
+            {
+                fs.Write(journalFrontMatter.ToString(asFrontMatter: true));
+                fs.WriteLine(content);
+                fs.Flush();
+            }
+        }
+
         public void RenameTag(IJournalReader journalReader, string oldTag, string newTag)
         {
             if (string.IsNullOrWhiteSpace(oldTag) || string.IsNullOrWhiteSpace(newTag))
@@ -46,7 +56,8 @@ namespace JournalCli.Infrastructure
 
             currentTags[oldItemIndex] = newTag;
 
-            var frontMatter = new JournalFrontMatter(currentTags, journalReader.FrontMatter.Readme, journalReader.EntryDate);
+            var parser = new ReadmeParser(journalReader.FrontMatter.Readme, journalReader.EntryDate);
+            var frontMatter = new JournalFrontMatter(currentTags, parser);
             var newEntry = frontMatter.ToString(asFrontMatter: true) + journalReader.Body;
             _fileSystem.File.WriteAllText(journalReader.FilePath, newEntry);
         }
@@ -61,6 +72,18 @@ namespace JournalCli.Infrastructure
                 _fileSystem.Directory.CreateDirectory(parent);
 
             var fileName = entryDate.ToJournalEntryFileName();
+            var fullPath = _fileSystem.Path.Combine(parent, fileName);
+            return fullPath;
+        }
+
+        public string GetCompiledJournalEntryFilePath(DateRange range)
+        {
+            var parent = _fileSystem.Path.Combine(_rootDirectory, "Compiled");
+
+            if (!_fileSystem.Directory.Exists(parent))
+                _fileSystem.Directory.CreateDirectory(parent);
+
+            var fileName = range.ToJournalEntryFileName();
             var fullPath = _fileSystem.Path.Combine(parent, fileName);
             return fullPath;
         }

@@ -42,20 +42,19 @@ namespace JournalCli.Core
 
         private JournalFrontMatter() { }
 
-        public JournalFrontMatter(IEnumerable<string> tags, string readme, LocalDate journalDate)
+        public JournalFrontMatter(IEnumerable<string> tags, ReadmeParser readmeParser = null)
         {
             Tags = tags?.Distinct().OrderBy(x => x).ToList();
 
-            if (string.IsNullOrWhiteSpace(readme))
+            if (readmeParser == null)
             {
                 Readme = null;
                 ReadmeDate = null;
             }
             else
             {
-                var parser = new ReadmeParser(readme, journalDate);
-                Readme = parser.FrontMatterValue;
-                ReadmeDate = parser.ExpirationDate;
+                Readme = readmeParser.FrontMatterValue;
+                ReadmeDate = readmeParser.ExpirationDate;
             }
         }
 
