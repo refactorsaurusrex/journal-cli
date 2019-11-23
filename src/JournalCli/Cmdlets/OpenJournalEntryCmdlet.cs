@@ -9,12 +9,10 @@ using NodaTime;
 namespace JournalCli.Cmdlets
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Open, "JournalEntry")]
+    [Cmdlet(VerbsCommon.Open, "JournalEntry", DefaultParameterSetName = "Date")]
     [Alias("oje")]
     public class OpenJournalEntryCmdlet : JournalCmdletBase
     {
-        // TODO: open entry via date or natural language input
-
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Entry")]
         public IJournalEntry Entry { get; set; }
 
@@ -22,7 +20,7 @@ namespace JournalCli.Cmdlets
         public string EntryName { get; set; }
 
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Date")]
-        public DateTime Date { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now;
 
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "DateOffset")]
         public int DateOffset { get; set; }
