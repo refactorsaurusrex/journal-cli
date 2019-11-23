@@ -148,7 +148,7 @@ namespace JournalCli.Core
             if (journalWriter.EntryExists(entryFilePath))
                 throw new JournalEntryAlreadyExistsException(entryFilePath);
 
-            var parser = new ReadmeParser(readme, entryDate);
+            var parser = string.IsNullOrWhiteSpace(readme) ? null : new ReadmeParser(readme, entryDate);
             var frontMatter = new JournalFrontMatter(tags, parser);
             journalWriter.Create(frontMatter, entryFilePath, entryDate);
             _systemProcess.Start(entryFilePath);
