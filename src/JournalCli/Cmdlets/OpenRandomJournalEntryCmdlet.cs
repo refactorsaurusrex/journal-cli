@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System;
+using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
@@ -11,6 +12,13 @@ namespace JournalCli.Cmdlets
     [Alias("orj")]
     public class OpenRandomJournalEntryCmdlet : JournalCmdletBase
     {
+#warning not implmented
+        [Parameter(ParameterSetName = "Range")]
+        public DateTime From { get; set; }
+
+        [Parameter(ParameterSetName = "Range")]
+        public DateTime To { get; set; }
+
         [Parameter]
         public string[] Tags { get; set; }
 

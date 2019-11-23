@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System;
+using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
@@ -15,6 +16,10 @@ namespace JournalCli.Cmdlets
         [Parameter]
         [ValidateSet("CurrentMonth", "CurrentYear", "Root")]
         public string To { get; set; } = "CurrentMonth";
+
+#warning NOT IMPLEMENTED
+        [Parameter]
+        public DateTime Date { get; set; }
 
         protected override void ProcessRecord()
         {

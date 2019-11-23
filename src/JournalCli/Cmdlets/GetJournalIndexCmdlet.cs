@@ -29,6 +29,12 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public SwitchParameter IncludeBodies { get; set; }
 
+        [Parameter(ParameterSetName = "Range")]
+        public DateTime From { get; set; }
+
+        [Parameter(ParameterSetName = "Range")]
+        public DateTime To { get; set; }
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
