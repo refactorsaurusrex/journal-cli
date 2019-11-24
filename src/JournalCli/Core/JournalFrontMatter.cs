@@ -91,8 +91,12 @@ namespace JournalCli.Core
 
                 if (tagsKey != null)
                 {
-                    var tags = (YamlSequenceNode)yamlStream.Documents[0].RootNode[tagsKey];
-                    Tags = tags.Select(x => x.ToString()).Distinct().OrderBy(x => x).ToList();
+                    var node = yamlStream.Documents[0].RootNode[tagsKey];
+                    if (node.NodeType == YamlNodeType.Sequence)
+                    {
+                        var tags = (YamlSequenceNode)node;
+                        Tags = tags.Select(x => x.ToString()).Distinct().OrderBy(x => x).ToList();
+                    }
                 }
 
                 if (readMeKey != null)
