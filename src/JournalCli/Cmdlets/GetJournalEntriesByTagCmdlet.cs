@@ -10,8 +10,9 @@ using JournalCli.Infrastructure;
 namespace JournalCli.Cmdlets
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Get, "JournalEntriesByTag", DefaultParameterSetName = "Any")]
+    [Cmdlet(VerbsCommon.Get, "JournalEntriesByTag")]
     [OutputType(typeof(IEnumerable<JournalIndexEntry<MetaJournalEntry>>))]
+    [OutputType(typeof(IEnumerable<JournalIndexEntry<CompleteJournalEntry>>))]
     [Alias("gjt")]
     public class GetJournalEntriesByTagCmdlet : JournalCmdletBase
     {
@@ -21,10 +22,7 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public SwitchParameter IncludeBodies { get; set; }
 
-        [Parameter(ParameterSetName = "Any")]
-        public SwitchParameter Any { get; set; }
-
-        [Parameter(ParameterSetName = "All")]
+        [Parameter]
         public SwitchParameter All { get; set; }
 
         [Parameter(ParameterSetName = "Range")]
@@ -42,19 +40,19 @@ namespace JournalCli.Cmdlets
             var markdownFiles = new MarkdownFiles(fileSystem, Location);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
-            switch (ParameterSetName)
+            switch (All.ToBool())
             {
-                case "Any" when IncludeBodies:
-                    WriteAnyTagResults<CompleteJournalEntry>(journal);
-                    break;
-                case "Any":
-                    WriteAnyTagResults<MetaJournalEntry>(journal);
-                    break;
-                case "All" when IncludeBodies:
+                case true when IncludeBodies:
                     WriteAllTagResults<CompleteJournalEntry>(journal);
                     break;
-                case "All":
+                case true when !IncludeBodies:
                     WriteAllTagResults<MetaJournalEntry>(journal);
+                    break;
+                case false when IncludeBodies:
+                    WriteAnyTagResults<CompleteJournalEntry>(journal);
+                    break;
+                case false when !IncludeBodies:
+                    WriteAnyTagResults<MetaJournalEntry>(journal);
                     break;
                 default:
                     throw new NotSupportedException();
