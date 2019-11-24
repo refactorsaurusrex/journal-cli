@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
-using JournalCli.Core;
 using JournalCli.Infrastructure;
 using NodaTime;
 
@@ -16,27 +15,26 @@ namespace JournalCli.Tests
         protected static List<string> JournalSamples = new List<string>
         {
             System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithoutFrontMatter.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags.md")),
+            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags1.md")),
+            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags2.md")),
+            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags3.md")),
+            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags4.md")),
+            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags5.md")),
+            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags6.md")),
+            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithoutTags.md")),
             System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTagsAndReadme.md")),
             System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EmptyEntry.md"))
         };
 
-        internal object CreateVirtualJournal()
-        {
-            throw new NotImplementedException();
-        }
-
         protected static int JournalSampleLength => JournalSamples.Count - 1;
-
-        protected string GetRandomJournalText() => JournalSamples[_random.Next(0, JournalSampleLength)];
 
         protected static string EntryWithoutFrontMatter => JournalSamples[0];
 
         protected static string EntryWithTags => JournalSamples[1];
 
-        protected static string EntryWithTagsAndReadme => JournalSamples[2];
+        protected static string EntryWithTagsAndReadme => JournalSamples[8];
 
-        protected static string EmptyEntry => JournalSamples[3];
+        protected static string EmptyEntry => JournalSamples[9];
 
         protected VirtualJournal CreateVirtualJournal(int yearStart, int yearEnd)
         {
@@ -56,7 +54,7 @@ namespace JournalCli.Tests
                         var filePath = fileSystem.Path.Combine(currentPath, dt.ToJournalEntryFileName());
                         var index = _random.Next(0, JournalSampleLength);
                         fileSystem.AddFile(filePath, new MockFileData(JournalSamples[index]));
-                        if (index == 2)
+                        if (index == 8)
                             fileSystem.TotalReadmeEntries++;
                     }
                 }

@@ -104,7 +104,7 @@ namespace JournalCli.Core
             return entryNames;
         }
 
-        public JournalIndex<T> CreateIndex<T>(DateRange range = null, string[] requiredTags = null)
+        public JournalIndex<T> CreateIndex<T>(DateRange range = null, ICollection<string> requiredTags = null)
             where T : class, IJournalEntry
         {
             var index = new JournalIndex<T>();
@@ -120,7 +120,7 @@ namespace JournalCli.Core
                 if (entry.Tags == null || entry.Tags.Count == 0)
                     continue;
 
-                if (requiredTags != null && requiredTags.Length > 0 && !entry.Tags.ContainsAll(requiredTags))
+                if (requiredTags != null && requiredTags.Count > 0 && !entry.Tags.ContainsAll(requiredTags))
                     continue;
 
                 foreach (var tag in entry.Tags)
