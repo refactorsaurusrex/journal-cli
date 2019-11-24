@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Abstractions;
 using System.Management.Automation;
 using JournalCli.Core;
 using JournalCli.Infrastructure;

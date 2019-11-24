@@ -81,7 +81,7 @@ namespace JournalCli.Tests
         }
 
         [Fact]
-        public void CreateIndex_IncludesAllTags_Always()
+        public void CreateIndex_IncludesAnyTag_WhenNoRequiredTagsIncluded()
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
@@ -91,7 +91,27 @@ namespace JournalCli.Tests
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
             var index = journal.CreateIndex<MetaJournalEntry>();
 
-            index.Select(x => x.Tag).Should().OnlyContain(s => new List<string> { "blah", "doh" }.Contains(s));
+            var expectedTags = new List<string> { "baby", "blah", "carrot", "cat", "cow", "dog", "doh", "forrest", "horse", "hungry", "pig", "tree" };
+            var actualTags = index.Select(x => x.Tag).ToList();
+
+            actualTags.Count.Should().Be(actualTags.Distinct().Count());
+            actualTags.Should().OnlyContain(tag => expectedTags.Contains(tag));
+        }
+
+        [Fact]
+        public void CreateIndex_IncludesAllTags_WhenRequiredTagsIncluded()
+        {
+            var fileSystem = CreateVirtualJournal(2017, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+            var requiredTags = new List<string> { "blah", "doh" };
+            var index = journal.CreateIndex<MetaJournalEntry>(requiredTags: requiredTags);
+
+            foreach (var entry in index.SelectMany(x => x.Entries))
+                entry.Tags.Should().Contain(requiredTags);
         }
 
         [Fact]
@@ -116,15 +136,15 @@ namespace JournalCli.Tests
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
             var originalIndex = journal.CreateIndex<MetaJournalEntry>();
-            var blahCount = originalIndex["blah"].Count;
 
+            var blahCount = originalIndex["blah"].Count;
             var renamedFiles = journal.RenameTag("blah", "landscapes");
 
             var index = journal.CreateIndex<MetaJournalEntry>();
             var landscapeCount = index["landscapes"].Count;
             landscapeCount.Should().Be(blahCount);
-            renamedFiles.Count().Should().Be(blahCount);
-            index.Select(x => x.Tag).Should().OnlyContain(s => new List<string> { "landscapes", "doh" }.Contains(s));
+            renamedFiles.Count.Should().Be(blahCount);
+            index.Select(x => x.Tag).Should().NotContain("blah");
         }
 
         [Fact]
