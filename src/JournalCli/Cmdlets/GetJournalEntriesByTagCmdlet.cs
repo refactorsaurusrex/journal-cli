@@ -33,10 +33,6 @@ namespace JournalCli.Cmdlets
         [Parameter(ParameterSetName = "Range")]
         public DateTime To { get; set; }
 
-        [Parameter]
-        [Obsolete("IncludeHeaders has been deprecated and is no longer in use.")]
-        public SwitchParameter IncludeHeaders { get; set; }
-
         protected override void ProcessRecord()
         {
             base.ProcessRecord();

@@ -23,10 +23,6 @@ namespace JournalCli.Cmdlets
         public string Direction { get; set; } = "Descending";
 
         [Parameter]
-        [Obsolete("IncludeHeaders has been deprecated and is no longer in use.")]
-        public SwitchParameter IncludeHeaders { get; set; }
-
-        [Parameter]
         public SwitchParameter IncludeBodies { get; set; }
 
         [Parameter(ParameterSetName = "Range")]
