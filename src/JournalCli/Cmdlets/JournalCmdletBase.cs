@@ -43,6 +43,15 @@ namespace JournalCli.Cmdlets
             Location = settings.DefaultJournalRoot;
         }
 
+        private protected Journal OpenJournal()
+        {
+            var fileSystem = new FileSystem();
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
+            var markdownFiles = new MarkdownFiles(fileSystem, Location);
+            var systemProcess = new SystemProcess();
+            return Journal.Open(ioFactory, markdownFiles, systemProcess);
+        }
+
         protected void Commit(GitCommitType commitType)
         {
             ValidateGitRepo();
