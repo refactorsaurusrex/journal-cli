@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
@@ -25,51 +24,49 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public SwitchParameter All { get; set; }
 
-        [Parameter(ParameterSetName = "Range")]
-        public DateTime From { get; set; }
+        [Parameter]
+        public DateTime? From { get; set; }
 
-        [Parameter(ParameterSetName = "Range")]
-        public DateTime To { get; set; }
+        [Parameter]
+        public DateTime? To { get; set; }
 
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
-            var fileSystem = new FileSystem();
-            var systemProcess = new SystemProcess();
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
-            var markdownFiles = new MarkdownFiles(fileSystem, Location);
-            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = GetRangeOrThrow(From, To);
+            var journal = OpenJournal();
 
             switch (All.ToBool())
             {
                 case true when IncludeBodies:
-                    WriteAllTagResults<CompleteJournalEntry>(journal);
+                    WriteAllTagResults<CompleteJournalEntry>(journal, dateRange);
                     break;
                 case true when !IncludeBodies:
-                    WriteAllTagResults<MetaJournalEntry>(journal);
+                    WriteAllTagResults<MetaJournalEntry>(journal, dateRange);
                     break;
                 case false when IncludeBodies:
-                    WriteAnyTagResults<CompleteJournalEntry>(journal);
+                    WriteAnyTagResults<CompleteJournalEntry>(journal, dateRange);
                     break;
                 case false when !IncludeBodies:
-                    WriteAnyTagResults<MetaJournalEntry>(journal);
+                    WriteAnyTagResults<MetaJournalEntry>(journal, dateRange);
                     break;
                 default:
                     throw new NotSupportedException();
             }
         }
 
-        private void WriteAllTagResults<T>(Journal journal)
+        private void WriteAllTagResults<T>(Journal journal, DateRange dateRange)
             where T : class, IJournalEntry
         {
-            var allIndex = journal.CreateIndex<T>(requiredTags: Tags).OrderByDescending(x => x.Entries.Count);
+            var allIndex = journal.CreateIndex<T>(dateRange, Tags).OrderByDescending(x => x.Entries.Count);
             WriteObject(allIndex, true);
         }
 
-        private void WriteAnyTagResults<T>(Journal journal)
+        private void WriteAnyTagResults<T>(Journal journal, DateRange dateRange)
             where T : class, IJournalEntry
         {
-            var anyIndex = journal.CreateIndex<T>();
+            var anyIndex = journal.CreateIndex<T>(dateRange);
             var result = anyIndex.Where(x => Tags.Contains(x.Tag)).OrderByDescending(x => x.Entries.Count);
             WriteObject(result, true);
         }

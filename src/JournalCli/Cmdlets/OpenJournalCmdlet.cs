@@ -17,7 +17,7 @@ namespace JournalCli.Cmdlets
         [ValidateSet("CurrentMonth", "CurrentYear", "Root")]
         public string To { get; set; } = "CurrentMonth";
 
-#warning NOT IMPLEMENTED
+        // TODO: Not implemented
         [Parameter]
         public DateTime Date { get; set; }
 

@@ -48,11 +48,7 @@ namespace JournalCli.Cmdlets
                 }
             }
 
-            var fileSystem = new FileSystem();
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
-            var markdownFiles = new MarkdownFiles(fileSystem, Location);
-            var journal = Journal.Open(ioFactory, markdownFiles, new SystemProcess());
-
+            var journal = OpenJournal();
             var readMeEntries = journal.GetReadmeEntries(EarliestDate, IncludeFuture);
             WriteObject(readMeEntries, true);
         }

@@ -29,11 +29,7 @@ namespace JournalCli.Cmdlets
             if (!DryRun && !YesOrNo($"Are you sure you want to rename all '{OldName}' tags to '{NewName}'?"))
                 return;
 
-            var fileSystem = new FileSystem();
-            var systemProcess = new SystemProcess();
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
-            var markdownFiles = new MarkdownFiles(fileSystem, Location);
-            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+            var journal = OpenJournal();
             ICollection<string> effectedEntries;
 
             if (DryRun)
