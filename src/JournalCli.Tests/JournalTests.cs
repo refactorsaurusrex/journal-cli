@@ -270,7 +270,7 @@ namespace JournalCli.Tests
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
-            Assert.Throws<InvalidOperationException>(() => journal.OpenRandomEntry("fake"));
+            Assert.Throws<InvalidOperationException>(() => journal.OpenRandomEntry(new List<string>{ "fake" }, null));
         }
 
         [Fact]
@@ -284,7 +284,7 @@ namespace JournalCli.Tests
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
-            Assert.Throws<InvalidOperationException>(() => journal.OpenRandomEntry("fake"));
+            Assert.Throws<InvalidOperationException>(() => journal.OpenRandomEntry(new[] { "fake" }, null));
         }
 
         [Fact]
@@ -309,7 +309,7 @@ namespace JournalCli.Tests
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            journal.OpenRandomEntry("blah");
+            journal.OpenRandomEntry(new[] { "cat" }, null);
             A.CallTo(() => systemProcess.Start(A<string>._)).MustHaveHappened();
         }
     }

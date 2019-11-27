@@ -25,32 +25,29 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public SwitchParameter IncludeBodies { get; set; }
 
-        [Parameter(ParameterSetName = "Range")]
-        public DateTime From { get; set; }
+        [Parameter]
+        public DateTime? From { get; set; }
 
-        [Parameter(ParameterSetName = "Range")]
-        public DateTime To { get; set; }
+        [Parameter]
+        public DateTime? To { get; set; }
 
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
-
-            var fileSystem = new FileSystem();
-            var systemProcess = new SystemProcess();
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
-            var markdownFiles = new MarkdownFiles(fileSystem, Location);
-            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+            var dateRange = GetRangeOrThrow(From, To);
+            var journal = OpenJournal();
+            
 
             if (IncludeBodies)
-                WriteResults<CompleteJournalEntry>(journal);
+                WriteResults<CompleteJournalEntry>(journal, dateRange);
             else
-                WriteResults<MetaJournalEntry>(journal);
+                WriteResults<MetaJournalEntry>(journal, dateRange);
         }
 
-        private void WriteResults<T>(Journal journal)
+        private void WriteResults<T>(Journal journal, DateRange dateRange)
             where T : class, IJournalEntry
         {
-            var index = journal.CreateIndex<T>();
+            var index = journal.CreateIndex<T>(dateRange);
 
             switch (OrderBy)
             {
