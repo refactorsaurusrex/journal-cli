@@ -9,12 +9,18 @@ namespace JournalCli.Infrastructure
     {
         public DateRange(LocalDate from, LocalDate to)
         {
+            if (from >= to)
+                throw new ArgumentException("'From' date must be earlier than 'To' date.");
+
             From = from;
             To = to;
         }
 
         public DateRange(DateTime from, DateTime to)
         {
+            if (from >= to)
+                throw new ArgumentException("'From' date must be earlier than 'To' date.");
+
             From = LocalDate.FromDateTime(from);
             To = LocalDate.FromDateTime(to);
         }

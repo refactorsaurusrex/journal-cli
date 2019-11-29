@@ -53,13 +53,7 @@ namespace JournalCli.Cmdlets
             return Journal.Open(ioFactory, markdownFiles, systemProcess);
         }
 
-        private protected DateRange GetRangeOrThrow(DateTime? from, DateTime? to)
-        {
-            if (from.HasValue ^ to.HasValue)
-                throw new PSArgumentException("The -From and -To parameters must be used together, or not at all.");
-
-            return from.HasValue ? new DateRange(from.Value, to.Value) : null;
-        }
+        private protected DateRange GetRangeOrNull(DateTime? from, DateTime to) => from.HasValue ? new DateRange(from.Value, to) : null;
 
         protected void Commit(GitCommitType commitType)
         {
