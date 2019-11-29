@@ -15,7 +15,7 @@ namespace JournalCli.Cmdlets
         public DateTime? From { get; set; }
 
         [Parameter(ParameterSetName = "Default")]
-        public DateTime? To { get; set; }
+        public DateTime To { get; set; } = DateTime.Now;
 
         [Parameter(ParameterSetName = "Default")]
         public string[] Tags { get; set; }
@@ -60,7 +60,7 @@ namespace JournalCli.Cmdlets
 
         private void RunDefault(Journal journal)
         {
-            var range = GetRangeOrThrow(From, To);
+            var range = GetRangeOrNull(From, To);
 
             try
             {

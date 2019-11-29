@@ -29,12 +29,12 @@ namespace JournalCli.Cmdlets
         public DateTime? From { get; set; }
 
         [Parameter]
-        public DateTime? To { get; set; }
+        public DateTime To { get; set; } = DateTime.Now;
 
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
-            var dateRange = GetRangeOrThrow(From, To);
+            var dateRange = GetRangeOrNull(From, To);
             var journal = OpenJournal();
             
 
