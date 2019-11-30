@@ -17,18 +17,10 @@ namespace JournalCli.Cmdlets
         }
 
         [Parameter]
-        [Obsolete("'RootDirectory' is obsolete. Use 'Location' instead.")]
-        public string RootDirectory { get; set; }
-
-        [Parameter]
         public string Location { get; set; }
 
         protected override void ProcessRecord()
         {
-            // Just temporary until RootDirectory is removed.
-            if (string.IsNullOrEmpty(Location) && !string.IsNullOrEmpty(RootDirectory))
-                Location = RootDirectory;
-
             if (!string.IsNullOrEmpty(Location))
             {
                 Location = ResolvePath(Location);
