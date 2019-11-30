@@ -16,13 +16,16 @@ namespace JournalCli.Cmdlets
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Entry")]
         public IJournalEntry Entry { get; set; }
 
+        [Parameter(Position = 0, ParameterSetName = "Last")]
+        public SwitchParameter Last { get; set; }
+
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Name")]
         public string EntryName { get; set; }
 
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Date")]
         public DateTime Date { get; set; } = DateTime.Now;
 
-        [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "DateOffset")]
+        [Parameter(Position = 0, ParameterSetName = "DateOffset")]
         public int DateOffset { get; set; }
 
         protected override void ProcessRecord()
@@ -37,20 +40,17 @@ namespace JournalCli.Cmdlets
             switch (ParameterSetName)
             {
                 case "Name":
-                    
                 {
-                        entryDate = EntryName.EndsWith(".md") ?
-                            Journal.FileNameWithExtensionPattern.Parse(EntryName).Value :
-                            Journal.FileNamePattern.Parse(EntryName).Value;
-                        path = journalWriter.GetJournalEntryFilePath(entryDate);
-                        break;
-                    }
+                    entryDate = EntryName.EndsWith(".md") ? Journal.FileNameWithExtensionPattern.Parse(EntryName).Value : Journal.FileNamePattern.Parse(EntryName).Value;
+                    path = journalWriter.GetJournalEntryFilePath(entryDate);
+                    break;
+                }
                 case "Date":
-                    {
-                        entryDate = LocalDate.FromDateTime(Date);
-                        path = journalWriter.GetJournalEntryFilePath(entryDate);
-                        break;
-                    }
+                {
+                    entryDate = LocalDate.FromDateTime(Date);
+                    path = journalWriter.GetJournalEntryFilePath(entryDate);
+                    break;
+                }
                 case "DateOffset":
                 {
                     entryDate = Today.PlusDays(DateOffset);
@@ -58,11 +58,11 @@ namespace JournalCli.Cmdlets
                     break;
                 }
                 case "Entry":
-                    {
-                        entryDate = Journal.FileNamePattern.Parse(Entry.EntryName).Value;
-                        path = journalWriter.GetJournalEntryFilePath(entryDate);
-                        break;
-                    }
+                {
+                    entryDate = Journal.FileNamePattern.Parse(Entry.EntryName).Value;
+                    path = journalWriter.GetJournalEntryFilePath(entryDate);
+                    break;
+                }
                 default:
                     throw new NotSupportedException();
             }
