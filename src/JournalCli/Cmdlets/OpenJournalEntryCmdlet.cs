@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
@@ -31,6 +32,15 @@ namespace JournalCli.Cmdlets
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
+            var systemProcess = new SystemProcess();
+
+            if (ParameterSetName == "Last")
+            {
+                var journal = OpenJournal();
+                var lastEntry = journal.CreateIndex<JournalEntryFile>().SelectMany(x => x.Entries).OrderByDescending(x => x.EntryDate).First();
+                systemProcess.Start(lastEntry.FilePath);
+                return;
+            }
 
             var fileSystem = new FileSystem();
             var journalWriter = new JournalWriter(fileSystem, Location);
@@ -70,7 +80,6 @@ namespace JournalCli.Cmdlets
             if (!fileSystem.File.Exists(path))
                 throw new PSInvalidOperationException($"An entry does not exist for '{entryDate}'.");
 
-            var systemProcess = new SystemProcess();
             systemProcess.Start(path);
         }
     }
