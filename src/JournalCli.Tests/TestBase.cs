@@ -36,6 +36,13 @@ namespace JournalCli.Tests
 
         protected static string EmptyEntry => JournalSamples[9];
 
+        protected VirtualJournal CreateEmptyJournal()
+        {
+            var fileSystem = new VirtualJournal();
+            fileSystem.AddDirectory(@"J:\Current\");
+            return fileSystem;
+        }
+
         protected VirtualJournal CreateVirtualJournal(int yearStart, int yearEnd)
         {
             var fileSystem = new VirtualJournal();
