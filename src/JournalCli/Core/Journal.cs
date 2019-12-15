@@ -186,18 +186,31 @@ namespace JournalCli.Core
         public void CreateCompiledEntry(DateRange range, string[] tags, bool allTagsRequired, bool overwrite)
         {
             List<JournalEntryFile> entries;
-            if (allTagsRequired)
+            var hasTags = tags != null && tags.Length > 0;
+
+            if (hasTags)
             {
-                entries = CreateIndex<JournalEntryFile>(range, tags)
-                    .SelectMany(x => x.Entries)
-                    .OrderBy(x => x)
-                    .Distinct()
-                    .ToList();
+                if (allTagsRequired)
+                {
+                    entries = CreateIndex<JournalEntryFile>(range, tags)
+                        .SelectMany(x => x.Entries)
+                        .OrderBy(x => x)
+                        .Distinct()
+                        .ToList();
+                }
+                else
+                {
+                    entries = CreateIndex<JournalEntryFile>(range)
+                        .Where(x => tags.Contains(x.Tag))
+                        .SelectMany(x => x.Entries)
+                        .OrderBy(x => x)
+                        .Distinct()
+                        .ToList();
+                }
             }
             else
             {
                 entries = CreateIndex<JournalEntryFile>(range)
-                    .Where(x => tags.Contains(x.Tag))
                     .SelectMany(x => x.Entries)
                     .OrderBy(x => x)
                     .Distinct()
