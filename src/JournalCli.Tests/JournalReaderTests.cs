@@ -35,10 +35,10 @@ namespace JournalCli.Tests
 
         public static IEnumerable<object[]> JournalTestData()
         {
-            yield return new object[] { EntryWithoutFrontMatter, null, 1, 72, null };
-            yield return new object[] { EmptyEntry, null, 0, 0, null };
-            yield return new object[] { EntryWithTags, null, 3, 129, new List<string> { "blah", "doh" } };
-            yield return new object[] { EntryWithTagsAndReadme, "5 years", 2, 75, new List<string> { "blah", "doh" } };
+            yield return new object[] { TestEntries.WithoutFrontMatter, null, 1, 72, null };
+            yield return new object[] { TestEntries.Empty, null, 0, 0, null };
+            yield return new object[] { TestEntries.WithTags1, null, 3, 129, new List<string> { "blah", "doh" } };
+            yield return new object[] { TestEntries.WithTagsAndReadme, "5 years", 2, 75, new List<string> { "blah", "doh" } };
         }
     }
 }

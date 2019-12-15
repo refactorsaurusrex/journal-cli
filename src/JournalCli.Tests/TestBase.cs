@@ -8,33 +8,27 @@ using NodaTime;
 
 namespace JournalCli.Tests
 {
-    public class TestBase
+    public abstract class TestBase
     {
-        private readonly Random _random = new Random();
-
-        protected static List<string> JournalSamples = new List<string>
+        private static readonly List<string> ValidJournalSamples = new List<string>
         {
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithoutFrontMatter.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags1.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags2.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags3.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags4.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags5.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTags6.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithoutTags.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EntryWithTagsAndReadme.md")),
-            System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.CurrentDirectory, "TestData", "EmptyEntry.md"))
+            TestEntries.WithTags1,
+            TestEntries.WithTags2,
+            TestEntries.WithTags3,
+            TestEntries.WithTags4,
+            TestEntries.WithTags5,
+            TestEntries.WithTags6,
+            TestEntries.WithTagsAndReadme
         };
 
-        protected static int JournalSampleLength => JournalSamples.Count - 1;
+        private static readonly List<string> InvalidJournalSamples = new List<string>
+        {
+            TestEntries.WithoutFrontMatter,
+            TestEntries.WithoutTags,
+            TestEntries.Empty
+        };
 
-        protected static string EntryWithoutFrontMatter => JournalSamples[0];
-
-        protected static string EntryWithTags => JournalSamples[1];
-
-        protected static string EntryWithTagsAndReadme => JournalSamples[8];
-
-        protected static string EmptyEntry => JournalSamples[9];
+        private readonly Random _random = new Random();
 
         protected VirtualJournal CreateEmptyJournal()
         {
@@ -43,8 +37,9 @@ namespace JournalCli.Tests
             return fileSystem;
         }
 
-        protected VirtualJournal CreateVirtualJournal(int yearStart, int yearEnd)
+        protected VirtualJournal CreateVirtualJournal(int yearStart, int yearEnd, bool onlyValidEntries = false)
         {
+            var samples = onlyValidEntries ? ValidJournalSamples : ValidJournalSamples.Concat(InvalidJournalSamples).ToList();
             var fileSystem = new VirtualJournal();
 
             for (var year = yearStart; year <= yearEnd; year++)
@@ -59,9 +54,12 @@ namespace JournalCli.Tests
                     {
                         var dt = new LocalDate(year, month, day);
                         var filePath = fileSystem.Path.Combine(currentPath, dt.ToJournalEntryFileName());
-                        var index = _random.Next(0, JournalSampleLength);
-                        fileSystem.AddFile(filePath, new MockFileData(JournalSamples[index]));
-                        if (index == 8)
+                        var index = _random.Next(0, samples.Count - 1);
+
+                        var text = samples[index];
+                        fileSystem.AddFile(filePath, new MockFileData(text));
+
+                        if (text == TestEntries.WithTagsAndReadme)
                             fileSystem.TotalReadmeEntries++;
                     }
                 }

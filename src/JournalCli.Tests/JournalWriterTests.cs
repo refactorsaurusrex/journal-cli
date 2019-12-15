@@ -18,7 +18,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = new MockFileSystem();
             var filePath = "J:\\JournalRoot\\2019\\03 March\\2019.01.01.md";
-            fileSystem.AddFile(filePath, new MockFileData(EntryWithTags, Encoding.UTF8));
+            fileSystem.AddFile(filePath, new MockFileData(TestEntries.WithTags1, Encoding.UTF8));
             var writer = new JournalWriter(fileSystem, "J:\\Current");
             var originalReader = new JournalReader(fileSystem, filePath);
             originalReader.FrontMatter.Tags.Should().OnlyContain(x => new List<string> { "doh", "blah" }.Contains(x));
@@ -69,7 +69,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = new MockFileSystem();
             const string entryPath = @"J:\Current\2019\01 January\2019.01.01.md";
-            fileSystem.AddFile(entryPath, new MockFileData(EntryWithoutFrontMatter));
+            fileSystem.AddFile(entryPath, new MockFileData(TestEntries.WithoutFrontMatter));
             var ioFactory = new JournalReaderWriterFactory(fileSystem, "J:\\Current");
             var writer = ioFactory.CreateWriter();
             var reader = ioFactory.CreateReader(entryPath);
