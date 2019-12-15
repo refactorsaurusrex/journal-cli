@@ -49,5 +49,7 @@ namespace JournalCli.Infrastructure
             var culture = CultureInfo.CurrentCulture;
             return $"{From.ToString(pattern, culture)}-{To.ToString(pattern, culture)}.md";
         }
+
+        public override string ToString() => $"{From} to {To}";
     }
 }
