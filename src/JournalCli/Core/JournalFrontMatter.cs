@@ -36,7 +36,13 @@ namespace JournalCli.Core
             }
 
             var yaml = sb.ToString();
-            var journalEntryDate = Journal.FileNamePattern.Parse(fileSystem.Path.GetFileNameWithoutExtension(filePath)).Value;
+            var fileName = fileSystem.Path.GetFileNameWithoutExtension(filePath);
+
+            // Compiled entries do not have a single entry date, nor any readme values.
+            if (Journal.IsCompiledEntry(fileName))
+                return new JournalFrontMatter(yaml, null);
+
+            var journalEntryDate = Journal.FileNamePattern.Parse(fileName).Value;
             return new JournalFrontMatter(yaml, journalEntryDate);
         }
 
@@ -58,7 +64,7 @@ namespace JournalCli.Core
             }
         }
 
-        public JournalFrontMatter(string yamlFrontMatter, LocalDate journalEntryDate)
+        public JournalFrontMatter(string yamlFrontMatter, LocalDate? journalEntryDate)
         {
             yamlFrontMatter = yamlFrontMatter.Trim();
             var yamlLines = yamlFrontMatter.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
@@ -99,10 +105,10 @@ namespace JournalCli.Core
                     }
                 }
 
-                if (readMeKey != null)
+                if (readMeKey != null && journalEntryDate != null)
                 {
                     var readme = (YamlScalarNode)yamlStream.Documents[0].RootNode[readMeKey];
-                    var parser = new ReadmeParser(readme.Value, journalEntryDate);
+                    var parser = new ReadmeParser(readme.Value, journalEntryDate.Value);
                     Readme = parser.FrontMatterValue;
                     ReadmeDate = parser.ExpirationDate;
                 }

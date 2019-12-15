@@ -26,7 +26,9 @@ namespace JournalCli.Core
             Body = string.Join(Environment.NewLine, lines.Skip(bodyStartIndex));
             FrontMatter = JournalFrontMatter.FromFilePath(fileSystem, filePath);
             EntryName = fileSystem.Path.GetFileNameWithoutExtension(FilePath) ?? throw new InvalidOperationException();
-            EntryDate = Journal.FileNamePattern.Parse(EntryName).Value;
+
+            if (!Journal.IsCompiledEntry(EntryName))
+                EntryDate = Journal.FileNamePattern.Parse(EntryName).Value;
         }
 
         public string Body { get; }

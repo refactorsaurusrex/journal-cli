@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using JournalCli.Infrastructure;
 using NodaTime;
 using NodaTime.Text;
@@ -21,6 +22,16 @@ namespace JournalCli.Core
         public static Journal Open(IJournalReaderWriterFactory readerWriterFactory, IMarkdownFiles markdownFiles, ISystemProcess systemProcess)
         {
             return new Journal(readerWriterFactory, markdownFiles, systemProcess);
+        }
+
+        public static bool IsCompiledEntry(string fileName)
+        {
+            var regex = @"[0-9]{4}.[0-9]{2}.[0-9]{2}-[0-9]{4}.[0-9]{2}.[0-9]{2}";
+
+            if (fileName.EndsWith(".md"))
+                regex += @"\.md";
+
+            return Regex.IsMatch(fileName, regex);
         }
 
         private Journal(IJournalReaderWriterFactory readerWriterFactory, IMarkdownFiles markdownFiles, ISystemProcess systemProcess)
