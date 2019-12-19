@@ -54,7 +54,7 @@ namespace JournalCli.Cmdlets
                 ThrowTerminatingError(message, ErrorCategory.InvalidOperation);
             }
 
-            var entries = Entries.Select(x => x.BaseObject).Cast<IJournalEntry>();
+            var entries = Entries.Select(x => x.BaseObject).Cast<IJournalEntry>().ToList();
             journal.CreateCompiledEntry(entries, Force);
         }
 

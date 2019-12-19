@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions.TestingHelpers;
@@ -81,6 +82,19 @@ namespace JournalCli.Tests
         }
 
         [Fact]
+        public void CreateNewEntry_ThrowsException_IfEntryAlreadyExists()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            Assert.Throws<JournalEntryAlreadyExistsException>(() => journal.CreateNewEntry(new LocalDate(2019, 1, 1), null, null));
+        }
+
+        [Fact]
         public void CreateIndex_IncludesAnyTag_WhenNoRequiredTagsIncluded()
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
@@ -112,6 +126,23 @@ namespace JournalCli.Tests
 
             foreach (var entry in index.SelectMany(x => x.Entries))
                 entry.Tags.Should().Contain(requiredTags);
+        }
+
+        [Fact]
+        public void CreateIndex_SkipsEntries_OutsideDateRange()
+        {
+            var fileSystem = CreateVirtualJournal(2017, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var from = new LocalDate(2019, 1, 1);
+            var to = new LocalDate(2019, 1, 10);
+            var dateRange = new DateRange(from, to);
+            var index = journal.CreateIndex<JournalEntryFile>(dateRange);
+            index.SelectMany(x => x.Entries).All(x => x.EntryDate >= from && x.EntryDate <= to).Should().BeTrue();
         }
 
         [Fact]
@@ -288,7 +319,7 @@ namespace JournalCli.Tests
         }
 
         [Fact]
-        public void OpenRandomEntry_OpensRandomEntry_WhenOneExists()
+        public void OpenRandomEntry_OpensEntry_WhenOneExists()
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
@@ -301,7 +332,7 @@ namespace JournalCli.Tests
         }
 
         [Fact]
-        public void OpenRandomEntry_OpensRandomEntry_ByTag()
+        public void OpenRandomEntry_OpensTaggedEntry_WhenTagIsProvided()
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
@@ -312,5 +343,338 @@ namespace JournalCli.Tests
             journal.OpenRandomEntry(new[] { "cat" }, null);
             A.CallTo(() => systemProcess.Start(A<string>._)).MustHaveHappened();
         }
+
+        [Fact]
+        public void OpenRandomEntry_OpensEntryWithinDateRange_WhenRangeIsProvided()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+            journal.OpenRandomEntry(null, new DateRange(new LocalDate(2019, 6,1), new LocalDate(2019, 6, 15)));
+
+            Func<string, bool> fileNameInRange = filePath =>
+            {
+                var nameElements = fileSystem.Path.GetFileNameWithoutExtension(filePath).Split(new[] {'.'});
+                var intElements = nameElements.Select(int.Parse).ToArray();
+                return intElements[0] == 2019 && intElements[1] == 6 && intElements[2] >= 1 && intElements[2] <= 15;
+            };
+            
+            A.CallTo(() => systemProcess.Start(A<string>.That.Matches(s => fileNameInRange(s)))).MustHaveHappened();
+        }
+
+        [Fact]
+        public void OpenRandomEntry_SearchesEntireJournal_WhenNoTagsOrDateRangeUsed()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            journal.OpenRandomEntry(new string[] { }, null);
+
+            A.CallTo(() => systemProcess.Start(A<string>._)).MustHaveHappened();
+        }
+
+        [Fact]
+        public void OpenRandomEntry_ThrowsException_WhenNoEntriesAreFound()
+        {
+            var fileSystem = CreateEmptyJournal();
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            Assert.Throws<InvalidOperationException>(() => journal.OpenRandomEntry());
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(24)]
+        public void GetRecentEntries_ReturnsSpecifiedNumberOfEntries_WhenLimitIsPositiveInt(int limit)
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var entries = journal.GetRecentEntries(limit);
+            entries.Count().Should().Be(limit);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void GetRecentEntries_ReturnsAllEntries_WhenLimitIsLessThanOne(int limit)
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var entries = journal.GetRecentEntries(limit);
+            entries.Count().Should().Be(fileSystem.AllFiles.Count());
+        }
+
+        [Fact]
+        public void CreateCompiledEntry1_ThrowsException_WhenEntryExistsAndOverwriteIsFalse()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = new DateRange("2019-2-12", "2019-3-1");
+            journal.CreateCompiledEntry(dateRange, null, false, false);
+            Assert.Throws<JournalEntryAlreadyExistsException>(() => journal.CreateCompiledEntry(dateRange, null, false, false));
+        }
+
+        [Fact]
+        public void CreateCompiledEntry1_OverwritesEntry_WhenEntryExistsAndOverwriteIsTrue()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = new DateRange("2019-2-12", "2019-3-1");
+            journal.CreateCompiledEntry(dateRange, tags: null, allTagsRequired: false, overwrite: false);
+            journal.CreateCompiledEntry(dateRange, tags: null, allTagsRequired: false, overwrite: true);
+        }
+
+        [Fact]
+        public void CreateCompiledEntry1_IncludesAllTags_WhenNoneAreSpecified()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = new DateRange("2019-2-12", "2019-3-1");
+            var filePath = ioFactory.CreateWriter().GetCompiledJournalEntryFilePath(dateRange);
+            journal.CreateCompiledEntry(dateRange, tags: null, allTagsRequired: false, overwrite: false);
+
+            var allTags = journal.CreateIndex<MetaJournalEntry>().Select(x => x.Tag);
+            ioFactory.CreateReader(filePath).FrontMatter.Tags.Should().OnlyContain(t => allTags.Contains(t));
+        }
+
+        [Fact]
+        public void CreateCompiledEntry1_IncludesAllDates_WhenNoFiltersAreSpecified()
+        {
+            var fileSystem = CreateVirtualJournal(2016, 2019, onlyValidEntries: true);
+
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = new DateRange("2016-1-1", "2019-12-28"); // Virtual journal assumes 28 days in a month.
+            var filePath = ioFactory.CreateWriter().GetCompiledJournalEntryFilePath(dateRange);
+            journal.CreateCompiledEntry(range: null, tags: null, allTagsRequired: false, overwrite: false);
+
+            fileSystem.FileExists(fileSystem.Path.Combine(rootDirectory, "Compiled", filePath)).Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("cat", "cow")]
+        [InlineData("cat")]
+        public void CreateCompiledEntry1_FiltersByTag_WhenTagIsSpecified(params string[] tags)
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = new DateRange("2019-2-12", "2019-6-1");
+            var filePath = ioFactory.CreateWriter().GetCompiledJournalEntryFilePath(dateRange);
+            journal.CreateCompiledEntry(dateRange, tags: tags, allTagsRequired: false, overwrite: false);
+
+            var expectedTags = journal.CreateIndex<MetaJournalEntry>()
+                .Where(x => tags.Contains(x.Tag))
+                .SelectMany(x => x.Entries)
+                .SelectMany(x => x.Tags)
+                .Distinct();
+
+            ioFactory.CreateReader(filePath).FrontMatter.Tags.Should().OnlyContain(t => expectedTags.Contains(t));
+        }
+
+        [Theory]
+        [InlineData("blah", "horse")]
+        [InlineData("blah", "doh", "cat")]
+        public void CreateCompiledEntry1_FiltersByTag_WhenTagIsSpecifiedAndAllAreRequired(params string[] tags)
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = new DateRange("2019-2-12", "2019-6-1");
+            var filePath = ioFactory.CreateWriter().GetCompiledJournalEntryFilePath(dateRange);
+            journal.CreateCompiledEntry(dateRange, tags: tags, allTagsRequired: true, overwrite: false);
+
+            var expectedTags = journal.CreateIndex<MetaJournalEntry>(range: null, requiredTags: tags)
+                .SelectMany(x => x.Entries)
+                .SelectMany(x => x.Tags)
+                .Distinct();
+
+            ioFactory.CreateReader(filePath).FrontMatter.Tags.Should().OnlyContain(t => expectedTags.Contains(t));
+        }
+
+        [Fact]
+        public void CreateCompiledEntry1_ThrowsException_WhenNoTaggedEntriesFound()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = new DateRange("2019-2-12", "2019-6-1");
+
+            Assert.Throws<InvalidOperationException>(() =>
+                journal.CreateCompiledEntry(dateRange, tags: new[] { "Jose" }, allTagsRequired: true, overwrite: false)
+            );
+        }
+
+        [Fact]
+        public void CreateCompiledEntry1_ThrowsException_WhenNoEntriesFoundInDateRange()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            var dateRange = new DateRange("2018-2-12", "2018-6-1");
+
+            Assert.Throws<InvalidOperationException>(() =>
+                journal.CreateCompiledEntry(dateRange, tags: null, allTagsRequired: true, overwrite: false)
+            );
+        }
+
+        [Theory]
+        [MemberData(nameof(EmptyListOfEntries))]
+        public void CreateCompiledEntry2_ThrowsException_WhenNoEntriesProvided(ICollection<IJournalEntry> entries)
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            Assert.Throws<ArgumentException>(() =>
+                journal.CreateCompiledEntry(entries, false)
+            );
+
+            Assert.Throws<ArgumentException>(() =>
+                journal.CreateCompiledEntry(null, false)
+            );
+        }
+
+        [Theory]
+        [ClassData(typeof(PipedEntries))]
+        public void CreateCompiledEntry2_CreatesEntry_WithProvidedEntries(ICollection<JournalEntryFile> entries)
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+            var expectedTags = entries.SelectMany(x => x.Tags).Distinct();
+            var expectedBodies = entries.Select(x => x.Body).Distinct();
+
+            journal.CreateCompiledEntry(entries.Cast<IJournalEntry>().ToList(), false);
+
+            var compiledDirectory = fileSystem.Path.Combine(rootDirectory, "Compiled");
+            var file = fileSystem.Directory.GetFiles(compiledDirectory).Single();
+            var fileText = fileSystem.File.ReadAllText(file);
+
+            foreach (var body in expectedBodies)
+                fileText.Should().Contain(body);
+
+            JournalFrontMatter.FromFilePath(fileSystem, file).Tags.Should().OnlyContain(t => expectedTags.Contains(t));
+
+            A.CallTo(() => systemProcess.Start(A<string>._)).MustHaveHappened();
+        }
+
+        [Theory]
+        [ClassData(typeof(PipedEntries))]
+        public void CreateCompiledEntry2_ThrowsException_WhenEntryExistsAndOverwriteIsFalse(ICollection<JournalEntryFile> entries)
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            journal.CreateCompiledEntry(entries.Cast<IJournalEntry>().ToList(), false);
+            Assert.Throws<JournalEntryAlreadyExistsException>(() => journal.CreateCompiledEntry(entries.Cast<IJournalEntry>().ToList(), false));
+        }
+
+        [Theory]
+        [ClassData(typeof(PipedEntries))]
+        public void CreateCompiledEntry2_OverwritesEntry_WhenEntryExistsAndOverwriteIsTrue(ICollection<JournalEntryFile> entries)
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+
+            journal.CreateCompiledEntry(entries.Cast<IJournalEntry>().ToList(), false);
+            journal.CreateCompiledEntry(entries.Cast<IJournalEntry>().ToList(), true);
+        }
+
+        public static IEnumerable<object[]> EmptyListOfEntries() => new[] { new object[] { new List<JournalEntryFile>().Cast<IJournalEntry>().ToList() } };
+    }
+
+    public class PipedEntries : TestBase, IEnumerable<object[]>
+    {
+        private readonly Journal _journal;
+
+        public PipedEntries()
+        {
+            var fileSystem = CreateVirtualJournal(2019, 2019);
+            const string rootDirectory = "J:\\Current";
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
+            _journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+        }
+
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            yield return new object[] { _journal.CreateIndex<JournalEntryFile>()["blah"].Entries };
+
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

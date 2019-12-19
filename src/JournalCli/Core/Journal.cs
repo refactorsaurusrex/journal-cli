@@ -183,6 +183,13 @@ namespace JournalCli.Core
             return limit >= 1 ? files.Take(limit) : files;
         }
 
+        /// <summary>
+        /// Creates a single journal entry comprised of all entries found which match the specified criteria. 
+        /// </summary>
+        /// <param name="range">The date range to search for entries. Dates are inclusive. Null values assume all entries are desired.</param>
+        /// <param name="tags">Filters entries by tag. Null values assumes all tags are desired.</param>
+        /// <param name="allTagsRequired">Requires that each matching entry contain all tags specified by the `tags` parameter.</param>
+        /// <param name="overwrite">True to overwrite an existing compiled entry with the same name. Otherwise, an exception is thrown.</param>
         public void CreateCompiledEntry(DateRange range, string[] tags, bool allTagsRequired, bool overwrite)
         {
             List<JournalEntryFile> entries;
@@ -217,6 +224,9 @@ namespace JournalCli.Core
                     .ToList();
             }
 
+            if (entries.Count == 0)
+                throw new InvalidOperationException("No journal entries found matching the specified criteria. Please change your criteria and try again.");
+
             if (range == null)
                 range = new DateRange(entries.First().EntryDate, entries.Last().EntryDate);
 
@@ -234,8 +244,11 @@ namespace JournalCli.Core
             _systemProcess.Start(entryFilePath);
         }
 
-        public void CreateCompiledEntry(IEnumerable<IJournalEntry> entries, bool overwrite)
+        public void CreateCompiledEntry(ICollection<IJournalEntry> entries, bool overwrite)
         {
+            if (entries == null || !entries.Any())
+                throw new ArgumentException("No entries were provided. At least one entry must be provided.", nameof(entries));
+
             var convertedEntries = entries.Select(x => new JournalEntryFile(x.GetReader())).OrderBy(x => x.EntryDate).ToList();
             var range = new DateRange(convertedEntries.First().EntryDate, convertedEntries.Last().EntryDate);
 
