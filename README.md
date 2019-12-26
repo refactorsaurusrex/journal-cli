@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/lhs9cnb68cxu0vuj/branch/master?svg=true)](https://ci.appveyor.com/project/refactorsaurusrex/journal-cli/branch/master)
+
 # What is this?
 
 `journal-cli` is a command line tool for people who want to journal with markdown files, love command line tools, and are highly averse to storing intimate information in the cloud unless it's encrypted.
