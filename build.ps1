@@ -22,7 +22,10 @@ if (Test-Path "$PSScriptRoot\publish") {
 $appName = "JournalCli"
 $publishOutputDir = "$PSScriptRoot\publish\$appName"
 $proj = Get-ChildItem -Filter "$appName.csproj" -Recurse -Path $PSScriptRoot | Select-Object -First 1 -ExpandProperty FullName
-dotnet publish $proj --output $publishOutputDir -c Release
+
+foreach ($target in 'win-x64','linux-x64','osx-x64') {
+  dotnet publish $proj --output $publishOutputDir -c Release --self-contained false -r $target
+}
 
 if ($LASTEXITCODE -ne 0) {
   throw "Failed to publish application."
