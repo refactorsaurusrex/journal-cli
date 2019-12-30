@@ -11,8 +11,10 @@ if ($env:APPVEYOR_REPO_TAG -eq 'true') {
     throw "Version must be greater than the last published version, which is 'v$lastPublishedVersion'."
   }
   Write-Host "Last published version: 'v$lastPublishedVersion'. Current version: 'v$Version'"
+} elseif ($null -ne $env:APPVEYOR_BUILD_NUMBER) {
+  $Version = "0.0.$env:APPVEYOR_BUILD_NUMBER"
 } elseif ($Version -eq '') {
-  $Version = '0.0.0'
+  $Version = "0.0.0"
 }
 
 if (Test-Path "$PSScriptRoot\publish") {
