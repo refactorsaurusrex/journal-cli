@@ -9,12 +9,10 @@ namespace JournalCli.Cmdlets
 {
     public abstract class JournalCmdletBase : CmdletBase
     {
+        private bool _beenWarned;
         private const string Error = "Journal location was not provided and no default location exists. One or the other is required";
-
-        protected JournalCmdletBase()
-        {
-            NativeBinaries.CopyIfNotExists();
-        }
+        private const string MissingGitBinaryWarning = "You're missing a native binary that's required to enable git integration. " +
+            "Click here for more information:\r\n\r\nhttps://journalcli.me/docs/faq#i-got-a-missing-git-binary-warning-whats-that-about\r\n";
 
         [Parameter]
         public string Location { get; set; }
@@ -49,46 +47,66 @@ namespace JournalCli.Cmdlets
 
         protected void Commit(GitCommitType commitType)
         {
-            ValidateGitRepo();
-            var message = GitCommitMessage.Get(commitType);
-            CommitCore(message);
+#if !DEBUG
+            try
+            {
+                ValidateGitRepo();
+                var message = GitCommitMessage.Get(commitType);
+                CommitCore(message);
+            }
+            catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException)
+            {
+                if (!_beenWarned)
+                {
+                    WriteWarning(MissingGitBinaryWarning);
+                    _beenWarned = true;
+                }
+            }
+#endif
         }
 
         protected void Commit(string message)
         {
-            ValidateGitRepo();
-            CommitCore(message);
+#if !DEBUG
+            try
+            {
+                ValidateGitRepo();
+                CommitCore(message);
+            }
+            catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException)
+            {
+                if (!_beenWarned)
+                {
+                    WriteWarning(MissingGitBinaryWarning);
+                    _beenWarned = true;
+                }
+            }
+#endif
         }
 
         private void CommitCore(string message)
         {
-#if DEBUG
-            if (System.Diagnostics.Debugger.IsAttached)
-                return;
-#endif
-            using (var repo = new Git.Repository(Location))
+            using var repo = new Git.Repository(Location);
+            var statusOptions = new Git.StatusOptions
             {
-                var statusOptions = new Git.StatusOptions
-                {
-                    DetectRenamesInIndex = true,
-                    DetectRenamesInWorkDir = true,
-                    IncludeIgnored = false,
-                    IncludeUntracked = true,
-                    RecurseUntrackedDirs = true,
-                    RecurseIgnoredDirs = false
-                };
+                DetectRenamesInIndex = true,
+                DetectRenamesInWorkDir = true,
+                IncludeIgnored = false,
+                IncludeUntracked = true,
+                RecurseUntrackedDirs = true,
+                RecurseIgnoredDirs = false
+            };
 
-                if (!repo.RetrieveStatus(statusOptions).IsDirty)
-                    return;
+            if (!repo.RetrieveStatus(statusOptions).IsDirty)
+                return;
 
-                Git.Commands.Stage(repo, "*");
+            Git.Commands.Stage(repo, "*");
 
-                var author = new Git.Signature("JournalCli", "@journalCli", DateTime.Now);
-                var committer = author;
+            var author = new Git.Signature("JournalCli", "@journalCli", DateTime.Now);
+            var committer = author;
 
-                var options = new Git.CommitOptions { PrettifyMessage = true };
-                var commit = repo.Commit(message, author, committer, options);
-            }
+            var options = new Git.CommitOptions { PrettifyMessage = true };
+            var commit = repo.Commit(message, author, committer, options);
         }
 
         private void ValidateGitRepo()
@@ -97,16 +115,14 @@ namespace JournalCli.Cmdlets
                 return;
 
             Git.Repository.Init(Location);
-            using (var repo = new Git.Repository(Location))
-            {
-                Git.Commands.Stage(repo, "*");
+            using var repo = new Git.Repository(Location);
+            Git.Commands.Stage(repo, "*");
 
-                var author = new Git.Signature("JournalCli", "@journalCli", DateTime.Now);
-                var committer = author;
+            var author = new Git.Signature("JournalCli", "@journalCli", DateTime.Now);
+            var committer = author;
 
-                var options = new Git.CommitOptions { PrettifyMessage = true };
-                var commit = repo.Commit("Initial commit", author, committer, options);
-            }
+            var options = new Git.CommitOptions { PrettifyMessage = true };
+            var commit = repo.Commit("Initial commit", author, committer, options);
         }
     }
 }
