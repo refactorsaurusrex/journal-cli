@@ -17,6 +17,8 @@ if ($env:APPVEYOR_REPO_TAG -eq 'true') {
   $Version = "0.0.0"
 }
 
+Write-Host "Building version '$Version'..."
+
 if (Test-Path "$PSScriptRoot\publish") {
   Remove-Item -Path "$PSScriptRoot\publish" -Recurse -Force
 }
