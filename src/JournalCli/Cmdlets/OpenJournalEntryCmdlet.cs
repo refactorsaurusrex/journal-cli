@@ -33,7 +33,7 @@ namespace JournalCli.Cmdlets
         {
             base.ProcessRecord();
 
-            if (ParameterSetName == "Last")
+            if (Last)
             {
                 var journal = OpenJournal();
                 var lastEntry = journal.CreateIndex<JournalEntryFile>().SelectMany(x => x.Entries).OrderByDescending(x => x.EntryDate).First();
