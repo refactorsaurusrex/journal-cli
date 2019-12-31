@@ -17,3 +17,5 @@ environment:
 skip_commits:
   files:
     - '**/*.md'
+install:
+  - pwsh: Install-Module -Name PowerShellGet -MinimumVersion 2.2.3 -Force
