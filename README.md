@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/lhs9cnb68cxu0vuj/branch/master?svg=true)](https://ci.appveyor.com/project/refactorsaurusrex/journal-cli/branch/master) ![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/journalcli)
+[![Build status](https://ci.appveyor.com/api/projects/status/lhs9cnb68cxu0vuj/branch/master?svg=true)](https://ci.appveyor.com/project/refactorsaurusrex/journal-cli/branch/master) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/journalcli)](https://www.powershellgallery.com/packages/JournalCli)
 
 # What is this?
 
