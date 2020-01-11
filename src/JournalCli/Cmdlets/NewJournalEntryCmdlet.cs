@@ -1,4 +1,5 @@
-﻿using System.Management.Automation;
+﻿using System;
+using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Infrastructure;
 using NodaTime;
@@ -19,12 +20,15 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public string Readme { get; set; }
 
+        [Parameter]
+        public DateTime? Date { get; set; }
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
 
             var journal = OpenJournal();
-            var entryDate = Today.PlusDays(DateOffset);
+            var entryDate = Date == null ? Today.PlusDays(DateOffset) : LocalDate.FromDateTime(Date.Value).PlusDays(DateOffset);
 
             var hour = Now.Time().Hour;
             if (hour >= 0 && hour <= 4)
