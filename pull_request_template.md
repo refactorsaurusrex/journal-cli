@@ -4,7 +4,7 @@
 ## Issues closed or fixed
 - Issue one
 - Issue two
-- ect...
+- etc...
 
 ## Required tasks
 - [ ] Update Docs
