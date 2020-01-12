@@ -39,8 +39,7 @@ namespace JournalCli.Cmdlets
             var fileSystem = new FileSystem();
             var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
             var markdownFiles = new MarkdownFiles(fileSystem, Location);
-            var systemProcess = new SystemProcess();
-            return Journal.Open(ioFactory, markdownFiles, systemProcess);
+            return Journal.Open(ioFactory, markdownFiles, SystemProcess);
         }
 
         private protected DateRange GetRangeOrNull(DateTime? from, DateTime to) => from.HasValue ? new DateRange(from.Value, to) : null;

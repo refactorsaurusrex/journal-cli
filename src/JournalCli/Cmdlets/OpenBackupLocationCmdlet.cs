@@ -17,7 +17,7 @@ namespace JournalCli.Cmdlets
             var path = UserSettings.Load(encryptedStore).BackupLocation;
             if (!string.IsNullOrEmpty(path) && fileSystem.Directory.Exists(path))
             {
-                new SystemProcess().Start(path);
+                SystemProcess.Start(path);
             }
             else
             {

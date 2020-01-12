@@ -52,7 +52,7 @@ namespace JournalCli.Cmdlets
                 var question = $"An entry for {entryDate} already exists. Do you want to open it instead?";
                 if (YesOrNo(question))
                 {
-                    new SystemProcess().Start(e.EntryFilePath);
+                    SystemProcess.Start(e.EntryFilePath);
                 }
             }
         }
