@@ -2,13 +2,13 @@
 
 # What is this?
 
-`journal-cli` is a command line tool for people who want to journal with markdown files, love command line tools, and are highly averse to storing intimate information in the cloud unless it's encrypted.
+`journal-cli` is a tool for people who want to journal with markdown, love command line tools, and are highly averse to storing intimate information in the cloud unless it's encrypted.
 
 # Background
 
-Sometime late in 2017, I found myself flipping through _really_ old entries in my Google Calendar. Turns out I have entries in there going back to 2001. It was interesting taking a stroll down memory lane and seeing everything from the mundane ("Dentist Appt") to the exciting ("Date with Austin chick")\*. It got me thinking that I should make an effort to write down the highlights of my day _every day_ because future-me might be interested in knowing what I did on, say, December 13th, 2018. So I made the decision to start keeping a journal. 
+Sometime late in 2017, I found myself flipping through _really_ old entries in my Google Calendar. Turns out I have entries in there dating back to 2001. It was interesting taking a stroll down memory lane and seeing everything from the mundane ("Dentist Appt") to the exciting ("Date with Austin chick")\*. It got me thinking that I should make an effort to write down the highlights of my day _every day_ because future-me might be interested in knowing what I did on, say, December 13th, 2018. So I made the decision to start keeping a daily journal. 
 
-For the first six months or so I used [Dynalist][dl], a tool I absolutely love. I was never particularly comfortable spelling out my life's details in a tool that didn't offer end-to-end encryption, but I stuck my head in the sand for as long as I could. Then in June of 2018 [Typeform][tf] - another tool I absolutely love - suffered a data breach, and some of my data was stolen. Luckily, the data taken from my account wasn't at all sensitive. But the incident cemented my fears that _nothing is safe in the cloud_. I resolved to find another, safer tool to use for journaling. 
+For the first six months or so I used [Dynalist][dl], a tool I absolutely love. I was never particularly comfortable spelling out my life's details in a tool that didn't offer end-to-end encryption, but I stuck my head in the sand for as long as I could. Then in June of 2018 [Typeform][tf] - a surveying app I've used - suffered a breach and some of my data was stolen. Luckily, the data taken from my account wasn't sensitive. But the incident cemented my fears that _nothing is safe in the cloud_. I resolved to find another, safer tool to use for journaling. 
 
 My next stop was [Inkdrop][id]. It's not designed with journaling in mind, but I found it fairly suitable for that purpose - as long as you don't sync your files to Inkdrop's servers. Unfortunately, after a while Inkdrop felt too constraining. Disabling cloud synchronization meant I could only write entries from a single computer. I was also irked by the Inkdrop developer's rigid opposition to adding any new features that [deviate even slightly from his narrowly defined product scope][id-journal]. I really wanted to use [Typora](https://typora.io/) - hands-down the best markdown editor available - but it lacked one really important feature. It offered no built-in mechanism for tagging files. Tags are essential for me because they basically constitute my journal's index.  
 
@@ -62,7 +62,13 @@ Every `journal-cli` command that alters the state of your journal automatically 
 
 # How do I get it?
 
-Check out the [Getting Started](https://journalcli.me/docs/getting-started) guide, which includes installation instructions.
+From the PowerShell Gallery:
+
+```powershell
+> Install-Module JournalCli 
+```
+
+For additional details and instructions, check out the [Getting Started](https://journalcli.me/docs/getting-started) guide.
 
 # A word about performance
 
