@@ -32,13 +32,12 @@ namespace JournalCli.Cmdlets
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
-            var systemProcess = new SystemProcess();
 
             if (ParameterSetName == "Last")
             {
                 var journal = OpenJournal();
                 var lastEntry = journal.CreateIndex<JournalEntryFile>().SelectMany(x => x.Entries).OrderByDescending(x => x.EntryDate).First();
-                systemProcess.Start(lastEntry.FilePath);
+                SystemProcess.Start(lastEntry.FilePath);
                 return;
             }
 
@@ -80,7 +79,7 @@ namespace JournalCli.Cmdlets
             if (!fileSystem.File.Exists(path))
                 throw new PSInvalidOperationException($"An entry does not exist for '{entryDate}'.");
 
-            systemProcess.Start(path);
+            SystemProcess.Start(path);
         }
     }
 }

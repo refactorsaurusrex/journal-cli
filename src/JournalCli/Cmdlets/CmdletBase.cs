@@ -4,11 +4,13 @@ using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Reflection;
+using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
 {
     public abstract class CmdletBase : PSCmdlet
     {
+        private readonly ISystemProcess _systemProcess = SystemProcessFactory.Create();
         private readonly Lazy<string> _assemblyName = new Lazy<string>(() => Assembly.GetExecutingAssembly().FullName);
 
         protected string ResolvePath(string path) => GetUnresolvedProviderPathFromPSPath(path);
@@ -101,5 +103,7 @@ namespace JournalCli.Cmdlets
 
             return result;
         }
+
+        private protected ISystemProcess SystemProcess => _systemProcess;
     }
 }

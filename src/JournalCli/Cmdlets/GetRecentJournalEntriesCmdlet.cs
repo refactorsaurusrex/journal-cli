@@ -20,8 +20,7 @@ namespace JournalCli.Cmdlets
             var fileSystem = new FileSystem();
             var readerWriterFactory = new JournalReaderWriterFactory(fileSystem, Location);
             var markdownFiles = new MarkdownFiles(fileSystem, Location);
-            var systemProcess = new SystemProcess();
-            var journal = Journal.Open(readerWriterFactory, markdownFiles, systemProcess);
+            var journal = Journal.Open(readerWriterFactory, markdownFiles, SystemProcess);
 
             var entries = journal.GetRecentEntries(Limit);
             WriteObject(entries, true);
