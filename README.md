@@ -70,6 +70,31 @@ From the PowerShell Gallery:
 
 For additional details and instructions, check out the [Getting Started](https://journalcli.me/docs/getting-started) guide.
 
+## Beta Versions
+
+New beta versions are published on every merge to master. If you'd like to try out the latest features before they're released to the PowerShell Gallery, follow these steps.
+
+First, make sure you've completely removed all versions installed from the PowerShell Gallery. The reason for this is all beta releases are versioned `0.0.X`, where `x` is the [build number](https://ci.appveyor.com/project/refactorsaurusrex/journal-cli). That means beta versions will always have a lower semantic version number than the official releases, which can cause problems with module autoloading and upgrades if you have both beta and non-beta versions installed. You can use this command to remove all versions:
+
+```powershell
+Get-InstalledModule "JournalCli" -AllVersions | Uninstall-Module
+
+# If JournalCli has already been loaded into your PowerShell session, 
+# this will cause an error. Restart your terminal and try again.
+```
+
+Next, register the beta feed:
+
+```powershell
+Register-PSRepository -Name "JournalCliBeta" -SourceLocation "https://www.myget.org/F/journal-cli/api/v2"
+```
+
+Last, install the module from the beta feed:
+
+```powershell
+Install-Module -Name "JournalCli" -Repository "JournalCliBeta" 
+```
+
 # A word about performance
 
 I've only tested this tool with a few hundred files on a very fast machine. I've made no deliberate effort to maximize performance. If you run this against thousands (or more!) files and/or on a slower machine, I can't promise Ferrari-like processing speeds. But if the tool feels laggy, [hit me up](https://github.com/refactorsaurusrex/journal-cli/issues) and let's fix it!
