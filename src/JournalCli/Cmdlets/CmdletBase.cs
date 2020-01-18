@@ -4,6 +4,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Reflection;
+using JournalCli.Core;
 using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
@@ -19,6 +20,36 @@ namespace JournalCli.Cmdlets
         {
             var errorRecord = new ErrorRecord(new Exception(message), category.ToString(), category, null);
             ThrowTerminatingError(errorRecord);
+        }
+
+        protected void CheckForUpdates()
+        {
+            // TODO: Catch all errors and log. This should never fail the app.
+
+            var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
+            var settings = UserSettings.Load(encryptedStore);
+            if (settings.NextUpdateCheck != null && DateTime.Now <= settings.NextUpdateCheck)
+                return;
+
+            var installedVersionResult = ScriptBlock.Create("Get-Module JournalCli -ListAvailable | select version").Invoke();
+
+            // TODO: Possible IndexOutOfRange error 
+            var installedVersion = (Version)installedVersionResult[0].Properties["Version"].Value;
+
+            var availableVersionsResults = ScriptBlock.Create("Find-Module JournalCli | select version").Invoke();
+            var availableVersions = availableVersionsResults.Select(x => new Version((string)x.Properties["Version"].Value)).ToList();
+
+            var newVersion = availableVersions.FirstOrDefault(x => x.IsBeta() == installedVersion.IsBeta());
+
+            if (newVersion > installedVersion)
+            {
+                WriteHostInverted("***** Update Available! *****");
+                WriteHostInverted($"You're currently using version {installedVersion}. Run 'Update-Module JournalCli' " +
+                    $"to upgrade to version {newVersion}, or run 'Suspend-JournalCliUpdateChecks' to snooze these notifications.");
+            }
+
+            settings.NextUpdateCheck = DateTime.Now.AddDays(1);
+            settings.Save(encryptedStore);
         }
 
         /// <summary>
