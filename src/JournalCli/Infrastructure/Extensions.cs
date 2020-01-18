@@ -56,5 +56,7 @@ namespace JournalCli.Infrastructure
                     throw new ArgumentOutOfRangeException(nameof(dayOfWeek), dayOfWeek, null);
             }
         }
+
+        public static bool IsBeta(this Version version) => version.Major == 0 && version.Minor == 0;
     }
 }
