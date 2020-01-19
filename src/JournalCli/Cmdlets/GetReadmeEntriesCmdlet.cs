@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
@@ -25,10 +24,8 @@ namespace JournalCli.Cmdlets
         [Parameter(ParameterSetName = "All")]
         public SwitchParameter All { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
-
             if (ParameterSetName == "Range")
             {
                 if (Duration == 0)
@@ -40,9 +37,9 @@ namespace JournalCli.Cmdlets
                 if (Duration < 0)
                 {
                     const string message = "If that was an attempt to look at FUTURE readme entries, nice try. ;) Although I discourage " +
-                        "looking at readme entries before they've expired (doing so seems to violate the spirit of writing a note " +
-                        "to your future self), I built a special switch for this use case. It's undocumented, but if you include " +
-                        "the -IncludeFuture switch, you'll get what you're after. Have fun!";
+                                           "looking at readme entries before they've expired (doing so seems to violate the spirit of writing a note " +
+                                           "to your future self), I built a special switch for this use case. It's undocumented, but if you include " +
+                                           "the -IncludeFuture switch, you'll get what you're after. Have fun!";
                     WriteWarning(message);
                     throw new PSArgumentOutOfRangeException(nameof(Duration), Duration, "Duration must be greater than or equal to 1.");
                 }

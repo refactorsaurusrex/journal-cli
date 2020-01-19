@@ -13,14 +13,12 @@ namespace JournalCli.Cmdlets
         [ValidateLength(5, 60)]
         public string Message { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
-
-            if (!string.IsNullOrEmpty(Message))
-                Commit(Message);
-            else
+            if (string.IsNullOrEmpty(Message))
                 Commit(GitCommitType.Manual);
+            else
+                Commit(Message);
         }
     }
 }

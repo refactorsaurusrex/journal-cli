@@ -23,10 +23,8 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public string[] Tags { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
-
             var range = ParameterSetName == "Year" ? new DateRange(new LocalDate(Year, 1, 1), new LocalDate(Year, 12, 31)) : GetRangeOrNull(From, To);
             var journal = OpenJournal();
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
@@ -31,12 +30,10 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public DateTime To { get; set; } = DateTime.Now;
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
             var dateRange = GetRangeOrNull(From, To);
             var journal = OpenJournal();
-            
 
             if (IncludeBodies)
                 WriteResults<CompleteJournalEntry>(journal, dateRange);

@@ -13,10 +13,8 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public int Limit { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
-
             var fileSystem = new FileSystem();
             var readerWriterFactory = new JournalReaderWriterFactory(fileSystem, Location);
             var markdownFiles = new MarkdownFiles(fileSystem, Location);

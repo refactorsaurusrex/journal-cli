@@ -21,10 +21,8 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public DateTime Date { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
-            
             var fileSystem = new FileSystem();
             string path;
             var year = Journal.YearDirectoryPattern.Format(Today.Date());

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Threading;
@@ -21,7 +22,9 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public string Location { get; set; }
 
-        protected override void ProcessRecord()
+        protected abstract void RunJournalCommand();
+
+        protected sealed override void ProcessRecord()
         {
             if (!string.IsNullOrEmpty(Location))
             {

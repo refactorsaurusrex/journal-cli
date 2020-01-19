@@ -23,10 +23,8 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public SwitchParameter SaveParameters { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
-
             var fileSystem = new FileSystem();
             var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
             var settings = UserSettings.Load(encryptedStore);
