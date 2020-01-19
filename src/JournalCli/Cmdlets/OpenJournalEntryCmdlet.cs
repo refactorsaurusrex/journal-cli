@@ -29,10 +29,8 @@ namespace JournalCli.Cmdlets
         [Parameter(Position = 0, ParameterSetName = "DateOffset")]
         public int DateOffset { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
-
             if (Last)
             {
                 var journal = OpenJournal();

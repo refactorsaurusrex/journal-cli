@@ -28,9 +28,8 @@ namespace JournalCli.Cmdlets
 
         public SwitchParameter Force { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
             var journal = OpenJournal();
 
             switch (ParameterSetName)

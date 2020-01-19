@@ -22,9 +22,8 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public string[] Tags { get; set; }
 
-        protected override void ProcessRecord()
+        protected override void RunJournalCommand()
         {
-            base.ProcessRecord();
             var dateRange = GetRangeOrNull(From, To);
 
             if (dateRange == null && Tags == null)
