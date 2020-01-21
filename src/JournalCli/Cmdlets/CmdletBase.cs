@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Reflection;
-using JournalCli.Core;
 using JournalCli.Infrastructure;
+using Serilog;
 
 namespace JournalCli.Cmdlets
 {
@@ -13,6 +14,16 @@ namespace JournalCli.Cmdlets
     {
         private readonly ISystemProcess _systemProcess = SystemProcessFactory.Create();
         private readonly Lazy<string> _assemblyName = new Lazy<string>(() => Assembly.GetExecutingAssembly().FullName);
+
+        protected CmdletBase()
+        {
+            // ReSharper disable AssignNullToNotNullAttribute
+            var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs", ".log");
+            // ReSharper restore AssignNullToNotNullAttribute
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.File(path, rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+        }
 
         protected string ResolvePath(string path) => GetUnresolvedProviderPathFromPSPath(path);
 

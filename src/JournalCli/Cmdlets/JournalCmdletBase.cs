@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
+using Serilog;
 using Git = LibGit2Sharp;
 
 namespace JournalCli.Cmdlets
@@ -26,17 +27,19 @@ namespace JournalCli.Cmdlets
 
         protected sealed override void ProcessRecord()
         {
-            if (!string.IsNullOrEmpty(Location))
+            try
             {
-                Location = ResolvePath(Location);
-                return;
-            }
+                if (!string.IsNullOrEmpty(Location))
+                {
+                    Location = ResolvePath(Location);
+                    return;
+                }
 
-            var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
-            var settings = UserSettings.Load(encryptedStore);
+                var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
+                var settings = UserSettings.Load(encryptedStore);
 
-            if (string.IsNullOrEmpty(settings.DefaultJournalRoot))
-                throw new PSInvalidOperationException(Error);
+                if (string.IsNullOrEmpty(settings.DefaultJournalRoot))
+                    throw new PSInvalidOperationException(Error);
 
                 Location = settings.DefaultJournalRoot;
 
