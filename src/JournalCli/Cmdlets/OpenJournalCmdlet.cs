@@ -4,6 +4,7 @@ using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
+using NodaTime;
 
 namespace JournalCli.Cmdlets
 {
@@ -14,15 +15,42 @@ namespace JournalCli.Cmdlets
     [Alias("oj")]
     public class OpenJournalCmdlet : JournalCmdletBase
     {
-        [Parameter]
+        [Parameter(ParameterSetName = "Current")]
         [ValidateSet("CurrentMonth", "CurrentYear", "Root")]
         public string To { get; set; } = "CurrentMonth";
 
-        // TODO: Not implemented
-        [Parameter]
+        [Parameter(ParameterSetName = "Date")]
         public DateTime Date { get; set; }
 
         protected override void RunJournalCommand()
+        {
+            switch (ParameterSetName)
+            {
+                case "Current":
+                    OpenToCurrent();
+                    break;
+                case "Date":
+                    OpenToDate();
+                    break;
+                default:
+                    throw new NotSupportedException("Unexpected parameter set.");
+            }
+        }
+
+        private void OpenToDate()
+        {
+            var year = Journal.YearDirectoryPattern.Format(LocalDate.FromDateTime(Date));
+            var month = Journal.MonthDirectoryPattern.Format(LocalDate.FromDateTime(Date));
+            var fileSystem = new FileSystem();
+            var path = fileSystem.Path.Combine(Location, year, month);
+
+            if (!fileSystem.Directory.Exists(path))
+                throw new PSInvalidOperationException("No directory currently exists for the selected period.");
+
+            SystemProcess.Start(path);
+        }
+
+        private void OpenToCurrent()
         {
             var fileSystem = new FileSystem();
             string path;
