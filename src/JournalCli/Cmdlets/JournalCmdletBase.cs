@@ -44,13 +44,17 @@ namespace JournalCli.Cmdlets
                 Location = settings.DefaultJournalRoot;
 
                 RunJournalCommand();
-                CheckForUpdates();
             }
             catch (Exception e)
             {
                 Log.Error(e, "Error encountered during ProcessRecord");
                 throw;
             }
+        }
+
+        protected sealed override void EndProcessing()
+        {
+            CheckForUpdates();
         }
 
         private protected Journal OpenJournal()
