@@ -18,12 +18,15 @@ namespace JournalCli.Cmdlets
         protected CmdletBase()
         {
             // ReSharper disable AssignNullToNotNullAttribute
-            var path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs", ".log");
+            LogsDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs");
+            var path = Path.Combine(LogsDirectory, ".log");
             // ReSharper restore AssignNullToNotNullAttribute
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.File(path, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
+
+        protected string LogsDirectory { get; }
 
         protected string ResolvePath(string path) => GetUnresolvedProviderPathFromPSPath(path);
 
