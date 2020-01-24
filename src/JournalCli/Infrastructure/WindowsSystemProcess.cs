@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 
-namespace JournalCli.Infrastructure {
+namespace JournalCli.Infrastructure
+{
     internal class WindowsSystemProcess : ISystemProcess
     {
         public void Start(string filePath)
