@@ -8,6 +8,7 @@ using JournalCli.Infrastructure;
 namespace JournalCli.Cmdlets
 {
     // TODO: "DefaultJournal" or just "Journal"? This will have an impact when named journals are introduced.
+    // https://github.com/refactorsaurusrex/journal-cli/issues/23
     [PublicAPI]
     [Cmdlet(VerbsCommon.Open, "Journal")]
     [Alias("oj")]

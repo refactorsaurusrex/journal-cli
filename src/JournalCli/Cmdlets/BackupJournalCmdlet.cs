@@ -17,6 +17,7 @@ namespace JournalCli.Cmdlets
         public string BackupLocation { get; set; }
 
         // TODO: Collect this in a more secure way
+        // https://github.com/refactorsaurusrex/journal-cli/issues/16
         [Parameter]
         public string Password { get; set; }
 
