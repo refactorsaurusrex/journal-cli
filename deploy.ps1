@@ -4,7 +4,7 @@ if ($env:APPVEYOR_REPO_TAG -eq 'true') {
   Write-Host "Publishing to the PowerShell Gallery..."
   Publish-Module -NuGetApiKey $env:psgallery -Path .\publish\JournalCli
   Write-Host "Package successfully published to the PowerShell Gallery."
-} elseif ($env:APPVEYOR_REPO_BRANCH -eq 'master') {
+} elseif ($env:APPVEYOR_REPO_BRANCH -eq 'master' -and $null -eq $env:APPVEYOR_PULL_REQUEST_NUMBER) {
   $options = @{
     Name = 'MyGet'
     SourceLocation = 'https://www.myget.org/F/journal-cli/api/v2'
@@ -17,5 +17,5 @@ if ($env:APPVEYOR_REPO_TAG -eq 'true') {
   Publish-Module -NuGetApiKey $env:myget -Path .\publish\JournalCli -Repository MyGet
   Write-Host "Package successfully published to the MyGet pre-release feed."
 } else {
-  Write-Host "Either this is a non-master branch build or no tags were pushed. Skipping deployment."
+  Write-Host "Non-master build and no tags pushed. Skipping deployment."
 }
