@@ -11,10 +11,10 @@ namespace JournalCli.Cmdlets
     [Alias("orj")]
     public class OpenRandomJournalEntryCmdlet : JournalCmdletBase
     {
-        [Parameter]
+        [Parameter(ParameterSetName = "Range")]
         public DateTime? From { get; set; }
 
-        [Parameter]
+        [Parameter(ParameterSetName = "Range")]
         public DateTime To { get; set; } = DateTime.Now;
 
         [Parameter(ParameterSetName = "Year", Mandatory = true)]
