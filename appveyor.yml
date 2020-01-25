@@ -1,7 +1,4 @@
 version: "{build}"
-branches:
-  only:
-  - master
 image: Visual Studio 2019
 build_script:
 - pwsh: '& ".\build.ps1"'
