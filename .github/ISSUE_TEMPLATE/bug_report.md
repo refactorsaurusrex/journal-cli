@@ -21,6 +21,9 @@ assignees: refactorsaurusrex
 ## Screenshots
 > If applicable, add screenshots to help explain your problem.
 
+## Logs
+> Run `Open-JournalCliLogsDirectory` and paste any relevant log information. Alternatively, upload your log file to a cloud storage provider and link to it here.
+
 ## Environmental Information
 > Required details about your working environment
 - OS: [e.g. Windows 10, macOS Catalina, Ubuntu 18]
