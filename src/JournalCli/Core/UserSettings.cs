@@ -15,6 +15,8 @@ namespace JournalCli.Core
 
         public string BackupPassword { get; set; }
 
+        public bool HideWelcomeScreen { get; set; }
+
         public DateTime? NextUpdateCheck { get; set; }
 
         public void Save(IEncryptedStore<UserSettings> encryptedStore) => encryptedStore.Save(this);
