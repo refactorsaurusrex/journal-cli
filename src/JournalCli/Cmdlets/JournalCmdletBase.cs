@@ -174,6 +174,9 @@ namespace JournalCli.Cmdlets
                 var availableVersions = availableVersionsResults.Select(x => new Version((string)x.Properties["Version"].Value)).ToList();
                 var newVersion = availableVersions.FirstOrDefault(x => x.IsBeta() == installedVersion.IsBeta());
 
+                if (newVersion == null)
+                    throw new InvalidOperationException("Unable to locate an appropriate new version of the module. Missing registered repository?");
+
                 if (newVersion > installedVersion)
                 {
                     WriteHostInverted("***** Update Available! *****");
