@@ -51,7 +51,7 @@ namespace JournalCli.Infrastructure
                 var resultBytes = ProtectedData.Unprotect(cipher, entropy, DataProtectionScope.CurrentUser);
                 var yaml = Encoding.UTF8.GetString(resultBytes);
 
-                var deserializer = new DeserializerBuilder().Build();
+                var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
                 return deserializer.Deserialize<T>(yaml);
             }
             catch (Exception)
