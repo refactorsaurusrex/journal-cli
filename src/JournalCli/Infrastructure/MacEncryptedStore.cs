@@ -52,7 +52,7 @@ namespace JournalCli.Infrastructure
                 var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).Name);
                 var cipherText = _fileSystem.File.ReadAllText(cipherPath);
                 var plainText = AuthenticatedEncryption.Decrypt(cipherText, cryptKey, authKey);
-                var deserializer = new DeserializerBuilder().Build();
+                var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
                 return deserializer.Deserialize<T>(plainText);
             }
             catch (Exception)
