@@ -200,5 +200,18 @@ namespace JournalCli.Cmdlets
                 }
             }
         }
+
+        private void ShowSplashScreen(string message)
+        {
+            var logo = $@"
+       __                             ___________ 
+      / /___  __  ___________  ____ _/ / ____/ (_)
+ __  / / __ \/ / / / ___/ __ \/ __ `/ / /   / / / 
+/ /_/ / /_/ / /_/ / /  / / / / /_/ / / /___/ / /  
+\____/\____/\__,_/_/  /_/ /_/\__,_/_/\____/_/_/   
+{message}                                                  
+";
+            WriteHost(logo);
+        }
     }
 }
