@@ -16,11 +16,19 @@ namespace JournalCli.Cmdlets
     public abstract class JournalCmdletBase : CmdletBase
     {
         private const string Error = "Journal location was not provided and no default location exists. One or the other is required";
+        private readonly UserSettings _settings;
+        private readonly IEncryptedStore<UserSettings> _encryptedStore;
+
 #if !DEBUG
         private bool _beenWarned;
         private const string MissingGitBinaryWarning = "You're missing a native binary that's required to enable git integration. " +
             "Click here for more information:\r\n\r\nhttps://journalcli.me/docs/faq#i-got-a-missing-git-binary-warning-whats-that-about\r\n";
 #endif
+        protected JournalCmdletBase()
+        {
+            _encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
+            _settings = UserSettings.Load(_encryptedStore);
+        }
 
         [Parameter]
         public string Location { get; set; }
@@ -55,6 +63,16 @@ namespace JournalCli.Cmdlets
         protected sealed override void EndProcessing()
         {
             CheckForUpdates();
+        }
+
+        protected sealed override void BeginProcessing()
+        {
+            if (_settings.HideWelcomeScreen) 
+                return;
+
+            ShowSplashScreen("Welcome! I hope you love using JournalCli. Visit https://journalcli.me for more information.");
+            _settings.HideWelcomeScreen = true;
+            _settings.Save(_encryptedStore);
         }
 
         private protected Journal OpenJournal()
@@ -152,9 +170,7 @@ namespace JournalCli.Cmdlets
             ProgressRecord progressRecord = null;
             try
             {
-                var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
-                var settings = UserSettings.Load(encryptedStore);
-                if (settings.NextUpdateCheck != null && DateTime.Now <= settings.NextUpdateCheck)
+                if (_settings.NextUpdateCheck != null && DateTime.Now <= _settings.NextUpdateCheck)
                     return;
 
                 progressRecord = new ProgressRecord(0, "Checking For Updates", "This won't take long...");
@@ -186,8 +202,8 @@ namespace JournalCli.Cmdlets
                     ShowSplashScreen(message);
                 }
 
-                settings.NextUpdateCheck = DateTime.Now.AddDays(7);
-                settings.Save(encryptedStore);
+                _settings.NextUpdateCheck = DateTime.Now.AddDays(7);
+                _settings.Save(_encryptedStore);
             }
             catch (Exception e)
             {
