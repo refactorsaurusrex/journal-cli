@@ -179,9 +179,11 @@ namespace JournalCli.Cmdlets
 
                 if (newVersion > installedVersion)
                 {
-                    WriteHostInverted("***** Update Available! *****");
-                    WriteHostInverted($"You're currently using version {installedVersion}. Run 'Update-Module JournalCli' " +
-                                      $"to upgrade to version {newVersion}, or run 'Suspend-JournalCliUpdateChecks' to snooze these notifications.");
+                    if (!System.Diagnostics.Debugger.IsAttached)
+                        ScriptBlock.Create("Update-Module JournalCli").Invoke();
+                    var message = $"v{newVersion.Major}.{newVersion.Minor}.{newVersion.Build} has been installed! Restart " +
+                        "your terminal to load the latest goodies.";
+                    ShowSplashScreen(message);
                 }
 
                 settings.NextUpdateCheck = DateTime.Now.AddDays(7);
