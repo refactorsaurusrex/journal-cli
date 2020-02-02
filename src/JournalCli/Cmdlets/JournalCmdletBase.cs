@@ -29,20 +29,19 @@ namespace JournalCli.Cmdlets
         {
             try
             {
-                if (string.IsNullOrEmpty(Location))
-                {
-                    var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
-                    var settings = UserSettings.Load(encryptedStore);
-
-                    if (string.IsNullOrEmpty(settings.DefaultJournalRoot))
-                        throw new PSInvalidOperationException(Error);
-
-                    Location = settings.DefaultJournalRoot;
-                }
-                else
+                if (!string.IsNullOrEmpty(Location))
                 {
                     Location = ResolvePath(Location);
+                    return;
                 }
+
+                var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
+                var settings = UserSettings.Load(encryptedStore);
+
+                if (string.IsNullOrEmpty(settings.DefaultJournalRoot))
+                    throw new PSInvalidOperationException(Error);
+
+                Location = settings.DefaultJournalRoot;
 
                 RunJournalCommand();
             }
