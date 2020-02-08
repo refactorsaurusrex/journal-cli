@@ -1,4 +1,4 @@
-[![Build status](https://img.shields.io/appveyor/ci/refactorsaurusrex/journal-cli?style=for-the-badge)](https://ci.appveyor.com/project/refactorsaurusrex/journal-cli/branch/master) 
+[![Build status](https://img.shields.io/appveyor/build/refactorsaurusrex/journal-cli/master?style=for-the-badge)](https://ci.appveyor.com/project/refactorsaurusrex/journal-cli/branch/master) 
 
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/JournalCli?style=for-the-badge)](https://www.powershellgallery.com/packages/JournalCli) [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/journalcli?style=for-the-badge&label=Downloads)](https://www.powershellgallery.com/packages/JournalCli) [![MyGet](https://img.shields.io/myget/journal-cli/v/JournalCli?label=Beta&style=for-the-badge)](https://www.myget.org/feed/journal-cli/package/nuget/JournalCli) 
 
