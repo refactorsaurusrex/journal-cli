@@ -195,7 +195,9 @@ namespace JournalCli.Cmdlets
 
                 if (newVersion > installedVersion)
                 {
-                    if (!System.Diagnostics.Debugger.IsAttached)
+                    if (System.Diagnostics.Debugger.IsAttached)
+                        WriteHostInverted("DEBUGGER ATTACHED: New module not installed.");
+                    else
                         ScriptBlock.Create("Update-Module JournalCli").Invoke();
                     var message = $"v{newVersion.Major}.{newVersion.Minor}.{newVersion.Build} has been installed! Restart " +
                         "your terminal to load the latest goodies.";
