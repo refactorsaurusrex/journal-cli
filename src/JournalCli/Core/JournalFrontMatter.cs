@@ -116,7 +116,7 @@ namespace JournalCli.Core
         }
 
         [YamlMember(Alias = "tags")]
-        public ICollection<string> Tags { get; }
+        public IReadOnlyCollection<string> Tags { get; private set; }
 
         [YamlMember(Alias = "readme")]
         public string Readme { get; }
@@ -129,6 +129,14 @@ namespace JournalCli.Core
 
         /// <inheritdoc />
         public bool HasTags() => Tags != null && Tags.Count > 0;
+
+        public void AppendTags(ICollection<string> tags)
+        {
+            if (tags == null || !tags.Any())
+                return;
+
+            Tags = Tags.Concat(tags).Distinct().OrderBy(x => x).ToList().AsReadOnly();
+        }
 
         public string ToString(bool asFrontMatter)
         {

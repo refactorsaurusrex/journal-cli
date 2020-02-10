@@ -14,7 +14,7 @@ namespace JournalCli.Core
             FilePath = filePath;
             var lines = fileSystem.File.ReadAllLines(FilePath).ToList();
 
-            var headers = lines.Where(x => x.StartsWith("#")).ToList();
+            var headers = lines.Where(HeaderValidator.IsValid).ToList();
             var h1 = headers.FirstOrDefault()?.Replace("# ", "");
 
             if (h1 != null && headers.Count > 1 && DateTime.TryParse(h1, out _))
@@ -23,7 +23,7 @@ namespace JournalCli.Core
                 Headers = lines.Where(x => x.StartsWith("#")).ToList();
 
             var bodyStartIndex = lines.FindLastIndex(s => s == JournalFrontMatter.BlockIndicator) + 1;
-            Body = string.Join(Environment.NewLine, lines.Skip(bodyStartIndex));
+            RawBody = string.Join(Environment.NewLine, lines.Skip(bodyStartIndex));
             FrontMatter = JournalFrontMatter.FromFilePath(fileSystem, filePath);
             EntryName = fileSystem.Path.GetFileNameWithoutExtension(FilePath) ?? throw new InvalidOperationException();
 
@@ -31,11 +31,11 @@ namespace JournalCli.Core
                 EntryDate = Journal.FileNamePattern.Parse(EntryName).Value;
         }
 
-        public string Body { get; }
+        public string RawBody { get; }
 
         public IJournalFrontMatter FrontMatter { get; }
 
-        public ICollection<string> Headers { get; }
+        public IReadOnlyCollection<string> Headers { get; }
 
         public string FilePath { get; }
 

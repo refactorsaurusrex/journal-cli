@@ -10,6 +10,8 @@ namespace JournalCli.Infrastructure
 {
     internal static class Extensions
     {
+        public static T ToEnum<T>(this string value) where T : Enum => (T)Enum.Parse(typeof(T), value, true);
+
         public static bool ContainsAll<T>(this IEnumerable<T> target, IEnumerable<T> matches) => matches.All(target.Contains);
 
         public static string ToJournalEntryFileName(this LocalDate date) => date.ToString(Journal.FileNameWithExtensionPattern.PatternText, CultureInfo.CurrentCulture);

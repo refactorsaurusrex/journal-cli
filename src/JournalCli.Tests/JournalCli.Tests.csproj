@@ -24,4 +24,30 @@
     <ProjectReference Include="..\JournalCli\JournalCli.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TestBodies\" />
+    <Folder Include="TestEntries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestBodies\AllTextHasExactlyOneHeader.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestBodies\MultipleHeadersIncludingDefaultH1.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestBodies\MultipleHeadersWithoutAssociatedText.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestBodies\NestedHeaders.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestBodies\NoHeadersOnlyText.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestBodies\OnlyFirstParagraphHasNoHeader.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

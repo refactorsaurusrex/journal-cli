@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using JournalCli.Infrastructure;
 using NodaTime;
-using NodaTime.Text;
 
 namespace JournalCli.Core
 {
@@ -22,9 +19,9 @@ namespace JournalCli.Core
         }
 
         public LocalDate ReadmeDate { get; }
-        public ICollection<string> Headers { get; }
+        public IReadOnlyCollection<string> Headers { get; }
         public string EntryName { get; }
-        public ICollection<string> Tags { get; }
+        public IReadOnlyCollection<string> Tags { get; }
         public override string ToString() => EntryName;
         public IJournalReader GetReader() => _reader;
     }

@@ -13,13 +13,13 @@ namespace JournalCli.Core
         public CompleteJournalEntry(IJournalReader reader)
         {
             _reader = reader;
-            WrapBody(reader.Body);
+            WrapBody(reader.RawBody);
             Tags = reader.FrontMatter.Tags;
             EntryName = reader.EntryName;
         }
 
         public string EntryName { get; }
-        public ICollection<string> Tags { get; }
+        public IReadOnlyCollection<string> Tags { get; }
         public override string ToString() => EntryName;
         public string Body { get; private set; }
         public IJournalReader GetReader() => _reader;
