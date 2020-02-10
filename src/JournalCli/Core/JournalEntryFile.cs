@@ -14,7 +14,7 @@ namespace JournalCli.Core
             _reader = reader;
             EntryDate = reader.EntryDate;
             FilePath = reader.FilePath;
-            Body = reader.Body;
+            Body = reader.RawBody;
             Tags = reader.FrontMatter.Tags;
             EntryName = reader.EntryName;
         }
@@ -23,7 +23,7 @@ namespace JournalCli.Core
         public string FilePath { get; }
         public string Body { get; }
         public string EntryName { get; }
-        public ICollection<string> Tags { get; }
+        public IReadOnlyCollection<string> Tags { get; }
         public override string ToString() => EntryName;
         public IJournalReader GetReader() => _reader;
 

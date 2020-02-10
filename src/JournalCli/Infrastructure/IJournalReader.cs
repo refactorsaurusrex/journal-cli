@@ -6,9 +6,9 @@ namespace JournalCli.Infrastructure
 {
     public interface IJournalReader
     {
-        string Body { get; }
+        string RawBody { get; }
         IJournalFrontMatter FrontMatter { get; }
-        ICollection<string> Headers { get; }
+        IReadOnlyCollection<string> Headers { get; }
         string FilePath { get; }
         string EntryName { get; }
         LocalDate EntryDate { get; }

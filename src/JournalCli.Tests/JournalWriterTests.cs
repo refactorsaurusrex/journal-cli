@@ -26,7 +26,7 @@ namespace JournalCli.Tests
             writer.RenameTag(originalReader, "blah", "horseman");
             var newReader = new JournalReader(fileSystem, filePath);
 
-            newReader.Body.Should().Be(originalReader.Body);
+            newReader.RawBody.Should().Be(originalReader.RawBody);
             newReader.FrontMatter.Tags.Should().OnlyContain(x => new List<string> { "doh", "horseman" }.Contains(x));
         }
 

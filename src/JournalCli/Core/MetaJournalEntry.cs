@@ -16,8 +16,8 @@ namespace JournalCli.Core
         }
 
         public string EntryName { get; }
-        public ICollection<string> Tags { get; }
-        public ICollection<string> Headers { get; }
+        public IReadOnlyCollection<string> Tags { get; }
+        public IReadOnlyCollection<string> Headers { get; }
         public override string ToString() => EntryName;
         public IJournalReader GetReader() => _reader;
     }

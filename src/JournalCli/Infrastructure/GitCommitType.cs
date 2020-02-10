@@ -4,6 +4,8 @@
     {
         PreNewJournalEntry,
         PostNewJournalEntry,
+        PreAppendJournalEntry,
+        PostAppendJournalEntry,
         PreRenameTag,
         PostRenameTag,
         Manual

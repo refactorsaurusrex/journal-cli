@@ -5,9 +5,10 @@ namespace JournalCli.Core
 {
     public interface IJournalFrontMatter
     {
-        ICollection<string> Tags { get; }
+        IReadOnlyCollection<string> Tags { get; }
         string Readme { get; }
         LocalDate? ReadmeDate { get; }
+        void AppendTags(ICollection<string> tags);
         string ToString(bool asFrontMatter);
         string ToString();
 

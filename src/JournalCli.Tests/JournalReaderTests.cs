@@ -20,7 +20,7 @@ namespace JournalCli.Tests
             fileSystem.AddFile(filePath, new MockFileData(entry, Encoding.UTF8));
             IJournalReader reader = new JournalReader(fileSystem, filePath);
 
-            reader.Body.Length.Should().Be(bodyLength);
+            reader.RawBody.Length.Should().Be(bodyLength);
             reader.EntryDate.Should().Be(new NodaTime.LocalDate(2019, 1, 1));
             reader.EntryName.Should().Be("2019.01.01");
             reader.FilePath.Should().Be(filePath);

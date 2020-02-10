@@ -67,10 +67,10 @@ namespace JournalCli.Cmdlets
 
         protected sealed override void BeginProcessing()
         {
-            if (_settings.HideWelcomeScreen) 
+            if (_settings.HideWelcomeScreen)
                 return;
 
-            ShowSplashScreen("Welcome! I hope you love using JournalCli. Visit https://journalcli.me for more information.");
+            ShowSplashScreen("Welcome! I hope you love using JournalCli. For help and other information, visit https://journalcli.me. Send feedback to hi@journalcli.me.");
             _settings.HideWelcomeScreen = true;
             _settings.Save(_encryptedStore);
         }

@@ -10,6 +10,10 @@ namespace JournalCli.Infrastructure
             {
                 default:
                     throw new NotSupportedException($"The commit type '{commitType}' is not currently supported");
+                case GitCommitType.PreAppendJournalEntry:
+                    return "PRE: " + AppendJournalEntry;
+                case GitCommitType.PostAppendJournalEntry:
+                    return "POST: " + AppendJournalEntry;
                 case GitCommitType.PreNewJournalEntry:
                     return "PRE: " + NewJournalEntry;
                 case GitCommitType.PostNewJournalEntry:
@@ -23,6 +27,7 @@ namespace JournalCli.Infrastructure
             }
         }
 
+        private const string AppendJournalEntry = "Append content to journal entry";
         private const string NewJournalEntry = "Add new journal entry";
         private const string RenameTag = "Rename tag";
     }
