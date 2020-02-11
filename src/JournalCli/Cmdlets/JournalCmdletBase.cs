@@ -55,6 +55,10 @@ namespace JournalCli.Cmdlets
             }
             catch (Exception e)
             {
+                if (e is PipelineStoppedException ||
+                    e is PipelineClosedException)
+                    throw;
+
                 Log.Error(e, "Error encountered during ProcessRecord");
                 throw;
             }
