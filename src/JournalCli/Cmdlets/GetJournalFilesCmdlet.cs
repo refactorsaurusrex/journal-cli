@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
@@ -30,7 +29,7 @@ namespace JournalCli.Cmdlets
             {
                 var fileSystem = new FileSystem();
                 var markdownFiles = new MarkdownFiles(fileSystem, Location);
-                var results = markdownFiles.FindAll().Select(x => new FileInfo(x));
+                var results = markdownFiles.FindAll().Select(x => new JournalFileInfo(x));
                 WriteObject(results, true);
 
                 return;
@@ -38,7 +37,7 @@ namespace JournalCli.Cmdlets
 
             var journal = OpenJournal();
             var index = journal.CreateIndex<JournalEntryFile>(dateRange, Tags);
-            var entries = index.SelectMany(x => x.Entries).Distinct().Select(x => new FileInfo(x.FilePath));
+            var entries = index.SelectMany(x => x.Entries).Distinct().Select(x => new JournalFileInfo(x.FilePath));
             WriteObject(entries, true);
         }
     }
