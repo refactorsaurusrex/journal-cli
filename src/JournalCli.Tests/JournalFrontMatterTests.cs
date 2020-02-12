@@ -13,6 +13,14 @@ namespace JournalCli.Tests
     public class JournalFrontMatterTests
     {
         [Fact]
+        public void AppendTags_AddsTags_WhenNoCurrentTagsExist()
+        {
+            var frontMatter = new JournalFrontMatter(string.Empty, null);
+            frontMatter.AppendTags(new[] { "test" });
+            frontMatter.Tags.Should().Contain("test");
+        }
+
+        [Fact]
         public void ToString_ShouldInsertDefaultTags_IfNoneArePresent()
         {
             var frontMatter = new JournalFrontMatter(string.Empty, Today.Date());
