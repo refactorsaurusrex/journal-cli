@@ -142,7 +142,10 @@ namespace JournalCli.Core
             if (tags == null || !tags.Any())
                 return;
 
-            Tags = Tags.Concat(tags).Distinct().OrderBy(x => x).ToList().AsReadOnly();
+            if (Tags == null)
+                Tags = tags.ToList();
+            else 
+                Tags = Tags.Concat(tags).Distinct().OrderBy(x => x).ToList().AsReadOnly();
         }
 
         public string ToString(bool asFrontMatter)
