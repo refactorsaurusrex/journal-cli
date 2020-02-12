@@ -34,7 +34,9 @@ namespace JournalCli.Cmdlets
             if (Last)
             {
                 var journal = OpenJournal();
-                var lastEntry = journal.CreateIndex<JournalEntryFile>().SelectMany(x => x.Entries).OrderByDescending(x => x.EntryDate).First();
+                var lastEntry = journal.CreateIndex<JournalEntryFile>().SelectMany(x => x.Entries).OrderByDescending(x => x.EntryDate).FirstOrDefault();
+                if (lastEntry == null)
+                    throw new PSInvalidOperationException("No entries found!");
                 SystemProcess.Start(lastEntry.FilePath);
                 return;
             }
