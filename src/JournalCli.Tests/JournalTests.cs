@@ -45,7 +45,7 @@ namespace JournalCli.Tests
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
             journal.CreateNewEntry(new LocalDate(2019, 7, 19), tags, readme);
 
-            fileSystem.GetFile("J:\\Current\\2019\\07 July\\2019.07.19.md").TextContents.Should().Be("---\r\n\r\n---\r\n# Friday, July 19, 2019\r\n");
+            fileSystem.GetFile("J:\\Current\\2019\\07 July\\2019.07.19.md").TextContents.Should().Be("---\r\ntags:\r\n  - (untagged)\r\n---\r\n# Friday, July 19, 2019\r\n");
         }
 
         [Fact]

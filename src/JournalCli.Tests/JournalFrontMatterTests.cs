@@ -12,6 +12,17 @@ namespace JournalCli.Tests
 {
     public class JournalFrontMatterTests
     {
+        [Fact]
+        public void ToString_ShouldInsertDefaultTags_IfNoneArePresent()
+        {
+            var frontMatter = new JournalFrontMatter(string.Empty, Today.Date());
+            var yaml = frontMatter.ToString(true);
+            yaml.Should().Contain("- (untagged)");
+
+            var text = frontMatter.ToString();
+            text.Should().Contain("- (untagged)");
+        }
+
         [Theory]
         [InlineData(null)]
         [InlineData("")]
