@@ -174,7 +174,14 @@ namespace JournalCli.Cmdlets
             ProgressRecord progressRecord = null;
             try
             {
-                if (_settings.NextUpdateCheck != null && DateTime.Now <= _settings.NextUpdateCheck)
+                if (_settings.NextUpdateCheck == null)
+                {
+                    _settings.NextUpdateCheck = DateTime.Now.AddDays(7);
+                    _settings.Save(_encryptedStore);
+                    return;
+                }
+
+                if (DateTime.Now <= _settings.NextUpdateCheck)
                     return;
 
                 progressRecord = new ProgressRecord(0, "Checking For Updates", "This won't take long...");
