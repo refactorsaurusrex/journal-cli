@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using FluentAssertions;
 using JournalCli.Core;
+using JournalCli.Infrastructure;
 using Xunit;
 using NodaTime;
 
@@ -8,6 +12,61 @@ namespace JournalCli.Tests
 {
     public class JournalFrontMatterTests
     {
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("---\r\n\r\n---\r\n")]
+        public void This_DoesNotThrowExceptions_WhenYamlStringIsNullOrEmpty(string yaml)
+        {
+            var frontMatter = new JournalFrontMatter(yaml, null);
+
+            frontMatter.Tags.Should().BeNull();
+            frontMatter.Readme.Should().BeNull();
+            frontMatter.ReadmeDate.Should().BeNull();
+            frontMatter.IsEmpty().Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("---\r\n\r\n---\r\n")]
+        public void This_DoesNotThrowExceptions_WhenYamlIsNullOrEmptyButDateIsValid(string yaml)
+        {
+            var frontMatter = new JournalFrontMatter(yaml, Today.Date());
+
+            frontMatter.Tags.Should().BeNull();
+            frontMatter.Readme.Should().BeNull();
+            frontMatter.ReadmeDate.Should().BeNull();
+            frontMatter.IsEmpty().Should().BeTrue();
+        }
+
+        [Fact]
+        public void This_DoesNotThrowExceptions_WhenTagsAndReadmeParserAreNull()
+        {
+            IEnumerable<string> tags = null;
+            ReadmeParser readmeParser = null;
+            var frontMatter = new JournalFrontMatter(tags, readmeParser);
+
+            frontMatter.Tags.Should().BeNull();
+            frontMatter.Readme.Should().BeNull();
+            frontMatter.ReadmeDate.Should().BeNull();
+            frontMatter.IsEmpty().Should().BeTrue();
+        }
+
+        [Fact]
+        public void This_DoesNotThrowExceptions_WhenEntryFileHasNoYaml()
+        {
+            var fileSystem = new MockFileSystem();
+            var filePath = @"D:\TempJournal\2020\02 February\2020.02.12.md";
+            fileSystem.AddFile(filePath, new MockFileData("Here is some text without front matter"));
+            var fm4 = JournalFrontMatter.FromFilePath(fileSystem, filePath);
+
+            fm4.Tags.Should().BeNull();
+            fm4.Readme.Should().BeNull();
+            fm4.ReadmeDate.Should().BeNull();
+            fm4.IsEmpty().Should().BeTrue();
+        }
+
         [Theory]
         [InlineData("Tags:\r\n  - one\r\n  - one", "tags:\r\n  - one", 1)]
         [InlineData("Tags:\r\n  - one\r\n  - one\r\n  - two", "tags:\r\n  - one\r\n  - two", 2)]

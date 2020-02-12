@@ -66,6 +66,13 @@ namespace JournalCli.Core
 
         public JournalFrontMatter(string yamlFrontMatter, LocalDate? journalEntryDate)
         {
+            if (string.IsNullOrWhiteSpace(yamlFrontMatter))
+                return;
+
+            var skipChars = Environment.NewLine.ToCharArray().Concat(new[] { '-' });
+            if (yamlFrontMatter.All(x => skipChars.Contains(x)))
+                return;
+
             yamlFrontMatter = yamlFrontMatter.Trim();
             var yamlLines = yamlFrontMatter.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
             var originalLineCount = yamlLines.Count;
