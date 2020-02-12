@@ -108,7 +108,7 @@ namespace JournalCli.Core
                     if (node.NodeType == YamlNodeType.Sequence)
                     {
                         var tags = (YamlSequenceNode)node;
-                        Tags = tags.Select(x => x.ToString()).Distinct().OrderBy(x => x).ToList();
+                        Tags = tags.Select(x => x.ToString()).Where(x => x != "(untagged)").Distinct().OrderBy(x => x).ToList();
                     }
                 }
 
@@ -147,11 +147,9 @@ namespace JournalCli.Core
 
         public string ToString(bool asFrontMatter)
         {
-            if (IsEmpty())
-                return asFrontMatter ? $"{BlockIndicator}{Environment.NewLine}{Environment.NewLine}{BlockIndicator}{Environment.NewLine}" : "";
-
+            var target = IsEmpty() ? new JournalFrontMatter(new[] { "(untagged)" }) : this;
             var serializer = new SerializerBuilder().Build();
-            var yaml = serializer.Serialize(this).Replace("- ", "  - ").Trim();
+            var yaml = serializer.Serialize(target).Replace("- ", "  - ").Trim();
             return asFrontMatter ? $"{BlockIndicator}{Environment.NewLine}{yaml}{Environment.NewLine}{BlockIndicator}{Environment.NewLine}" : yaml;
         }
 
