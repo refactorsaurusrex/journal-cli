@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
-using System.Management.Automation.Runspaces;
-using System.Threading;
-using System.Threading.Tasks;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
 using Serilog;
