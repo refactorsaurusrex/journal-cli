@@ -7,9 +7,10 @@ using JournalCli.Infrastructure;
 namespace JournalCli.Cmdlets
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Get, "ReadmeEntries", DefaultParameterSetName = "All")]
+    [Cmdlet(VerbsCommon.Get, "JournalReadmeEntries", DefaultParameterSetName = "All")]
     [OutputType(typeof(ReadmeJournalEntryCollection))]
-    public class GetReadmeEntriesCmdlet : JournalCmdletBase
+    [Alias("Get-ReadmeEntries")]
+    public class GetJournalReadmeEntriesCmdlet : JournalCmdletBase
     {
         [Parameter(DontShow = true)]
         public SwitchParameter IncludeFuture { get; set; }
@@ -26,6 +27,9 @@ namespace JournalCli.Cmdlets
 
         protected override void RunJournalCommand()
         {
+            if (MyInvocation.InvocationName == "Get-ReadmeEntries")
+                WriteWarning("'Get-ReadmeEntries' is obsolete and will be removed in a future release. Use 'Get-JournalReadmeEntries' instead.");
+
             if (ParameterSetName == "Range")
             {
                 if (Duration == 0)

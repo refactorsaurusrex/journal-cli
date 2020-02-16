@@ -7,11 +7,15 @@ using JournalCli.Infrastructure;
 namespace JournalCli.Cmdlets
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Open, "BackupLocation")]
-    public class OpenBackupLocationCmdlet : CmdletBase
+    [Cmdlet(VerbsCommon.Open, "JournalBackupLocation")]
+    [Alias("Open-BackupLocation")]
+    public class OpenJournalBackupLocationCmdlet : CmdletBase
     {
         protected override void ProcessRecord()
         {
+            if (MyInvocation.InvocationName == "Open-BackupLocation")
+                WriteWarning("'Open-BackupLocation' is obsolete and will be removed in a future release. Use 'Open-JournalBackupLocation' instead.");
+
             var fileSystem = new FileSystem();
             var encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
             var path = UserSettings.Load(encryptedStore).BackupLocation;
