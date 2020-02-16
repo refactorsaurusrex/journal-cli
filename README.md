@@ -36,7 +36,7 @@ Use `Get-JournalIndex` and `Get-JournalEntriesByTag` to scan all your journal fi
 
 Create new journal entries, right from your terminal, that are automatically saved in appropriate year and month directories using a specific date-based naming convention. (Example: `2018.12.13.md`) 
 
-Forgot to create an entry for yesterday? No problem. Just pass in a `DateOffset` parameter like so:
+Forgot to create an entry for yesterday? No problem. Just pass in a `-DateOffset` parameter like so:
 
 ```powershell
 New-JournalEntry -DateOffset -1
@@ -56,7 +56,7 @@ You can dynamically create new entries composed of an arbitrary set of original 
 New-CompiledJournalEntry -Tags skiing
 ```
 
-This will create a single markdown file that contains every entry every written that's tagged `skiing`. Or maybe you want to create a single entry for the entire year of 2019. 
+This will create a single markdown file that contains *every journal entry written* that's tagged `skiing`. Or maybe you want to create a single entry for the entire year of 2019. 
 
 ```powershell
 New-CompiledJournalEntry -From '2019.1.1' -To '2019.12.31'
@@ -90,7 +90,7 @@ Use the new `Add-JournalEntryContent` cmdlet to write entries directly from your
 Add-JournalEntryContent "Today I went to work, and it was swell."
 ```
 
-By default, new content will be entered under the standard H1 date header. But you can also specify a header name with the `-Header` parameter. If the header already exists, your content will be appended to it. Otherwise, the new header will be appended to the bottom of the entry. You can also add tags with the `-Tags` parameter, and target an entry date other than `Today` by using the `-Date` and/or `-DateOffset` parameters.
+By default, new content will be entered under the standard H1 date header. But you can also specify a header name with the `-Header` parameter. If the header already exists, your content will be appended to it. Otherwise, the new header will be appended to the bottom of the entry along with the associated content. You can also add tags with the `-Tags` parameter, and target an entry date other than `Today` by using the `-Date` and/or `-DateOffset` parameters.
 
 ## Write notes to your future self
 
