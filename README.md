@@ -24,7 +24,7 @@ Finally, I had a realization. *Typora supports yaml front matter. I can use fron
 
 ## Create an index of your journal
 
-Run `Get-JournalIndex` to scan all your journal files and create an index of your entire journal. This allows you to:
+Use `Get-JournalIndex` and `Get-JournalEntriesByTag` to scan all your journal files and create an index of your entire journal. This allows you to:
 
 - Display a list of all tags used in your journal.
 - Sort tags by name or count, in ascending or descending order.
@@ -42,11 +42,67 @@ Forgot to create an entry for yesterday? No problem. Just pass in a `DateOffset`
 New-JournalEntry -DateOffset -1
 ```
 
+Use the `-Date` parameter to create an entry for a specific date:
+
+```powershell
+New-JournalEntry -Date '2017.4.25'
+```
+
+## Create new _compiled_ journal entries
+
+You can dynamically create new entries composed of an arbitrary set of original entries. For example, maybe you want a complete history of all your ski trip notes in a single file:
+
+```powershell
+New-CompiledJournalEntry -Tags skiing
+```
+
+This will create a single markdown file that contains every entry every written that's tagged `skiing`. Or maybe you want to create a single entry for the entire year of 2019. 
+
+```powershell
+New-CompiledJournalEntry -From '2019.1.1' -To '2019.12.31'
+```
+
+You can also use the `-Entries` parameter to pass in a set of `IJournalEntry` objects created by creative usage of `Get-JournalIndex` or `Get-JournalEntriesByTag`. 
+
+## Read entries from your terminal
+
+There are several ways to peruse journal entry content directly from your terminal window.
+
+```powershell
+# Displays entry names, tags, and headers.
+Get-JournalEntriesByTag -Tags skiing | select -ExpandProperty entries
+
+# Displays entry names, tags, and body content.
+Get-JournalEntriesByTag -Tags skiing -IncludeBodies | select -ExpandProperty entries
+
+# Displays full content of retrieved entries one page at a time.
+Get-JournalEntriesByTag -Tags skiing -IncludeBodies | 
+  select -ExpandProperty entries | 
+  select -ExpandProperty Body |
+  more
+```
+
+## Write entries from your terminal
+
+Use the new `Add-JournalEntryContent` cmdlet to write entries directly from your terminal. 
+
+```powershell
+Add-JournalEntryContent "Today I went to work, and it was swell."
+```
+
+By default, new content will be entered under the standard H1 date header. But you can also specify a header name with the `-Header` parameter. If the header already exists, your content will be appended to it. Otherwise, the new header will be appended to the bottom of the entry. You can also add tags with the `-Tags` parameter, and target an entry date other than `Today` by using the `-Date` and/or `-DateOffset` parameters.
+
+## Write notes to your future self
+
+Use the `-Readme` parameter of the `New-JournalEntry` cmdlet to add a specified date in the future when you want future-you to re-read the entry. Run `Get-JournalReadmeEntries` to display a list of entries with expired readme dates. (Future entries are hidden by default.) In a future release, you'll be able to export this list to Google Calendar so you can receive reminders to re-read your entries at the set date and time.
+
+Further documentation on this feature can be found [here](https://journalcli.me/docs/features#valid-readme-expressions). 
+
 ## Create backups
 
 Create a snapshot of your entire journal and save it to a zip file. Optionally, protect the zip file with a password.
 
-## Open a random journal entry
+## Open random journal entries
 
 What's the point of keeping a journal if you never re-read your entries? Run `Open-RandomJournalEntry` to open a randomly selected entry. Pass in one or more tag names to narrow down the collection of possible entries.
 
@@ -58,7 +114,7 @@ Want to see every journal entry that was tagged `work`, `family`, or whatever? R
 
 Let's say you have a few dozen entries with the tag `family` and a few dozen more with the tag `family-drama`. Maybe you decide the latter really should be combined with the former. Use the `Rename-JournalTag` function to do exactly that. 
 
-## Complete version history
+## Version History
 
 Every `journal-cli` command that alters the state of your journal automatically captures the changes with a git commit. Having a complete and permanent editing history allows you to easily view all changes made to specific entries, and undo most accidental changes  - such as a regrettable tag rename operation. You do not need to install git separately because it is fully integrated with `journal-cli`.
 
@@ -74,7 +130,7 @@ For additional details and instructions, check out the [Getting Started](https:/
 
 ## Beta Versions
 
-New beta versions are published on every merge to master. If you'd like to try out the latest features before they're released to the PowerShell Gallery, follow these steps.
+New beta versions are published on every merge to master. To see what changes are in the current beta, look at the [Ready For Release column](https://github.com/refactorsaurusrex/journal-cli/projects/1) of the `journal-cli` roadmap. If you'd like to try out these features before they're released to the PowerShell Gallery, follow the steps below.
 
 First, make sure you've completely removed all versions installed from the PowerShell Gallery. The reason for this is all beta releases are versioned `0.0.X`, where `x` is the [build number](https://ci.appveyor.com/project/refactorsaurusrex/journal-cli). That means beta versions will always have a lower semantic version number than the official releases, which can cause problems with module autoloading and upgrades if you have both beta and non-beta versions installed. You can use this command to remove all versions:
 
@@ -103,7 +159,7 @@ I've only tested this tool with a few hundred files on a very fast machine. I've
 
 # Bugs / Suggestions
 
-So far, I've written this tool with exactly one user in mind: **me**. That seems like a prudent choice since I'm not sure how many people out there share my particular obsession with markdown, command line tools, and data security. That said, if you like the idea behind `journal-cli` but feel something is missing or could be improved, let's talk. Open an [issue][issues] or [email me][profile]. (I can't promise I will accept changes that weren't agreed upon in advance, so please open the communication lines before writing any code.)
+So far, I've written this tool with exactly one user in mind: **me**. That seems like a prudent choice since I'm not sure how many people out there share my particular obsession with markdown, command line tools, and data security. That said, if you like the idea behind `journal-cli` but feel something is missing or could be improved, let's talk. Open an [issue][issues],  [email me][profile], or post a message on [gitter](https://gitter.im/journal-cli/community). I can't promise I will accept changes that weren't agreed upon in advance, so please open the communication lines before writing any code.
 
 [dl]: https://dynalist.io/
 [tf]: https://www.typeform.com/
