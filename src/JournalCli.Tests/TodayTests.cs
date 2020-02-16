@@ -1,5 +1,4 @@
 ﻿using System;
-using AutoFixture;
 using FluentAssertions;
 using JournalCli.Infrastructure;
 using NodaTime;

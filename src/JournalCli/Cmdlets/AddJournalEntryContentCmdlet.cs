@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Management.Automation;
-using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using JournalCli.Infrastructure;
 using NodaTime;

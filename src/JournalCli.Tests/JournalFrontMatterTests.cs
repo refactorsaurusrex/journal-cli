@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
+﻿using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
 using FluentAssertions;
 using JournalCli.Core;
