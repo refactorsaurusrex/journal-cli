@@ -4,7 +4,7 @@
 
 # What is this?
 
-`journal-cli` is a tool for people who want to journal with markdown, love command line tools, and are highly averse to storing intimate information in the cloud unless it's encrypted.
+`journal-cli` is a *cross-platform* tool for people who want to journal with markdown, love command line tools, and are highly averse to storing intimate information in the cloud unless it's encrypted.
 
 # Background
 
@@ -120,7 +120,7 @@ Every `journal-cli` command that alters the state of your journal automatically 
 
 # How do I get it?
 
-From the PowerShell Gallery:
+`journal-cli` runs anywhere PowerShell 6 runs, including on Windows, Linux, and MacOS systems. Install it from the PowerShell Gallery:
 
 ```powershell
 > Install-Module JournalCli 
