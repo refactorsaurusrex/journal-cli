@@ -8,6 +8,8 @@
         PostAppendJournalEntry,
         PreRenameTag,
         PostRenameTag,
-        Manual
+        Manual,
+        PreOpenJournalEntry,
+        PostOpenJournalEntry
     }
 }
