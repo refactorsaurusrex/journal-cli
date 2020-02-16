@@ -29,6 +29,9 @@ namespace JournalCli.Cmdlets
         [Parameter(Position = 0, ParameterSetName = "DateOffset")]
         public int DateOffset { get; set; }
 
+        [Parameter(ParameterSetName = "Entry")]
+        public SwitchParameter Wait { get; set; }
+
         protected override void RunJournalCommand()
         {
             if (Last)
@@ -80,6 +83,13 @@ namespace JournalCli.Cmdlets
                 throw new PSInvalidOperationException($"An entry does not exist for '{entryDate}'.");
 
             SystemProcess.Start(path);
+
+            if (Wait)
+            {
+                var result = Choice($"Reading entry for {entryDate}", "Continue on to next entry?", 0, "&Continue", "&Quit");
+                if (result == 1)
+                    ThrowTerminatingError("Pipeline terminated at user's request.", ErrorCategory.NotSpecified);
+            }
         }
     }
 }
