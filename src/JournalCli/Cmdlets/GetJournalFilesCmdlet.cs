@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
@@ -21,24 +23,59 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public string[] Tags { get; set; }
 
+        [Parameter]
+        [ValidateSet("Ascending", "Descending")]
+        public string SortDirection { get; set; } = "Descending";
+
+        [Parameter]
+        public int Limit { get; set; }
+
         protected override void RunJournalCommand()
         {
             var dateRange = GetRangeOrNull(From, To);
 
             if (dateRange == null && Tags == null)
-            {
-                var fileSystem = new FileSystem();
-                var markdownFiles = new MarkdownFiles(fileSystem, Location);
-                var results = markdownFiles.FindAll().Select(x => new JournalFileInfo(x));
-                WriteObject(results, true);
+                FromAll();
+            else
+                FromDate(dateRange);
+        }
 
-                return;
-            }
+        private void FromAll()
+        {
+            var fileSystem = new FileSystem();
+            var markdownFiles = new MarkdownFiles(fileSystem, Location);
 
+            var sorted = SortDirection == "Descending" ?
+                markdownFiles.FindAll().OrderByDescending(FileNameToDate) :
+                markdownFiles.FindAll().OrderBy(FileNameToDate);
+
+            var filtered = Limit > 0 ? 
+                sorted.Take(Limit).Select(x => new JournalFileInfo(x)) : 
+                sorted.Select(x => new JournalFileInfo(x));
+
+            WriteObject(filtered, true);
+        }
+
+        private void FromDate(DateRange dateRange)
+        {
             var journal = OpenJournal();
             var index = journal.CreateIndex<JournalEntryFile>(dateRange, Tags);
-            var entries = index.SelectMany(x => x.Entries).Distinct().Select(x => new JournalFileInfo(x.FilePath));
-            WriteObject(entries, true);
+
+            var sorted = SortDirection == "Descending"
+                ? index.SelectMany(x => x.Entries).Distinct().OrderByDescending(x => x.EntryDate)
+                : index.SelectMany(x => x.Entries).Distinct().OrderBy(x => x.EntryDate);
+
+            var filtered = Limit > 0 ? 
+                sorted.Take(Limit).Select(x => new JournalFileInfo(x.FilePath)) : 
+                sorted.Select(x => new JournalFileInfo(x.FilePath));
+
+            WriteObject(filtered, true);
+        }
+
+        private DateTime FileNameToDate(string fileName)
+        {
+            var withoutExt = Path.GetFileNameWithoutExtension(fileName);
+            return DateTime.Parse(withoutExt);
         }
     }
 }

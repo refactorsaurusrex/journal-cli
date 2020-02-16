@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System;
+using System.IO.Abstractions;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
@@ -8,6 +9,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "RecentJournalEntries")]
+    [Obsolete("It will be removed in a future release. Use Get-JournalFiles instead.")]
     public class GetRecentJournalEntriesCmdlet : JournalCmdletBase
     {
         [Parameter]
