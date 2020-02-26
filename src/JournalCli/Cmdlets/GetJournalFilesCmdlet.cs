@@ -11,6 +11,7 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "JournalFiles")]
+    [OutputType(typeof(PSObject[]))]
     public class GetJournalFilesCmdlet : JournalCmdletBase
     {
         [Parameter]
@@ -48,9 +49,7 @@ namespace JournalCli.Cmdlets
                 markdownFiles.FindAll().OrderByDescending(FileNameToDate) :
                 markdownFiles.FindAll().OrderBy(FileNameToDate);
 
-            var filtered = Limit > 0 ? 
-                sorted.Take(Limit).Select(x => new JournalFileInfo(x)) : 
-                sorted.Select(x => new JournalFileInfo(x));
+            var filtered = Limit > 0 ? sorted.Take(Limit).Select(PathToPSObject) : sorted.Select(PathToPSObject);
 
             WriteObject(filtered, true);
         }
@@ -65,8 +64,8 @@ namespace JournalCli.Cmdlets
                 : index.SelectMany(x => x.Entries).Distinct().OrderBy(x => x.EntryDate);
 
             var filtered = Limit > 0 ? 
-                sorted.Take(Limit).Select(x => new JournalFileInfo(x.FilePath)) : 
-                sorted.Select(x => new JournalFileInfo(x.FilePath));
+                sorted.Take(Limit).Select(x => PathToPSObject(x.FilePath)) : 
+                sorted.Select(x => PathToPSObject(x.FilePath));
 
             WriteObject(filtered, true);
         }
@@ -76,5 +75,7 @@ namespace JournalCli.Cmdlets
             var withoutExt = Path.GetFileNameWithoutExtension(fileName);
             return DateTime.Parse(withoutExt);
         }
+
+        private PSObject PathToPSObject(string path) => InvokeProvider.Item.Get(path).First();
     }
 }
