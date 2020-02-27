@@ -34,19 +34,31 @@ Use `Get-JournalIndex` and `Get-JournalEntriesByTag` to scan all your journal fi
 
 ## Create new journal entries
 
-Create new journal entries, right from your terminal, that are automatically saved in appropriate year and month directories using a specific date-based naming convention. (Example: `2018.12.13.md`) 
+Create new journal entries, right from your terminal, that are automatically saved in appropriate year and month directories using a specific date-based naming convention and edit them in your favorite markdown editor.
+
+```powershell
+New-JournalEntry -Tags work,play
+```
 
 Forgot to create an entry for yesterday? No problem. Just pass in a `-DateOffset` parameter like so:
 
 ```powershell
-New-JournalEntry -DateOffset -1
+New-JournalEntry -DateOffset -1 -Tags work,play
 ```
 
 Use the `-Date` parameter to create an entry for a specific date:
 
 ```powershell
-New-JournalEntry -Date '2017.4.25'
+New-JournalEntry -Date '2017.4.25' -Tags work,play
 ```
+
+You can also skip the markdown editor and write entries directly from your terminal window:
+
+```powershell
+Add-JournalEntryContent "I went to work and it was swell." -Tags work
+```
+
+The `Add-JournalEntryContent` cmdlet has the same `-Date` and `-DateOffset` parameters as `New-JournalEntry`.
 
 ## Create new _compiled_ journal entries
 
