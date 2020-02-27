@@ -15,7 +15,7 @@ namespace JournalCli.Core
         private readonly List<(string header, string text)> _bodyStructure;
         private static readonly string DoubleNewLine = $"{Environment.NewLine}{Environment.NewLine}";
 
-        public JournalEntryBody() => _bodyStructure = new List<(string header, string text)>();
+        public JournalEntryBody() => _bodyStructure = new List<(string header, string text)> {($"# {Today.Date().ToString()}", string.Empty)};
 
         public JournalEntryBody(string rawBody)
         {
