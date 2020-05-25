@@ -96,6 +96,7 @@ namespace JournalCli.Cmdlets
             }
             catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException)
             {
+                Log.Error(e, "Error encountered during Commit()");
                 if (!_beenWarned)
                 {
                     WriteWarning(MissingGitBinaryWarning);
@@ -115,6 +116,7 @@ namespace JournalCli.Cmdlets
             }
             catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException)
             {
+                Log.Error(e, "Error encountered during Commit()");
                 if (!_beenWarned)
                 {
                     WriteWarning(MissingGitBinaryWarning);
