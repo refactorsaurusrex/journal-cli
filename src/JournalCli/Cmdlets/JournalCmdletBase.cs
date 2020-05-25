@@ -16,7 +16,7 @@ namespace JournalCli.Cmdlets
         private readonly IEncryptedStore<UserSettings> _encryptedStore;
 
 #if !DEBUG
-        private bool _beenWarned;
+        private static bool _beenWarned;
         private const string MissingGitBinaryWarning = "You're missing a native binary that's required to enable git integration. " +
             "Click here for more information:\r\n\r\nhttps://journalcli.me/docs/faq#i-got-a-missing-git-binary-warning-whats-that-about\r\n";
 #endif
