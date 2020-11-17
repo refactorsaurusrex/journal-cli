@@ -46,21 +46,10 @@ foreach ($target in $targets) {
     if ($_.Name -notlike "*git*") {
       Remove-Item $_
     }
-    # if (Test-Path "$publishOutputDir\$($_.Name)") {
-    #   Remove-Item $_
-    # }
   }
 }
 
-# Copy-Item -Path "$PSScriptRoot\src\post-install.ps1" -Destination $publishOutputDir
 Get-ChildItem -Path $publishOutputDir -Filter "*.pdb" -Recurse | Remove-Item
-
-# $manifestBuildDir = "$PSScriptRoot\manifestBuild"
-# if (Test-Path $manifestBuildDir) {
-#   Remove-Item -Path $manifestBuildDir -Force -Recurse 
-# }
-
-# dotnet publish $proj -c Release --self-contained true -r 'win-x64' --output $manifestBuildDir
 
 Import-Module "$publishOutputDir\$appName.dll"
 $moduleInfo = Get-Module $appName
@@ -85,7 +74,6 @@ $updateManifestArgs = @{
   ModuleVersion = $Version
   AliasesToExport = $cmdletAliases
   RootModule = "$appName.dll"
-  # ScriptsToProcess = @("post-install.ps1")
   CmdletsToExport = $cmdletNames
   CompatiblePSEditions = @("Desktop","Core")
   HelpInfoUri = "https://github.com/refactorsaurusrex/journal-cli/wiki"
@@ -100,8 +88,6 @@ $updateManifestArgs = @{
 New-ModuleManifest @newManifestArgs
 Update-ModuleManifest @updateManifestArgs
 Remove-ModuleManifestComments $manifestPath -NoConfirm
-
-# & "$PSScriptRoot\consolidate-artifacts.ps1" -RootDirectory "$PSScriptRoot\src\$appName\bin\Release\netstandard2.0" -PublishDirectory $publishOutputDir -Targets $targets
 
 Install-Module platyPS
 Import-Module platyPS
