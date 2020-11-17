@@ -151,7 +151,7 @@ namespace JournalCli.Core
         public string ToString(bool asFrontMatter)
         {
             var target = IsEmpty() ? new JournalFrontMatter(new[] { "(untagged)" }) : this;
-            var serializer = new SerializerBuilder().Build();
+            var serializer = new SerializerBuilder().ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults).Build();
             var yaml = serializer.Serialize(target).Replace("- ", "  - ").Trim();
             return asFrontMatter ? $"{BlockIndicator}{Environment.NewLine}{yaml}{Environment.NewLine}{BlockIndicator}{Environment.NewLine}" : yaml;
         }
