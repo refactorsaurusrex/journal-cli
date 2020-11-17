@@ -18,24 +18,49 @@ if ($env:APPVEYOR_REPO_TAG -eq 'true') {
 }
 
 Write-Host "Building version '$Version'..."
+$appName = "JournalCli"
 
 if (Test-Path "$PSScriptRoot\publish") {
   Remove-Item -Path "$PSScriptRoot\publish" -Recurse -Force
 }
 
-$appName = "JournalCli"
+New-Item -Path "$PSScriptRoot\publish\$appName" -ItemType Directory | Out-Null
 $publishOutputDir = "$PSScriptRoot\publish\$appName"
 $proj = Get-ChildItem -Filter "$appName.csproj" -Recurse -Path $PSScriptRoot | Select-Object -First 1 -ExpandProperty FullName
 
-foreach ($target in 'win-x64','linux-x64','osx-x64') {
-  dotnet publish $proj --output $publishOutputDir -c Release --self-contained false -r $target
-}
-
+dotnet publish $proj -c Release --self-contained true --output "$publishOutputDir"
 if ($LASTEXITCODE -ne 0) {
   throw "Failed to publish application."
 }
 
-Remove-Item "$publishOutputDir\*.pdb"
+$targets = 'win-x64','linux-x64','osx-x64','ubuntu.18.04-x64'
+foreach ($target in $targets) {
+  dotnet publish $proj -c Release --self-contained true -r $target --output "$publishOutputDir\$target"
+  if ($LASTEXITCODE -ne 0) {
+    throw "Failed to publish application."
+  }
+}
+
+foreach ($target in $targets) {
+  Get-ChildItem -Path "$publishOutputDir\$target" | ForEach-Object {
+    if ($_.Name -notlike "*git*") {
+      Remove-Item $_
+    }
+    # if (Test-Path "$publishOutputDir\$($_.Name)") {
+    #   Remove-Item $_
+    # }
+  }
+}
+
+# Copy-Item -Path "$PSScriptRoot\src\post-install.ps1" -Destination $publishOutputDir
+Get-ChildItem -Path $publishOutputDir -Filter "*.pdb" -Recurse | Remove-Item
+
+# $manifestBuildDir = "$PSScriptRoot\manifestBuild"
+# if (Test-Path $manifestBuildDir) {
+#   Remove-Item -Path $manifestBuildDir -Force -Recurse 
+# }
+
+# dotnet publish $proj -c Release --self-contained true -r 'win-x64' --output $manifestBuildDir
 
 Import-Module "$publishOutputDir\$appName.dll"
 $moduleInfo = Get-Module $appName
@@ -59,7 +84,8 @@ $updateManifestArgs = @{
   CompanyName = 'RAWR! Productions'
   ModuleVersion = $Version
   AliasesToExport = $cmdletAliases
-  NestedModules = ".\$appName.dll"
+  RootModule = "$appName.dll"
+  # ScriptsToProcess = @("post-install.ps1")
   CmdletsToExport = $cmdletNames
   CompatiblePSEditions = @("Desktop","Core")
   HelpInfoUri = "https://github.com/refactorsaurusrex/journal-cli/wiki"
@@ -74,6 +100,8 @@ $updateManifestArgs = @{
 New-ModuleManifest @newManifestArgs
 Update-ModuleManifest @updateManifestArgs
 Remove-ModuleManifestComments $manifestPath -NoConfirm
+
+# & "$PSScriptRoot\consolidate-artifacts.ps1" -RootDirectory "$PSScriptRoot\src\$appName\bin\Release\netstandard2.0" -PublishDirectory $publishOutputDir -Targets $targets
 
 Install-Module platyPS
 Import-Module platyPS
