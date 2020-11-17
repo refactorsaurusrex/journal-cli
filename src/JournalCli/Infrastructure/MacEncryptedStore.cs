@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO.Abstractions;
+using AuthenticatedEncryption;
 using YamlDotNet.Serialization;
 
 namespace JournalCli.Infrastructure
 {
-    using AuthenticatedEncryption;
-
     internal class MacEncryptedStore<T> : EncryptedStore<T>
         where T : class, new()
     {
@@ -23,8 +22,8 @@ namespace JournalCli.Infrastructure
             if (!_fileSystem.File.Exists(_cryptKeyPath) || !_fileSystem.File.Exists(_authKeyPath))
             {
                 fileSystem.Directory.CreateDirectory(StorageLocation);
-                var cryptKey = AuthenticatedEncryption.NewKey();
-                var authKey = AuthenticatedEncryption.NewKey();
+                var cryptKey = Encryption.NewKey();
+                var authKey = Encryption.NewKey();
 
                 _fileSystem.File.WriteAllBytes(_cryptKeyPath, cryptKey);
                 _fileSystem.File.WriteAllBytes(_authKeyPath, authKey);
@@ -38,7 +37,7 @@ namespace JournalCli.Infrastructure
 
             var cryptKey = _fileSystem.File.ReadAllBytes(_cryptKeyPath);
             var authKey = _fileSystem.File.ReadAllBytes(_authKeyPath);
-            var cipherText = AuthenticatedEncryption.Encrypt(yaml, cryptKey, authKey);
+            var cipherText = Encryption.Encrypt(yaml, cryptKey, authKey);
             var cipherPath = _fileSystem.Path.Combine(StorageLocation, target.GetType().Name);
             _fileSystem.File.WriteAllText(cipherPath, cipherText);
         }
@@ -51,7 +50,7 @@ namespace JournalCli.Infrastructure
                 var authKey = _fileSystem.File.ReadAllBytes(_authKeyPath);
                 var cipherPath = _fileSystem.Path.Combine(StorageLocation, typeof(T).Name);
                 var cipherText = _fileSystem.File.ReadAllText(cipherPath);
-                var plainText = AuthenticatedEncryption.Decrypt(cipherText, cryptKey, authKey);
+                var plainText = Encryption.Decrypt(cipherText, cryptKey, authKey);
                 var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
                 return deserializer.Deserialize<T>(plainText);
             }
