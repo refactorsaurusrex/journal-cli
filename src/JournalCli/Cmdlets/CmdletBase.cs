@@ -18,7 +18,8 @@ namespace JournalCli.Cmdlets
         protected CmdletBase()
         {
             // ReSharper disable AssignNullToNotNullAttribute
-            LogsDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs");
+            ModuleDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            LogsDirectory = Path.Combine(ModuleDirectory, "logs");
             var path = Path.Combine(LogsDirectory, ".log");
             // ReSharper restore AssignNullToNotNullAttribute
             Log.Logger = new LoggerConfiguration()
@@ -27,6 +28,8 @@ namespace JournalCli.Cmdlets
         }
 
         protected string LogsDirectory { get; }
+
+        protected string ModuleDirectory { get; }
 
         protected string ResolvePath(string path) => GetUnresolvedProviderPathFromPSPath(path);
 
