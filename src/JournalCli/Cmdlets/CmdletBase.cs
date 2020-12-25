@@ -13,7 +13,7 @@ namespace JournalCli.Cmdlets
     public abstract class CmdletBase : PSCmdlet
     {
         private readonly ISystemProcess _systemProcess = SystemProcessFactory.Create();
-        private readonly Lazy<string> _assemblyName = new Lazy<string>(() => Assembly.GetExecutingAssembly().FullName);
+        private readonly Lazy<string> _assemblyName = new(() => Assembly.GetExecutingAssembly().FullName);
 
         protected CmdletBase()
         {
