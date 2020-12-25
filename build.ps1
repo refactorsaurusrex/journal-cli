@@ -33,7 +33,7 @@ if ($LASTEXITCODE -ne 0) {
   throw "Failed to publish application."
 }
 
-$targets = 'win-x64','linux-x64','osx-x64'
+$targets = 'win-x64','linux-x64','osx-x64','ubuntu.18.04-x64'
 foreach ($target in $targets) {
   dotnet publish $proj -c Release --self-contained true -r $target --output "$publishOutputDir\$target"
   if ($LASTEXITCODE -ne 0) {

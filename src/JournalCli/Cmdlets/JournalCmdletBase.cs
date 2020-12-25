@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Management.Automation;
@@ -17,6 +18,7 @@ namespace JournalCli.Cmdlets
 
 #if !DEBUG
         private static bool _beenWarned;
+        private static bool _binaryMoveAttempted;
         private const string MissingGitBinaryWarning = "You're missing a native binary that's required to enable git integration. " +
             "Click here for more information:\r\n\r\nhttps://journalcli.me/docs/faq#i-got-a-missing-git-binary-warning-whats-that-about\r\n";
 #endif
@@ -87,40 +89,45 @@ namespace JournalCli.Cmdlets
 
         protected void Commit(GitCommitType commitType)
         {
-#if !DEBUG
-            try
-            {
-                ValidateGitRepo();
-                var message = GitCommitMessage.Get(commitType);
-                CommitCore(message);
-            }
-            catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException)
-            {
-                Log.Error(e, "Error encountered during Commit()");
-                if (!_beenWarned)
-                {
-                    WriteWarning(MissingGitBinaryWarning);
-                    _beenWarned = true;
-                }
-            }
-#endif
+            var message = GitCommitMessage.Get(commitType);
+            Commit(message);
         }
 
         protected void Commit(string message)
         {
 #if !DEBUG
-            try
+            void TryMovingLinuxBinaries()
             {
-                ValidateGitRepo();
-                CommitCore(message);
-            }
-            catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException)
-            {
-                Log.Error(e, "Error encountered during Commit()");
-                if (!_beenWarned)
+                var binaries = Directory.GetFiles(Path.Combine(ModuleDirectory, "ubuntu.18.04-x64"));
+                foreach (var binary in binaries)
                 {
-                    WriteWarning(MissingGitBinaryWarning);
-                    _beenWarned = true;
+                    var destination = Path.Combine(ModuleDirectory, "linux-x64", Path.GetFileName(binary));
+                    File.Copy(binary, destination, true);
+                }
+            }
+
+            while (!_beenWarned || !_binaryMoveAttempted)
+            {
+                try
+                {
+                    ValidateGitRepo();
+                    CommitCore(message);
+                }
+                catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException)
+                {
+                    Log.Error(e, $"Error encountered while executing {nameof(Commit)} method");
+
+                    if (_binaryMoveAttempted)
+                    {
+                        if (_beenWarned) continue;
+                        WriteWarning(MissingGitBinaryWarning);
+                        _beenWarned = true;
+                    }
+                    else
+                    {
+                        TryMovingLinuxBinaries();
+                        _binaryMoveAttempted = true;
+                    }
                 }
             }
 #endif
