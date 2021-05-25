@@ -6,7 +6,6 @@ using System.Management.Automation;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
 using Serilog;
-using Git = LibGit2Sharp;
 
 namespace JournalCli.Cmdlets
 {
@@ -16,12 +15,6 @@ namespace JournalCli.Cmdlets
         private readonly UserSettings _settings;
         private readonly IEncryptedStore<UserSettings> _encryptedStore;
 
-#if !DEBUG
-        private static bool _beenWarned;
-        private static bool _binaryMoveAttempted;
-        private const string MissingGitBinaryWarning = "You're missing a native binary that's required to enable git integration. " +
-            "Click here for more information:\r\n\r\nhttps://journalcli.me/docs/faq#i-got-a-missing-git-binary-warning-whats-that-about\r\n";
-#endif
         protected JournalCmdletBase()
         {
             _encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
@@ -86,93 +79,6 @@ namespace JournalCli.Cmdlets
         }
 
         private protected DateRange GetRangeOrNull(DateTime? from, DateTime to) => from.HasValue ? new DateRange(from.Value, to) : null;
-
-        protected void Commit(GitCommitType commitType)
-        {
-            var message = GitCommitMessage.Get(commitType);
-            Commit(message);
-        }
-
-        protected void Commit(string message)
-        {
-#if !DEBUG
-            void TryMovingLinuxBinaries()
-            {
-                var binaries = Directory.GetFiles(Path.Combine(ModuleDirectory, "ubuntu.18.04-x64"));
-                foreach (var binary in binaries)
-                {
-                    var destination = Path.Combine(ModuleDirectory, "linux-x64", Path.GetFileName(binary));
-                    File.Copy(binary, destination, true);
-                }
-            }
-
-            while (!_beenWarned || !_binaryMoveAttempted)
-            {
-                try
-                {
-                    ValidateGitRepo();
-                    CommitCore(message);
-                }
-                catch (TypeInitializationException e) when (e.InnerException is DllNotFoundException)
-                {
-                    Log.Error(e, $"Error encountered while executing {nameof(Commit)} method");
-
-                    if (_binaryMoveAttempted)
-                    {
-                        if (_beenWarned) continue;
-                        WriteWarning(MissingGitBinaryWarning);
-                        _beenWarned = true;
-                    }
-                    else
-                    {
-                        TryMovingLinuxBinaries();
-                        _binaryMoveAttempted = true;
-                    }
-                }
-            }
-#endif
-        }
-
-        private void CommitCore(string message)
-        {
-            using var repo = new Git.Repository(Location);
-            var statusOptions = new Git.StatusOptions
-            {
-                DetectRenamesInIndex = true,
-                DetectRenamesInWorkDir = true,
-                IncludeIgnored = false,
-                IncludeUntracked = true,
-                RecurseUntrackedDirs = true,
-                RecurseIgnoredDirs = false
-            };
-
-            if (!repo.RetrieveStatus(statusOptions).IsDirty)
-                return;
-
-            Git.Commands.Stage(repo, "*");
-
-            var author = new Git.Signature("JournalCli", "@journalCli", DateTime.Now);
-            var committer = author;
-
-            var options = new Git.CommitOptions { PrettifyMessage = true };
-            var commit = repo.Commit(message, author, committer, options);
-        }
-
-        private void ValidateGitRepo()
-        {
-            if (Git.Repository.IsValid(Location))
-                return;
-
-            Git.Repository.Init(Location);
-            using var repo = new Git.Repository(Location);
-            Git.Commands.Stage(repo, "*");
-
-            var author = new Git.Signature("JournalCli", "@journalCli", DateTime.Now);
-            var committer = author;
-
-            var options = new Git.CommitOptions { PrettifyMessage = true };
-            var commit = repo.Commit("Initial commit", author, committer, options);
-        }
 
         private void CheckForUpdates()
         {
