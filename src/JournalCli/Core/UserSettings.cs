@@ -11,14 +11,17 @@ namespace JournalCli.Core
 
         public string DefaultJournalRoot { get; set; }
 
+        [Obsolete("Time for this to go")]
         public string BackupLocation { get; set; }
 
+        [Obsolete("Time for this to go")]
         public string BackupPassword { get; set; }
 
         public bool HideWelcomeScreen { get; set; }
 
         public DateTime? NextUpdateCheck { get; set; }
 
+        [Obsolete("If the backup password is removed, do we really need to encrypt the file?")]
         public void Save(IEncryptedStore<UserSettings> encryptedStore) => encryptedStore.Save(this);
 
         public bool Equals(UserSettings other)
