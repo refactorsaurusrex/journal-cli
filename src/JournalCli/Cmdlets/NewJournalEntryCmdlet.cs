@@ -38,12 +38,9 @@ namespace JournalCli.Cmdlets
                     entryDate = dayPrior;
             }
 
-            Commit(GitCommitType.PreNewJournalEntry);
-
             try
             {
                 journal.CreateNewEntry(entryDate, Tags, Readme);
-                Commit(GitCommitType.PostNewJournalEntry);
             }
             catch (JournalEntryAlreadyExistsException e)
             {

@@ -82,13 +82,11 @@ namespace JournalCli.Cmdlets
             if (!fileSystem.File.Exists(path))
                 throw new PSInvalidOperationException($"An entry does not exist for '{entryDate}'.");
 
-            Commit(GitCommitType.PreOpenJournalEntry);
             SystemProcess.Start(path);
 
             if (Wait)
             {
                 var result = Choice($"Reading entry for {entryDate}", "Continue on to next entry?", 0, "&Continue", "&Quit");
-                Commit(GitCommitType.PostOpenJournalEntry);
                 if (result == 1)
                     ThrowTerminatingError("Pipeline terminated at user's request.", ErrorCategory.NotSpecified);
             }

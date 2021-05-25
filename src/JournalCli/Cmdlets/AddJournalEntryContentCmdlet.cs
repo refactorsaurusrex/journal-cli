@@ -47,10 +47,8 @@ namespace JournalCli.Cmdlets
                     entryDate = dayPrior;
             }
 
-            Commit(GitCommitType.PreAppendJournalEntry);
             var journal = OpenJournal();
             journal.AppendEntryContent(entryDate, Body, Header, Tags);
-            Commit(GitCommitType.PostAppendJournalEntry);
         }
     }
 }

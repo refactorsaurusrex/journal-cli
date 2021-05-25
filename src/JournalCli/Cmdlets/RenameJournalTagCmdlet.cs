@@ -36,10 +36,7 @@ namespace JournalCli.Cmdlets
             }
             else
             {
-                Commit(GitCommitType.PreRenameTag);
                 effectedEntries = journal.RenameTag(OldName, NewName);
-                Commit(GitCommitType.PostRenameTag);
-
                 var notice = $"The tag '{OldName}' has been successfully replaced with '{NewName}' in all {effectedEntries.Count} entries.";
                 WriteHostInverted(notice);
             }
