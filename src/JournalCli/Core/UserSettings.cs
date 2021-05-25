@@ -11,12 +11,6 @@ namespace JournalCli.Core
 
         public string DefaultJournalRoot { get; set; }
 
-        [Obsolete("Time for this to go")]
-        public string BackupLocation { get; set; }
-
-        [Obsolete("Time for this to go")]
-        public string BackupPassword { get; set; }
-
         public bool HideWelcomeScreen { get; set; }
 
         public DateTime? NextUpdateCheck { get; set; }
@@ -28,9 +22,7 @@ namespace JournalCli.Core
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(DefaultJournalRoot, other.DefaultJournalRoot) && 
-                string.Equals(BackupLocation, other.BackupLocation) &&
-                string.Equals(BackupPassword, other.BackupPassword);
+            return string.Equals(DefaultJournalRoot, other.DefaultJournalRoot);
         }
 
         public override bool Equals(object obj)
@@ -46,8 +38,7 @@ namespace JournalCli.Core
             unchecked
             {
                 var hashCode = DefaultJournalRoot != null ? DefaultJournalRoot.GetHashCode() : 0;
-                hashCode = (hashCode * 397) ^ (BackupLocation != null ? BackupLocation.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (BackupPassword != null ? BackupPassword.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (NextUpdateCheck.HasValue ? NextUpdateCheck.Value.GetHashCode() : 0);
                 return hashCode;
             }
         }

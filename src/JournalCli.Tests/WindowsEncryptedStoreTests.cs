@@ -20,7 +20,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = A.Fake<IFileSystem>();
             var store = new WindowsEncryptedStore<UserSettings>(fileSystem);
-            var settings = new UserSettings { BackupPassword = "secret" };
+            var settings = new UserSettings { DefaultJournalRoot = @"C:\Secret\location" };
             store.Save(settings);
 
             A.CallTo(() => fileSystem.File.WriteAllBytes(A<string>.Ignored, A<byte[]>.Ignored)).MustHaveHappenedTwiceExactly();
