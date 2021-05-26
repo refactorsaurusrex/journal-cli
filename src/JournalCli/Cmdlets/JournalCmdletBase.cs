@@ -24,6 +24,7 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public string Location { get; set; }
 
+        // TODO: Rethink this pattern. Process record should only be used if data will be piped in. Otherwise, EndProcessing should be used.
         protected abstract void RunJournalCommand();
 
         protected sealed override void ProcessRecord()

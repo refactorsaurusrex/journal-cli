@@ -13,6 +13,7 @@ namespace JournalCli.Cmdlets
     [OutputType(typeof(IEnumerable<JournalIndexEntry<MetaJournalEntry>>))]
     [OutputType(typeof(IEnumerable<JournalIndexEntry<CompleteJournalEntry>>))]
     [Alias("gjt")]
+    // TODO: Rename to Get-JournalEntries
     public class GetJournalEntriesByTagCmdlet : JournalCmdletBase
     {
         [Parameter(Mandatory = true)]

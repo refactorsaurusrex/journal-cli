@@ -13,6 +13,7 @@ namespace JournalCli.Cmdlets
     [PublicAPI]
     [Cmdlet(VerbsCommon.Open, "Journal")]
     [Alias("oj")]
+    // TODO: Rename to Open-JournalLocation
     public class OpenJournalCmdlet : JournalCmdletBase
     {
         [Parameter(ParameterSetName = "Current")]
