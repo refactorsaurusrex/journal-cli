@@ -9,7 +9,6 @@ namespace JournalCli.Cmdlets
     [PublicAPI]
     [Cmdlet(VerbsCommon.Get, "JournalReadmeEntries", DefaultParameterSetName = "All")]
     [OutputType(typeof(ReadmeJournalEntryCollection))]
-    [Alias("Get-ReadmeEntries")]
     public class GetJournalReadmeEntriesCmdlet : JournalCmdletBase
     {
         [Parameter(DontShow = true)]
@@ -25,10 +24,9 @@ namespace JournalCli.Cmdlets
         [Parameter(ParameterSetName = "All")]
         public SwitchParameter All { get; set; }
 
-        protected override void RunJournalCommand()
+        protected override void EndProcessing()
         {
-            if (MyInvocation.InvocationName == "Get-ReadmeEntries")
-                WriteWarning("'Get-ReadmeEntries' is obsolete and will be removed in a future release. Use 'Get-JournalReadmeEntries' instead.");
+            base.EndProcessing();
 
             if (ParameterSetName == "Range")
             {
@@ -41,9 +39,9 @@ namespace JournalCli.Cmdlets
                 if (Duration < 0)
                 {
                     const string message = "If that was an attempt to look at FUTURE readme entries, nice try. ;) Although I discourage " +
-                                           "looking at readme entries before they've expired (doing so seems to violate the spirit of writing a note " +
-                                           "to your future self), I built a special switch for this use case. It's undocumented, but if you include " +
-                                           "the -IncludeFuture switch, you'll get what you're after. Have fun!";
+                        "looking at readme entries before they've expired (doing so seems to violate the spirit of writing a note " +
+                        "to your future self), I built a special switch for this use case. It's undocumented, but if you include " +
+                        "the -IncludeFuture switch, you'll get what you're after. Have fun!";
                     WriteWarning(message);
                     throw new PSArgumentOutOfRangeException(nameof(Duration), Duration, "Duration must be greater than or equal to 1.");
                 }

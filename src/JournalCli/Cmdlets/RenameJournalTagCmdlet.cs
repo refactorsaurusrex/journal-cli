@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
-using JournalCli.Infrastructure;
 
 namespace JournalCli.Cmdlets
 {
@@ -19,8 +18,10 @@ namespace JournalCli.Cmdlets
         [Parameter(Mandatory = true)]
         public string NewName { get; set; }
 
-        protected override void RunJournalCommand()
+        protected override void EndProcessing()
         {
+            base.EndProcessing();
+
             if (!DryRun && !YesOrNo($"Are you sure you want to rename all '{OldName}' tags to '{NewName}'?"))
                 return;
 

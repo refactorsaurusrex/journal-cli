@@ -24,10 +24,21 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public string Location { get; set; }
 
-        // TODO: Rethink this pattern. Process record should only be used if data will be piped in. Otherwise, EndProcessing should be used.
-        protected abstract void RunJournalCommand();
+        protected override void BeginProcessing()
+        {
+            ResolveJournalLocation();
 
-        protected sealed override void ProcessRecord()
+            if (!_settings.HideWelcomeScreen)
+            {
+                ShowSplashScreen("Welcome! I hope you love using JournalCli. For help and other information, visit https://journalcli.me. Send feedback to hi@journalcli.me.");
+                _settings.HideWelcomeScreen = true;
+                _settings.Save(_encryptedStore);
+            }
+        }
+
+        protected override void EndProcessing() => CheckForUpdates();
+
+        private void ResolveJournalLocation()
         {
             try
             {
@@ -42,8 +53,6 @@ namespace JournalCli.Cmdlets
                 {
                     Location = ResolvePath(Location);
                 }
-
-                RunJournalCommand();
             }
             catch (Exception e)
             {
@@ -54,21 +63,6 @@ namespace JournalCli.Cmdlets
                 Log.Error(e, "Error encountered during ProcessRecord");
                 throw;
             }
-        }
-
-        protected sealed override void EndProcessing()
-        {
-            CheckForUpdates();
-        }
-
-        protected sealed override void BeginProcessing()
-        {
-            if (_settings.HideWelcomeScreen)
-                return;
-
-            ShowSplashScreen("Welcome! I hope you love using JournalCli. For help and other information, visit https://journalcli.me. Send feedback to hi@journalcli.me.");
-            _settings.HideWelcomeScreen = true;
-            _settings.Save(_encryptedStore);
         }
 
         private protected Journal OpenJournal()

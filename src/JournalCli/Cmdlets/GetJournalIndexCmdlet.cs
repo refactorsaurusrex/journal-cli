@@ -30,8 +30,10 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public DateTime To { get; set; } = DateTime.Now;
 
-        protected override void RunJournalCommand()
+        protected override void EndProcessing()
         {
+            base.EndProcessing();
+
             var dateRange = GetRangeOrNull(From, To);
             var journal = OpenJournal();
 

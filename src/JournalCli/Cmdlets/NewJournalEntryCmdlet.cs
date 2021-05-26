@@ -23,8 +23,10 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public DateTime? Date { get; set; }
 
-        protected override void RunJournalCommand()
+        protected override void EndProcessing()
         {
+            base.EndProcessing();
+
             var journal = OpenJournal();
             var entryDate = Date == null ? Today.PlusDays(DateOffset) : LocalDate.FromDateTime(Date.Value).PlusDays(DateOffset);
 
