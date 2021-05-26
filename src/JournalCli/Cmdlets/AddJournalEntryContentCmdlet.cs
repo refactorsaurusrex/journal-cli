@@ -27,8 +27,10 @@ namespace JournalCli.Cmdlets
         [Parameter(Position = 1)]
         public string[] Tags { get; set; }
 
-        protected override void RunJournalCommand()
+        protected override void EndProcessing()
         {
+            base.EndProcessing();
+
             if (!string.IsNullOrWhiteSpace(Header))
                 HeaderValidator.ValidateOrThrow(Header);
 

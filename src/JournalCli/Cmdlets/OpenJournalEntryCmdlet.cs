@@ -32,8 +32,10 @@ namespace JournalCli.Cmdlets
         [Parameter(ParameterSetName = "Entry")]
         public SwitchParameter Wait { get; set; }
 
-        protected override void RunJournalCommand()
+        protected override void ProcessRecord()
         {
+            base.ProcessRecord();
+
             if (Last)
             {
                 var journal = OpenJournal();
@@ -52,29 +54,29 @@ namespace JournalCli.Cmdlets
             switch (ParameterSetName)
             {
                 case "Name":
-                {
-                    entryDate = EntryName.EndsWith(".md") ? Journal.FileNameWithExtensionPattern.Parse(EntryName).Value : Journal.FileNamePattern.Parse(EntryName).Value;
-                    path = journalWriter.GetJournalEntryFilePath(entryDate);
-                    break;
-                }
+                    {
+                        entryDate = EntryName.EndsWith(".md") ? Journal.FileNameWithExtensionPattern.Parse(EntryName).Value : Journal.FileNamePattern.Parse(EntryName).Value;
+                        path = journalWriter.GetJournalEntryFilePath(entryDate);
+                        break;
+                    }
                 case "Date":
-                {
-                    entryDate = LocalDate.FromDateTime(Date);
-                    path = journalWriter.GetJournalEntryFilePath(entryDate);
-                    break;
-                }
+                    {
+                        entryDate = LocalDate.FromDateTime(Date);
+                        path = journalWriter.GetJournalEntryFilePath(entryDate);
+                        break;
+                    }
                 case "DateOffset":
-                {
-                    entryDate = Today.PlusDays(DateOffset);
-                    path = journalWriter.GetJournalEntryFilePath(entryDate);
-                    break;
-                }
+                    {
+                        entryDate = Today.PlusDays(DateOffset);
+                        path = journalWriter.GetJournalEntryFilePath(entryDate);
+                        break;
+                    }
                 case "Entry":
-                {
-                    entryDate = Journal.FileNamePattern.Parse(Entry.EntryName).Value;
-                    path = journalWriter.GetJournalEntryFilePath(entryDate);
-                    break;
-                }
+                    {
+                        entryDate = Journal.FileNamePattern.Parse(Entry.EntryName).Value;
+                        path = journalWriter.GetJournalEntryFilePath(entryDate);
+                        break;
+                    }
                 default:
                     throw new NotSupportedException();
             }

@@ -23,8 +23,10 @@ namespace JournalCli.Cmdlets
         [Parameter(ParameterSetName = "Date")]
         public DateTime Date { get; set; }
 
-        protected override void RunJournalCommand()
+        protected override void EndProcessing()
         {
+            base.EndProcessing();
+
             switch (ParameterSetName)
             {
                 case "Current":

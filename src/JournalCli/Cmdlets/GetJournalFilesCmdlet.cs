@@ -30,8 +30,10 @@ namespace JournalCli.Cmdlets
         [Parameter]
         public int Limit { get; set; }
 
-        protected override void RunJournalCommand()
+        protected override void EndProcessing()
         {
+            base.EndProcessing();
+
             var dateRange = GetRangeOrNull(From, To);
 
             if (dateRange == null && Tags == null)
