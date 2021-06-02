@@ -1,5 +1,4 @@
-﻿using System;
-using System.Management.Automation;
+﻿using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Infrastructure;
 using NodaTime;
@@ -12,41 +11,38 @@ namespace JournalCli.Cmdlets
     public class NewJournalEntryCmdlet : JournalCmdletBase
     {
         [Parameter]
-        public int DateOffset { get; set; }
-
-        [Parameter]
         public string[] Tags { get; set; }
 
         [Parameter]
         public string Readme { get; set; }
 
         [Parameter]
-        public DateTime? Date { get; set; }
+        [NaturalDate(RoundTo.StartOfPeriod)]
+        public LocalDate Date { get; set; } = Today.Date();
 
         protected override void EndProcessing()
         {
             base.EndProcessing();
 
             var journal = OpenJournal();
-            var entryDate = Date == null ? Today.PlusDays(DateOffset) : LocalDate.FromDateTime(Date.Value).PlusDays(DateOffset);
 
             var hour = Now.Time().Hour;
             if (hour >= 0 && hour <= 4)
             {
-                var dayPrior = entryDate.Minus(Period.FromDays(1));
-                var question = $"Did you mean to create an entry for '{dayPrior}' or '{entryDate}'?";
-                var result = Choice("It's after midnight!", question, 0, dayPrior.DayOfWeek.ToChoiceString(), entryDate.DayOfWeek.ToChoiceString());
+                var dayPrior = Date.Minus(Period.FromDays(1));
+                var question = $"Did you mean to create an entry for '{dayPrior}' or '{Date}'?";
+                var result = Choice("It's after midnight!", question, 0, dayPrior.DayOfWeek.ToChoiceString(), Date.DayOfWeek.ToChoiceString());
                 if (result == 0)
-                    entryDate = dayPrior;
+                    Date = dayPrior;
             }
 
             try
             {
-                journal.CreateNewEntry(entryDate, Tags, Readme);
+                journal.CreateNewEntry(Date, Tags, Readme);
             }
             catch (JournalEntryAlreadyExistsException e)
             {
-                var question = $"An entry for {entryDate} already exists. Do you want to open it instead?";
+                var question = $"An entry for {Date} already exists. Do you want to open it instead?";
                 if (YesOrNo(question))
                 {
                     SystemProcess.Start(e.EntryFilePath);

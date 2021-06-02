@@ -5,7 +5,7 @@ using NodaTime;
 
 namespace JournalCli.Core
 {
-    internal class ReadmeJournalEntryCollection : IEnumerable<ReadmeJournalEntry>
+    public class ReadmeJournalEntryCollection : IEnumerable<ReadmeJournalEntry>
     {
         private readonly LocalDate _earliestDate;
         private readonly bool _includeFuture;

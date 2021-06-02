@@ -68,12 +68,11 @@ namespace JournalCli.Cmdlets
         private protected Journal OpenJournal()
         {
             var fileSystem = new FileSystem();
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location);
+            var wrap = Math.Min(Host.UI.RawUI.WindowSize.Width, 120);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location, wrap);
             var markdownFiles = new MarkdownFiles(fileSystem, Location);
             return Journal.Open(ioFactory, markdownFiles, SystemProcess);
         }
-
-        private protected DateRange GetRangeOrNull(DateTime? from, DateTime to) => from.HasValue ? new DateRange(from.Value, to) : null;
 
         private void CheckForUpdates()
         {

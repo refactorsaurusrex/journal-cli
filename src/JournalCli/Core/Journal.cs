@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using JournalCli.Infrastructure;
 using NodaTime;
@@ -19,8 +20,22 @@ namespace JournalCli.Core
         private readonly IMarkdownFiles _markdownFiles;
         private readonly ISystemProcess _systemProcess;
 
+        private static readonly CacheItemPolicy Policy = new CacheItemPolicy { SlidingExpiration = TimeSpan.FromHours(24) };
+
         public static Journal Open(IJournalReaderWriterFactory readerWriterFactory, IMarkdownFiles markdownFiles, ISystemProcess systemProcess)
         {
+            if (!MemoryCache.Default.Contains(nameof(FirstEntryDate)))
+            {
+                var firstEntryDate = markdownFiles
+                    .FindAll(fileNamesOnly: true)
+                    .Select(md => FileNameWithExtensionPattern.Parse(md))
+                    .Select(x => x.Value)
+                    .OrderBy(dt => dt)
+                    .First();
+
+                MemoryCache.Default.Set(nameof(FirstEntryDate), firstEntryDate, Policy);
+            }
+
             return new Journal(readerWriterFactory, markdownFiles, systemProcess);
         }
 
@@ -41,43 +56,13 @@ namespace JournalCli.Core
             _systemProcess = systemProcess;
         }
 
-        public void OpenRandomEntry()
+        public MetaJournalEntry GetRandomEntry(ICollection<string> tags, TagOperator tagOperator, DateRange dateRange)
         {
-            var entries = _markdownFiles.FindAll();
-
+            var entries = GetEntries<MetaJournalEntry>(tags, tagOperator, SortOrder.Ascending, dateRange, null).ToList();
             if (entries.Count == 0)
                 throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
-
             var index = new Random().Next(0, entries.Count - 1);
-            _systemProcess.Start(entries[index]);
-        }
-
-        public void OpenRandomEntry(ICollection<string> tags, DateRange dateRange)
-        {
-            if ((tags == null || tags.Count == 0) && dateRange == null)
-            {
-                OpenRandomEntry();
-                return;
-            }
-
-            var entries = CreateIndex<JournalEntryFile>().SelectMany(x => x.Entries).ToList();
-
-            if (entries.Count == 0)
-                throw new InvalidOperationException("I couldn't find any journal entries. Did you pass in the right root directory?");
-
-            if (tags != null && tags.Count > 0)
-                entries = entries.Where(x => x.Tags.Any(tags.Contains)).ToList();
-
-            if (dateRange != null)
-                entries = entries.Where(x => dateRange.Includes(x.EntryDate)).ToList();
-
-            if (entries.Count == 0)
-                throw new InvalidOperationException("No entries were found with any of the tags provided or within the specified date range.");
-
-            var random = new Random();
-            var index = random.Next(0, entries.Count - 1);
-
-            _systemProcess.Start(entries.ElementAt(index).FilePath);
+            return entries[index];
         }
 
         public ReadmeJournalEntryCollection GetReadmeEntries(LocalDate earliestDate, bool includeFuture)
@@ -123,7 +108,7 @@ namespace JournalCli.Core
             return entryNames;
         }
 
-        public JournalIndex<T> CreateIndex<T>(DateRange range = null, ICollection<string> requiredTags = null)
+        public JournalIndex<T> CreateIndex<T>(DateRange range = null, ICollection<string> requiredTags = null, ICollection<string> optionalTags = null)
             where T : class, IJournalEntry
         {
             var index = new JournalIndex<T>();
@@ -140,6 +125,9 @@ namespace JournalCli.Core
                     continue;
 
                 if (requiredTags != null && requiredTags.Count > 0 && !entry.Tags.ContainsAll(requiredTags))
+                    continue;
+
+                if (optionalTags != null && optionalTags.Count > 0 && !entry.Tags.ContainsAny(optionalTags))
                     continue;
 
                 foreach (var tag in entry.Tags)
@@ -169,7 +157,7 @@ namespace JournalCli.Core
 
             var parser = string.IsNullOrWhiteSpace(readme) ? null : new ReadmeParser(readme, entryDate);
             var frontMatter = new JournalFrontMatter(tags, parser);
-            var header = $"# {entryDate.ToString()}";
+            var header = $"# {entryDate}";
             journalWriter.Create(entryFilePath, frontMatter, header);
             _systemProcess.Start(entryFilePath);
         }
@@ -206,31 +194,21 @@ namespace JournalCli.Core
             journalWriter.Create(entryFilePath, frontMatter, journalBody.ToString());
         }
 
-        public IEnumerable<string> GetRecentEntries(int limit)
-        {
-            var files = _markdownFiles.FindAll()
-                .Select(x => new JournalEntryFile(_readerWriterFactory.CreateReader(x)))
-                .OrderByDescending(x => x.EntryDate)
-                .Select(x => x.EntryName);
-
-            return limit >= 1 ? files.Take(limit) : files;
-        }
-
         /// <summary>
         /// Creates a single journal entry comprised of all entries found which match the specified criteria. 
         /// </summary>
         /// <param name="range">The date range to search for entries. Dates are inclusive. Null values assume all entries are desired.</param>
         /// <param name="tags">Filters entries by tag. Null values assumes all tags are desired.</param>
-        /// <param name="allTagsRequired">Requires that each matching entry contain all tags specified by the `tags` parameter.</param>
+        /// <param name="tagOperator">Indicates whether all tags must be matched, or if any tag can be matched.</param>
         /// <param name="overwrite">True to overwrite an existing compiled entry with the same name. Otherwise, an exception is thrown.</param>
-        public void CreateCompiledEntry(DateRange range, string[] tags, bool allTagsRequired, bool overwrite)
+        public void CreateCompiledEntry(DateRange range, string[] tags, TagOperator tagOperator, bool overwrite)
         {
             List<JournalEntryFile> entries;
             var hasTags = tags != null && tags.Length > 0;
 
             if (hasTags)
             {
-                if (allTagsRequired)
+                if (tagOperator == TagOperator.All)
                 {
                     entries = CreateIndex<JournalEntryFile>(range, tags)
                         .SelectMany(x => x.Entries)
@@ -260,8 +238,7 @@ namespace JournalCli.Core
             if (entries.Count == 0)
                 throw new InvalidOperationException("No journal entries found matching the specified criteria. Please change your criteria and try again.");
 
-            if (range == null)
-                range = new DateRange(entries.First().EntryDate, entries.Last().EntryDate);
+            range ??= new DateRange(entries.First().EntryDate, entries.Last().EntryDate);
 
             var journalWriter = _readerWriterFactory.CreateWriter();
             var entryFilePath = journalWriter.GetCompiledJournalEntryFilePath(range);
@@ -297,6 +274,80 @@ namespace JournalCli.Core
             var frontMatter = new JournalFrontMatter(aggregatedTags);
             journalWriter.CreateCompiled(frontMatter, entryFilePath, content);
             _systemProcess.Start(entryFilePath);
+        }
+
+        public IEnumerable<T> GetEntries<T>(ICollection<string> tags, TagOperator tagOperator, SortOrder direction, DateRange dateRange, int? limit)
+            where T : class, IJournalEntry
+        {
+            var entries = _markdownFiles.FindAll()
+                .Select(x => _readerWriterFactory.CreateReader(x).ToJournalEntry<T>());
+
+            if (tags != null && tags.Any())
+            {
+                switch (tagOperator)
+                {
+                    default:
+                        throw new NotSupportedException();
+                    case TagOperator.All:
+                        entries = entries.Where(x => x.Tags != null && x.Tags.ContainsAll(tags));
+                        break;
+                    case TagOperator.Any:
+                        entries = entries.Where(x => x.Tags != null && x.Tags.ContainsAny(tags));
+                        break;
+                }
+            }
+
+            if (dateRange != null)
+            {
+                entries = entries.Where(x => dateRange.Includes(x.EntryDate));
+            }
+
+            switch (direction)
+            {
+                case SortOrder.Ascending:
+                    entries = entries.OrderBy(x => x.EntryDate);
+                    break;
+                case SortOrder.Descending:
+                    entries = entries.OrderByDescending(x => x.EntryDate);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            if (limit.HasValue)
+            {
+                entries = entries.Take(limit.Value);
+            }
+
+            return entries;
+        }
+
+        public JournalEntryFile GetEntryFromName(string name)
+        {
+            var entryDate = name.EndsWith(".md") ? FileNameWithExtensionPattern.Parse(name).Value : FileNamePattern.Parse(name).Value;
+            var writer = _readerWriterFactory.CreateWriter();
+            var path = writer.GetJournalEntryFilePath(entryDate);
+            var reader = _readerWriterFactory.CreateReader(path);
+            return new JournalEntryFile(reader);
+        }
+
+        public JournalEntryFile GetEntryFromDate(LocalDate date)
+        {
+            var writer = _readerWriterFactory.CreateWriter();
+            var path = writer.GetJournalEntryFilePath(date);
+            var reader = _readerWriterFactory.CreateReader(path);
+            return new JournalEntryFile(reader);
+        }
+
+        public LocalDate FirstEntryDate
+        {
+            get
+            {
+                if (MemoryCache.Default[nameof(FirstEntryDate)] is LocalDate localDate)
+                    return localDate;
+
+                throw new InvalidOperationException($"{nameof(FirstEntryDate)} has not been set.");
+            }
         }
     }
 }

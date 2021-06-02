@@ -20,11 +20,11 @@ namespace JournalCli.Tests
             var filePath = "J:\\JournalRoot\\2019\\03 March\\2019.01.01.md";
             fileSystem.AddFile(filePath, new MockFileData(TestEntries.WithTags1, Encoding.UTF8));
             var writer = new JournalWriter(fileSystem, "J:\\Current");
-            var originalReader = new JournalReader(fileSystem, filePath);
+            var originalReader = new JournalReader(fileSystem, filePath, BodyWrapWidth);
             originalReader.FrontMatter.Tags.Should().OnlyContain(x => new List<string> { "doh", "blah" }.Contains(x));
 
             writer.RenameTag(originalReader, "blah", "horseman");
-            var newReader = new JournalReader(fileSystem, filePath);
+            var newReader = new JournalReader(fileSystem, filePath, BodyWrapWidth);
 
             newReader.RawBody.Should().Be(originalReader.RawBody);
             newReader.FrontMatter.Tags.Should().OnlyContain(x => new List<string> { "doh", "horseman" }.Contains(x));
@@ -58,7 +58,7 @@ namespace JournalCli.Tests
         public void RenameTag_ThrowsInvalidOperationException_WhenOldTagDoesNotExist()
         {
             var fileSystem = CreateVirtualJournal(2017, 2020);
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, "J:\\Current");
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, "J:\\Current", BodyWrapWidth);
             var writer = ioFactory.CreateWriter();
             var reader = ioFactory.CreateReader(fileSystem.AllFiles.First(x => x.EndsWith(".md")));
             Assert.Throws<InvalidOperationException>(() => writer.RenameTag(reader, "oldTag", "newTag"));
@@ -70,7 +70,7 @@ namespace JournalCli.Tests
             var fileSystem = new MockFileSystem();
             const string entryPath = @"J:\Current\2019\01 January\2019.01.01.md";
             fileSystem.AddFile(entryPath, new MockFileData(TestEntries.WithoutFrontMatter));
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, "J:\\Current");
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, "J:\\Current", BodyWrapWidth);
             var writer = ioFactory.CreateWriter();
             var reader = ioFactory.CreateReader(entryPath);
             Assert.Throws<InvalidOperationException>(() => writer.RenameTag(reader, "oldTag", "newTag"));

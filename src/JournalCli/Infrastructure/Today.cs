@@ -20,6 +20,12 @@ namespace JournalCli.Infrastructure
             return SubtractFromToday(periodBuilder.Build());
         }
 
+        public static LocalDate MinusWeeks(int count)
+        {
+            var periodBuilder = new PeriodBuilder { Weeks = count };
+            return SubtractFromToday(periodBuilder.Build());
+        }
+
         public static LocalDate MinusYears(int count)
         {
             var periodBuilder = new PeriodBuilder { Years = count };

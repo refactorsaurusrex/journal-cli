@@ -16,12 +16,14 @@ namespace JournalCli.Core
             Headers = reader.Headers;
             Tags = reader.FrontMatter.Tags;
             EntryName = reader.EntryName;
+            EntryDate = reader.EntryDate;
         }
 
         public LocalDate ReadmeDate { get; }
         public IReadOnlyCollection<string> Headers { get; }
         public string EntryName { get; }
         public IReadOnlyCollection<string> Tags { get; }
+        public LocalDate EntryDate { get; }
         public override string ToString() => EntryName;
         public IJournalReader GetReader() => _reader;
     }

@@ -4,6 +4,6 @@ namespace JournalCli.Infrastructure
 {
     public interface IMarkdownFiles
     {
-        List<string> FindAll();
+        List<string> FindAll(bool fileNamesOnly = false);
     }
 }

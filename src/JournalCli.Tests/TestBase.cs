@@ -10,6 +10,8 @@ namespace JournalCli.Tests
 {
     public abstract class TestBase
     {
+        public const int BodyWrapWidth = 120;
+
         private static readonly List<string> ValidJournalSamples = new List<string>
         {
             TestEntries.WithTags1,

@@ -11,17 +11,17 @@ namespace JournalCli.Cmdlets
     // TODO: "DefaultJournal" or just "Journal"? This will have an impact when named journals are introduced.
     // https://github.com/refactorsaurusrex/journal-cli/issues/23
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Open, "Journal")]
-    [Alias("oj")]
-    // TODO: Rename to Open-JournalLocation
-    public class OpenJournalCmdlet : JournalCmdletBase
+    [Cmdlet(VerbsCommon.Open, "JournalLocation")]
+    [Alias("ojl")]
+    public class OpenJournalLocationCmdlet : JournalCmdletBase
     {
         [Parameter(ParameterSetName = "Current")]
         [ValidateSet("CurrentMonth", "CurrentYear", "Root")]
         public string To { get; set; } = "CurrentMonth";
 
         [Parameter(ParameterSetName = "Date")]
-        public DateTime Date { get; set; }
+        [NaturalDate(RoundTo.StartOfPeriod)]
+        public LocalDate Date { get; set; } = Today.Date();
 
         protected override void EndProcessing()
         {
@@ -42,8 +42,8 @@ namespace JournalCli.Cmdlets
 
         private void OpenToDate()
         {
-            var year = Journal.YearDirectoryPattern.Format(LocalDate.FromDateTime(Date));
-            var month = Journal.MonthDirectoryPattern.Format(LocalDate.FromDateTime(Date));
+            var year = Journal.YearDirectoryPattern.Format(Date);
+            var month = Journal.MonthDirectoryPattern.Format(Date);
             var fileSystem = new FileSystem();
             var path = fileSystem.Path.Combine(Location, year, month);
 

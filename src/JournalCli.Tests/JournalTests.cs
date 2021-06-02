@@ -21,7 +21,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = new MockFileSystem();
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = A.Fake<IMarkdownFiles>();
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -39,7 +39,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = new MockFileSystem();
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = A.Fake<IMarkdownFiles>();
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -53,7 +53,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = new MockFileSystem();
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = A.Fake<IMarkdownFiles>();
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -70,7 +70,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = new MockFileSystem();
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = A.Fake<IMarkdownFiles>();
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -86,7 +86,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -99,7 +99,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -117,7 +117,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -133,7 +133,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -150,7 +150,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -162,7 +162,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -186,7 +186,7 @@ namespace JournalCli.Tests
             var ioFactory = A.Fake<IJournalReaderWriterFactory>();
             var writer = A.Fake<IJournalWriter>();
             A.CallTo(() => ioFactory.CreateWriter()).Returns(writer);
-            A.CallTo(() => ioFactory.CreateReader(A<string>.Ignored)).ReturnsLazily((string file) => new JournalReader(fileSystem, file));
+            A.CallTo(() => ioFactory.CreateReader(A<string>.Ignored)).ReturnsLazily((string file) => new JournalReader(fileSystem, file, BodyWrapWidth));
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -200,7 +200,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -215,7 +215,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2017, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -228,7 +228,7 @@ namespace JournalCli.Tests
             var earliestDate = new LocalDate(2009, 4, 25);
             var fileSystem = CreateVirtualJournal(2005, 2010);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -244,7 +244,7 @@ namespace JournalCli.Tests
             var earliestDate = new LocalDate();
             var fileSystem = CreateVirtualJournal(2005, 2010);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -262,7 +262,7 @@ namespace JournalCli.Tests
             var earliestDate = new LocalDate();
             var fileSystem = CreateVirtualJournal(2030, 2030);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -279,7 +279,7 @@ namespace JournalCli.Tests
             var earliestDate = new LocalDate();
             var fileSystem = CreateVirtualJournal(2030, 2031);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -296,12 +296,12 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2020, 2023);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
-            Assert.Throws<InvalidOperationException>(() => journal.OpenRandomEntry(new List<string>{ "fake" }, null));
+            Assert.Throws<InvalidOperationException>(() => journal.GetRandomEntry(new List<string>{ "fake" }, TagOperator.Any, null));
         }
 
         [Fact]
@@ -310,38 +310,12 @@ namespace JournalCli.Tests
             var fileSystem = new MockFileSystem();
             const string rootDirectory = "J:\\Current";
             fileSystem.AddDirectory(rootDirectory);
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
-            Assert.Throws<InvalidOperationException>(() => journal.OpenRandomEntry(new[] { "fake" }, null));
-        }
-
-        [Fact]
-        public void OpenRandomEntry_OpensEntry_WhenOneExists()
-        {
-            var fileSystem = CreateVirtualJournal(2019, 2019);
-            const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
-            var systemProcess = A.Fake<ISystemProcess>();
-            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
-            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            journal.OpenRandomEntry();
-            A.CallTo(() => systemProcess.Start(A<string>._)).MustHaveHappened();
-        }
-
-        [Fact]
-        public void OpenRandomEntry_OpensTaggedEntry_WhenTagIsProvided()
-        {
-            var fileSystem = CreateVirtualJournal(2019, 2019);
-            const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
-            var systemProcess = A.Fake<ISystemProcess>();
-            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
-            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            journal.OpenRandomEntry(new[] { "cat" }, null);
-            A.CallTo(() => systemProcess.Start(A<string>._)).MustHaveHappened();
+            Assert.Throws<InvalidOperationException>(() => journal.GetRandomEntry(new[] { "fake" }, TagOperator.Any, null));
         }
 
         [Fact]
@@ -349,20 +323,15 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-            journal.OpenRandomEntry(null, new DateRange(new LocalDate(2019, 6,1), new LocalDate(2019, 6, 15)));
+            var entry = journal.GetRandomEntry(null, TagOperator.Any, new DateRange(new LocalDate(2019, 6,1), new LocalDate(2019, 6, 15)));
 
-            Func<string, bool> fileNameInRange = filePath =>
-            {
-                var nameElements = fileSystem.Path.GetFileNameWithoutExtension(filePath).Split(new[] {'.'});
-                var intElements = nameElements.Select(int.Parse).ToArray();
-                return intElements[0] == 2019 && intElements[1] == 6 && intElements[2] >= 1 && intElements[2] <= 15;
-            };
-            
-            A.CallTo(() => systemProcess.Start(A<string>.That.Matches(s => fileNameInRange(s)))).MustHaveHappened();
+            var nameElements = entry.EntryName.Split(new[] { '.' });
+            var intElements = nameElements.Select(int.Parse).ToArray();
+            Assert.True(intElements[0] == 2019 && intElements[1] == 6 && intElements[2] >= 1 && intElements[2] <= 15);
         }
 
         [Fact]
@@ -370,14 +339,13 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
-            journal.OpenRandomEntry(new string[] { }, null);
-
-            A.CallTo(() => systemProcess.Start(A<string>._)).MustHaveHappened();
+            var entry = journal.GetRandomEntry(new string[] { }, TagOperator.Any, null);
+            entry.Should().NotBeNull();
         }
 
         [Fact]
@@ -385,45 +353,12 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateEmptyJournal();
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var systemProcess = A.Fake<ISystemProcess>();
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
-            Assert.Throws<InvalidOperationException>(() => journal.OpenRandomEntry());
-        }
-
-        [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(24)]
-        public void GetRecentEntries_ReturnsSpecifiedNumberOfEntries_WhenLimitIsPositiveInt(int limit)
-        {
-            var fileSystem = CreateVirtualJournal(2019, 2019);
-            const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
-            var systemProcess = A.Fake<ISystemProcess>();
-            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
-            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-
-            var entries = journal.GetRecentEntries(limit);
-            entries.Count().Should().Be(limit);
-        }
-
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public void GetRecentEntries_ReturnsAllEntries_WhenLimitIsLessThanOne(int limit)
-        {
-            var fileSystem = CreateVirtualJournal(2019, 2019);
-            const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
-            var systemProcess = A.Fake<ISystemProcess>();
-            var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
-            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
-
-            var entries = journal.GetRecentEntries(limit);
-            entries.Count().Should().Be(fileSystem.AllFiles.Count());
+            Assert.Throws<InvalidOperationException>(() => journal.GetRandomEntry(null, TagOperator.Any, null));
         }
 
         [Fact]
@@ -431,14 +366,14 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
             var dateRange = new DateRange("2019-2-12", "2019-3-1");
-            journal.CreateCompiledEntry(dateRange, null, false, false);
-            Assert.Throws<JournalEntryAlreadyExistsException>(() => journal.CreateCompiledEntry(dateRange, null, false, false));
+            journal.CreateCompiledEntry(dateRange, null, TagOperator.Any, false);
+            Assert.Throws<JournalEntryAlreadyExistsException>(() => journal.CreateCompiledEntry(dateRange, null, TagOperator.Any, false));
         }
 
         [Fact]
@@ -446,14 +381,14 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
             var dateRange = new DateRange("2019-2-12", "2019-3-1");
-            journal.CreateCompiledEntry(dateRange, tags: null, allTagsRequired: false, overwrite: false);
-            journal.CreateCompiledEntry(dateRange, tags: null, allTagsRequired: false, overwrite: true);
+            journal.CreateCompiledEntry(dateRange, tags: null, TagOperator.Any, overwrite: false);
+            journal.CreateCompiledEntry(dateRange, tags: null, TagOperator.Any, overwrite: true);
         }
 
         [Fact]
@@ -461,14 +396,14 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
             var dateRange = new DateRange("2019-2-12", "2019-3-1");
             var filePath = ioFactory.CreateWriter().GetCompiledJournalEntryFilePath(dateRange);
-            journal.CreateCompiledEntry(dateRange, tags: null, allTagsRequired: false, overwrite: false);
+            journal.CreateCompiledEntry(dateRange, tags: null, TagOperator.Any, overwrite: false);
 
             var allTags = journal.CreateIndex<MetaJournalEntry>().Select(x => x.Tag);
             ioFactory.CreateReader(filePath).FrontMatter.Tags.Should().OnlyContain(t => allTags.Contains(t));
@@ -480,14 +415,14 @@ namespace JournalCli.Tests
             var fileSystem = CreateVirtualJournal(2016, 2019, onlyValidEntries: true);
 
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
             var dateRange = new DateRange("2016-1-1", "2019-12-28"); // Virtual journal assumes 28 days in a month.
             var filePath = ioFactory.CreateWriter().GetCompiledJournalEntryFilePath(dateRange);
-            journal.CreateCompiledEntry(range: null, tags: null, allTagsRequired: false, overwrite: false);
+            journal.CreateCompiledEntry(range: null, tags: null, TagOperator.Any, overwrite: false);
 
             fileSystem.FileExists(fileSystem.Path.Combine(rootDirectory, "Compiled", filePath)).Should().BeTrue();
         }
@@ -499,14 +434,14 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
             var dateRange = new DateRange("2019-2-12", "2019-6-1");
             var filePath = ioFactory.CreateWriter().GetCompiledJournalEntryFilePath(dateRange);
-            journal.CreateCompiledEntry(dateRange, tags: tags, allTagsRequired: false, overwrite: false);
+            journal.CreateCompiledEntry(dateRange, tags: tags, TagOperator.Any, overwrite: false);
 
             var expectedTags = journal.CreateIndex<MetaJournalEntry>()
                 .Where(x => tags.Contains(x.Tag))
@@ -524,14 +459,14 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
 
             var dateRange = new DateRange("2019-2-12", "2019-6-1");
             var filePath = ioFactory.CreateWriter().GetCompiledJournalEntryFilePath(dateRange);
-            journal.CreateCompiledEntry(dateRange, tags: tags, allTagsRequired: true, overwrite: false);
+            journal.CreateCompiledEntry(dateRange, tags: tags, TagOperator.All, overwrite: false);
 
             var expectedTags = journal.CreateIndex<MetaJournalEntry>(range: null, requiredTags: tags)
                 .SelectMany(x => x.Entries)
@@ -546,7 +481,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -554,7 +489,7 @@ namespace JournalCli.Tests
             var dateRange = new DateRange("2019-2-12", "2019-6-1");
 
             Assert.Throws<InvalidOperationException>(() =>
-                journal.CreateCompiledEntry(dateRange, tags: new[] { "Jose" }, allTagsRequired: true, overwrite: false)
+                journal.CreateCompiledEntry(dateRange, tags: new[] { "Jose" }, TagOperator.All, overwrite: false)
             );
         }
 
@@ -563,7 +498,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -571,7 +506,7 @@ namespace JournalCli.Tests
             var dateRange = new DateRange("2018-2-12", "2018-6-1");
 
             Assert.Throws<InvalidOperationException>(() =>
-                journal.CreateCompiledEntry(dateRange, tags: null, allTagsRequired: true, overwrite: false)
+                journal.CreateCompiledEntry(dateRange, tags: null, TagOperator.All, overwrite: false)
             );
         }
 
@@ -581,7 +516,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -601,7 +536,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -628,7 +563,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -643,7 +578,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
@@ -663,7 +598,7 @@ namespace JournalCli.Tests
         {
             var fileSystem = CreateVirtualJournal(2019, 2019);
             const string rootDirectory = "J:\\Current";
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory);
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
             var systemProcess = A.Fake<ISystemProcess>();
             var markdownFiles = new MarkdownFiles(fileSystem, rootDirectory);
             _journal = Journal.Open(ioFactory, markdownFiles, systemProcess);

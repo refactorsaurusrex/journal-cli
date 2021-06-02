@@ -14,6 +14,8 @@ namespace JournalCli.Infrastructure
 
         public static bool ContainsAll<T>(this IEnumerable<T> target, IEnumerable<T> matches) => matches.All(target.Contains);
 
+        public static bool ContainsAny<T>(this IEnumerable<T> target, IEnumerable<T> matches) => matches.Any(target.Contains);
+
         public static string ToJournalEntryFileName(this LocalDate date) => date.ToString(Journal.FileNameWithExtensionPattern.PatternText, CultureInfo.CurrentCulture);
 
         public static string Wrap(this string text, int width = 120)

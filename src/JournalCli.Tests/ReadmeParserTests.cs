@@ -29,7 +29,7 @@ namespace JournalCli.Tests
         [InlineData("1 week", "5/2/2019")]
         public void This_CanParse_AllValidDateFormats(string readmeValue, string expectedResult)
         {
-            // TODO: Eventually, perhaps, this will need to be adjust to allow for non-American formats. 
+            // Eventually, perhaps, this will need to be adjust to allow for non-American formats. 
             var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
             var parser = new ReadmeParser(readmeValue, journalDate);
             parser.FormattedExpirationDate.Should().BeEquivalentTo(expectedResult);

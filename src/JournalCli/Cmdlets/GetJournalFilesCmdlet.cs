@@ -1,11 +1,9 @@
-﻿using System;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
+﻿using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
+using NodaTime;
 
 namespace JournalCli.Cmdlets
 {
@@ -15,67 +13,36 @@ namespace JournalCli.Cmdlets
     public class GetJournalFilesCmdlet : JournalCmdletBase
     {
         [Parameter]
-        public DateTime? From { get; set; }
+        [NaturalDate(RoundTo.StartOfPeriod)]
+        public LocalDate From { get; set; }
 
         [Parameter]
-        public DateTime To { get; set; } = DateTime.Now;
+        [NaturalDate(RoundTo.EndOfPeriod)]
+        public LocalDate To { get; set; } = Today.Date();
 
         [Parameter]
         public string[] Tags { get; set; }
 
         [Parameter]
-        [ValidateSet("Ascending", "Descending")]
-        public string SortDirection { get; set; } = "Descending";
+        public TagOperator TagsOperator { get; set; } = TagOperator.Any;
 
         [Parameter]
-        public int Limit { get; set; }
+        public SortOrder Direction { get; set; } = SortOrder.Descending;
+
+        [Parameter]
+        [WildcardInt]
+        public int? Limit { get; set; } = 30;
 
         protected override void EndProcessing()
         {
             base.EndProcessing();
 
-            var dateRange = GetRangeOrNull(From, To);
-
-            if (dateRange == null && Tags == null)
-                FromAll();
-            else
-                FromDate(dateRange);
-        }
-
-        private void FromAll()
-        {
-            var fileSystem = new FileSystem();
-            var markdownFiles = new MarkdownFiles(fileSystem, Location);
-
-            var sorted = SortDirection == "Descending" ?
-                markdownFiles.FindAll().OrderByDescending(FileNameToDate) :
-                markdownFiles.FindAll().OrderBy(FileNameToDate);
-
-            var filtered = Limit > 0 ? sorted.Take(Limit).Select(PathToPSObject) : sorted.Select(PathToPSObject);
-
-            WriteObject(filtered, true);
-        }
-
-        private void FromDate(DateRange dateRange)
-        {
             var journal = OpenJournal();
-            var index = journal.CreateIndex<JournalEntryFile>(dateRange, Tags);
+            From = LocalDate.Max(From, journal.FirstEntryDate);
+            var dateRange = new DateRange(From, To);
 
-            var sorted = SortDirection == "Descending"
-                ? index.SelectMany(x => x.Entries).Distinct().OrderByDescending(x => x.EntryDate)
-                : index.SelectMany(x => x.Entries).Distinct().OrderBy(x => x.EntryDate);
-
-            var filtered = Limit > 0 ? 
-                sorted.Take(Limit).Select(x => PathToPSObject(x.FilePath)) : 
-                sorted.Select(x => PathToPSObject(x.FilePath));
-
-            WriteObject(filtered, true);
-        }
-
-        private DateTime FileNameToDate(string fileName)
-        {
-            var withoutExt = Path.GetFileNameWithoutExtension(fileName);
-            return DateTime.Parse(withoutExt);
+            var entries = journal.GetEntries<JournalEntryFile>(Tags, TagsOperator, Direction, dateRange, Limit).Select(x => PathToPSObject(x.FilePath));
+            WriteObject(entries, true);
         }
 
         private PSObject PathToPSObject(string path) => InvokeProvider.Item.Get(path).First();
