@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Infrastructure;
@@ -9,14 +8,12 @@ namespace JournalCli.Cmdlets
 {
     [PublicAPI]
     [Alias("aje")]
-    [Cmdlet(VerbsCommon.Add, "JournalEntryContent")]
-    public class AddJournalEntryContentCmdlet : JournalCmdletBase
+    [Cmdlet(VerbsCommon.Add, "JournalContent")]
+    public class AddJournalContentCmdlet : JournalCmdletBase
     {
         [Parameter]
-        public DateTime Date { get; set; } = DateTime.Now;
-
-        [Parameter]
-        public int DateOffset { get; set; }
+        [NaturalDate(RoundTo.StartOfPeriod)]
+        public LocalDate Date { get; set; } = Today.Date();
 
         [Parameter]
         public string Header { get; set; }
@@ -37,20 +34,19 @@ namespace JournalCli.Cmdlets
             if (!string.IsNullOrWhiteSpace(Header) && (Body == null || !Body.Any()))
                 throw new PSArgumentException("Header cannot be used without Body. Please specify a Body and try again.");
 
-            var entryDate = LocalDate.FromDateTime(Date).PlusDays(DateOffset);
             var hour = Now.Time().Hour;
 
             if (hour >= 0 && hour <= 4)
             {
-                var dayPrior = entryDate.Minus(Period.FromDays(1));
-                var question = $"Edit entry for '{dayPrior}' or '{entryDate}'?";
-                var result = Choice("It's after midnight!", question, 0, dayPrior.DayOfWeek.ToChoiceString(), entryDate.DayOfWeek.ToChoiceString());
+                var dayPrior = Date.Minus(Period.FromDays(1));
+                var question = $"Edit entry for '{dayPrior}' or '{Date}'?";
+                var result = Choice("It's after midnight!", question, 0, dayPrior.DayOfWeek.ToChoiceString(), Date.DayOfWeek.ToChoiceString());
                 if (result == 0)
-                    entryDate = dayPrior;
+                    Date = dayPrior;
             }
 
             var journal = OpenJournal();
-            journal.AppendEntryContent(entryDate, Body, Header, Tags);
+            journal.AppendEntryContent(Date, Body, Header, Tags);
         }
     }
 }

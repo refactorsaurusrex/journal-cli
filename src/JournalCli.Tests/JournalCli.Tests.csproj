@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TestEntries\**" />
+    <EmbeddedResource Remove="TestEntries\**" />
+    <None Remove="TestEntries\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.17.0" />
     <PackageReference Include="FakeItEasy" Version="7.0.2" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
@@ -26,7 +32,6 @@
 
   <ItemGroup>
     <Folder Include="TestBodies\" />
-    <Folder Include="TestEntries\" />
   </ItemGroup>
 
   <ItemGroup>

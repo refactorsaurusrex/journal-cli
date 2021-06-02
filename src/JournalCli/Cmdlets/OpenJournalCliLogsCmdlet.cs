@@ -5,8 +5,8 @@ using JetBrains.Annotations;
 namespace JournalCli.Cmdlets
 {
     [PublicAPI]
-    [Cmdlet(VerbsCommon.Open, "JournalCliLogsDirectory")]
-    public class OpenJournalCliLogsDirectoryCmdlet : CmdletBase
+    [Cmdlet(VerbsCommon.Open, "JournalCliLogs")]
+    public class OpenJournalCliLogsCmdlet : CmdletBase
     {
         protected override void ProcessRecord()
         {

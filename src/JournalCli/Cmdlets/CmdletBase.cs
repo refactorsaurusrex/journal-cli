@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -40,11 +41,15 @@ namespace JournalCli.Cmdlets
         }
 
         /// <summary>
-        /// Prompts the user to confirm their actions before proceeding. 
+        /// The statement should be in the form of "You are about to _______________________."
+        /// Fill in the blank with the scary thing the user is about to do.
         /// </summary>
-        /// <param name="warning">A statement (not a question) about what is about to happen.</param>
-        /// <returns>True if the user wants to proceed. False if they want to abort.</returns>
-        protected bool AreYouSure(string warning) => ShouldContinue("Are you certain you want to continue?", "ACTION: " + warning);
+        /// <returns>True, if the user wants to continue. If false, the command should exit immediately.</returns>
+        protected bool AreYouSure(string statement, bool defaultToYes = false)
+        {
+            var result = Choice($"You are about to {statement}.", "Are you sure you want to continue?", defaultToYes ? 0 : 1, "&Yes", "&No");
+            return result == 0;
+        }
 
         /// <summary>
         /// Sends and informational message to the pipeline.
@@ -55,7 +60,13 @@ namespace JournalCli.Cmdlets
         /// <summary>
         /// Prints a message to the PowerShell host.
         /// </summary>
-        protected void WriteHost(string message) => Host.UI.WriteLine(message);
+        protected void WriteHost(string message, bool lineBreak = true)
+        {
+            if (lineBreak)
+                Host.UI.WriteLine(message);
+            else
+                Host.UI.Write(message);
+        }
 
         /// <summary>
         /// Prints a message to the PowerShell host with the specified fore- and background colors.
@@ -64,9 +75,19 @@ namespace JournalCli.Cmdlets
             Host.UI.WriteLine(foregroundColor, backgroundColor, message);
 
         /// <summary>
+        /// Prints a message to the PowerShell host with the specified foreground color.
+        /// </summary>
+        protected void WriteHost(string message, ConsoleColor foregroundColor) =>
+            Host.UI.WriteLine(foregroundColor, Host.UI.RawUI.BackgroundColor, message);
+
+        /// <summary>
         /// Prints a message to the PowerShell host with the fore- and background colors inverted.
         /// </summary>
-        protected void WriteHostInverted(string message) => Host.UI.WriteLine(Host.UI.RawUI.BackgroundColor, Host.UI.RawUI.ForegroundColor, message);
+        protected void WriteHostInverted(string message)
+        {
+            Host.UI.Write(Host.UI.RawUI.BackgroundColor, Host.UI.RawUI.ForegroundColor, message);
+            Host.UI.WriteLine();
+        }
 
         /// <summary>
         /// Asks the user a yes or no question and returns true if the user selects yes, or false for no.
@@ -74,7 +95,7 @@ namespace JournalCli.Cmdlets
         /// <param name="question">A question to ask the user. Include a question mark at the end.</param>
         protected bool YesOrNo(string question)
         {
-            return YesOrNo(question, Host.UI.RawUI.BackgroundColor, Host.UI.RawUI.ForegroundColor);
+            return YesOrNo(question, Host.UI.RawUI.ForegroundColor, Host.UI.RawUI.BackgroundColor);
         }
 
         /// <summary>
@@ -83,17 +104,22 @@ namespace JournalCli.Cmdlets
         /// <param name="question">A question to ask the user. Include a question mark at the end.</param>
         /// <param name="foreground">The foreground color to use.</param>
         /// <param name="background">The background color to use.</param>
-        protected bool YesOrNo(string question, ConsoleColor foreground, ConsoleColor background)
+        /// <param name="allowEnterForYes">Allow the Enter key to be used for Yes.</param>
+        protected bool YesOrNo(string question, ConsoleColor foreground, ConsoleColor background, bool allowEnterForYes = false)
         {
+            var allowed = new List<char> { 'y', 'Y', 'n', 'N' };
+            if (allowEnterForYes)
+                allowed.Add('\r');
+
             KeyInfo key;
             do
             {
-                Host.UI.Write(foreground, background, $" {question} (y/n) ");
+                Host.UI.Write(foreground, background, $"{question} (y/n) ");
                 key = Host.UI.RawUI.ReadKey();
                 Host.UI.WriteLine();
-            } while (key.Character != 'y' && key.Character != 'n');
+            } while (!allowed.Contains(key.Character));
 
-            return key.Character == 'y';
+            return key.Character == 'y' || key.Character == 'Y' || allowEnterForYes && key.Character == '\r';
         }
 
         /// <summary>
@@ -120,6 +146,21 @@ namespace JournalCli.Cmdlets
             Host.UI.RawUI.BackgroundColor = origBackground;
 
             return result;
+        }
+
+        protected void WriteHeader(IEnumerable<string> titles, ConsoleColor foregroundColor = ConsoleColor.Green)
+        {
+            var width = Host.UI.RawUI.WindowSize.Width - 3;
+            var backgroundColor = Host.UI.RawUI.BackgroundColor;
+
+            WriteHost(string.Empty);
+            WriteHost(new string('=', width), backgroundColor, foregroundColor);
+            WriteHost(string.Empty);
+            foreach (var title in titles)
+                WriteHost(title.PadLeft(3 + title.Length), backgroundColor, foregroundColor);
+            WriteHost(string.Empty);
+            WriteHost(new string('=', width), backgroundColor, foregroundColor);
+            WriteHost(string.Empty);
         }
 
         private protected ISystemProcess SystemProcess => _systemProcess;

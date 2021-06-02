@@ -17,7 +17,7 @@ namespace JournalCli.Tests
 
             foreach (var filePath in fileSystem.AllFiles)
             {
-                var reader = new JournalReader(fileSystem, filePath);
+                var reader = new JournalReader(fileSystem, filePath, BodyWrapWidth);
                 readmeCollection.Add(reader);
             }
 
@@ -34,7 +34,7 @@ namespace JournalCli.Tests
 
             foreach (var filePath in fileSystem.AllFiles)
             {
-                var reader = new JournalReader(fileSystem, filePath);
+                var reader = new JournalReader(fileSystem, filePath, BodyWrapWidth);
                 readmeCollection.Add(reader);
             }
 
@@ -50,7 +50,7 @@ namespace JournalCli.Tests
 
             foreach (var filePath in fileSystem.AllFiles)
             {
-                var reader = new JournalReader(fileSystem, filePath);
+                var reader = new JournalReader(fileSystem, filePath, BodyWrapWidth);
                 readmeCollection.Add(reader);
             }
 

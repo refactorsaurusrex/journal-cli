@@ -4,6 +4,7 @@ using System.Management.Automation;
 using JetBrains.Annotations;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
+using NodaTime;
 
 namespace JournalCli.Cmdlets
 {
@@ -12,16 +13,18 @@ namespace JournalCli.Cmdlets
     public class NewCompiledJournalEntryCmdlet : JournalCmdletBase
     {
         [Parameter(ParameterSetName = "Default")]
-        public DateTime? From { get; set; }
+        [NaturalDate(RoundTo.StartOfPeriod)]
+        public LocalDate From { get; set; }
 
         [Parameter(ParameterSetName = "Default")]
-        public DateTime To { get; set; } = DateTime.Now;
+        [NaturalDate(RoundTo.EndOfPeriod)]
+        public LocalDate To { get; set; } = Today.Date();
 
         [Parameter(ParameterSetName = "Default")]
         public string[] Tags { get; set; }
 
         [Parameter(ParameterSetName = "Default")]
-        public SwitchParameter AllTags { get; set; }
+        public TagOperator TagOperator { get; set; } = TagOperator.Any;
 
         [Parameter(Mandatory = true, ParameterSetName = "Entries", ValueFromPipeline = true)]
         public PSObject[] Entries { get; set; }
@@ -33,6 +36,7 @@ namespace JournalCli.Cmdlets
             base.ProcessRecord();
 
             var journal = OpenJournal();
+            From = LocalDate.Max(From, journal.FirstEntryDate);
 
             switch (ParameterSetName)
             {
@@ -61,11 +65,11 @@ namespace JournalCli.Cmdlets
 
         private void RunDefault(Journal journal)
         {
-            var range = GetRangeOrNull(From, To);
+            var range = new DateRange(From, To);
 
             try
             {
-                journal.CreateCompiledEntry(range, Tags, AllTags, Force);
+                journal.CreateCompiledEntry(range, Tags, TagOperator, Force);
             }
             catch (JournalEntryAlreadyExistsException e)
             {

@@ -17,9 +17,9 @@ namespace JournalCli.Infrastructure
             _rootDirectory = rootDirectory;
         }
 
-        public List<string> FindAll() => FindAll(_rootDirectory);
+        public List<string> FindAll(bool fileNamesOnly = false) => FindAll(_rootDirectory, fileNamesOnly);
 
-        private List<string> FindAll(string rootDirectory)
+        private List<string> FindAll(string rootDirectory, bool fileNamesOnly = false)
         {
             var root = _fileSystem.DirectoryInfo.FromDirectoryName(rootDirectory);
             var allFiles = new List<string>();
@@ -29,12 +29,12 @@ namespace JournalCli.Infrastructure
                 if (dir.Name == "Compiled")
                     continue;
 
-                var result = FindAll(dir.FullName);
+                var result = FindAll(dir.FullName, fileNamesOnly);
                 allFiles.AddRange(result);
             }
 
             var files = _fileSystem.Directory.GetFiles(rootDirectory, "*.md");
-            allFiles.AddRange(files);
+            allFiles.AddRange(fileNamesOnly ? files.Select(_fileSystem.Path.GetFileName) : files);
             return allFiles;
         }
     }

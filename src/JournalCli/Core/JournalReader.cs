@@ -9,8 +9,11 @@ namespace JournalCli.Core
 {
     internal class JournalReader : IJournalReader
     {
-        public JournalReader(IFileSystem fileSystem, string filePath)
+        private readonly int _bodyWrapWidth;
+
+        public JournalReader(IFileSystem fileSystem, string filePath, int bodyWrapWidth)
         {
+            _bodyWrapWidth = bodyWrapWidth;
             FilePath = filePath;
             var lines = fileSystem.File.ReadAllLines(FilePath).ToList();
 
@@ -45,19 +48,14 @@ namespace JournalCli.Core
 
         public T ToJournalEntry<T>() where T : class, IJournalEntry
         {
-            switch (typeof(T))
+            return typeof(T) switch
             {
-                default:
-                    throw new NotSupportedException($"Unable to create instance of {typeof(T).Name}.");
-                case var t when t == typeof(JournalEntryFile):
-                    return new JournalEntryFile(this) as T;
-                case var t when t == typeof(MetaJournalEntry):
-                    return new MetaJournalEntry(this) as T;
-                case var t when t == typeof(ReadmeJournalEntry):
-                    return new ReadmeJournalEntry(this) as T;
-                case var t when t == typeof(CompleteJournalEntry):
-                    return new CompleteJournalEntry(this) as T;
-            }
+                var t when t == typeof(JournalEntryFile) => new JournalEntryFile(this) as T,
+                var t when t == typeof(MetaJournalEntry) => new MetaJournalEntry(this) as T,
+                var t when t == typeof(ReadmeJournalEntry) => new ReadmeJournalEntry(this) as T,
+                var t when t == typeof(CompleteJournalEntry) => new CompleteJournalEntry(this, _bodyWrapWidth) as T,
+                _ => throw new NotSupportedException($"Unable to create instance of {typeof(T).Name}.")
+            };
         }
     }
 }

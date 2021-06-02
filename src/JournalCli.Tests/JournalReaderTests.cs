@@ -17,7 +17,7 @@ namespace JournalCli.Tests
             var fileSystem = new MockFileSystem();
             var filePath = "J:\\JournalRoot\\2019\\03 March\\2019.01.01.md";
             fileSystem.AddFile(filePath, new MockFileData(entry, Encoding.UTF8));
-            IJournalReader reader = new JournalReader(fileSystem, filePath);
+            IJournalReader reader = new JournalReader(fileSystem, filePath, BodyWrapWidth);
 
             reader.RawBody.Length.Should().Be(bodyLength);
             reader.EntryDate.Should().Be(new NodaTime.LocalDate(2019, 1, 1));
