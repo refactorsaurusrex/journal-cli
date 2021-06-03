@@ -7,7 +7,7 @@ using NodaTime;
 
 namespace JournalCli.Core
 {
-    public class CompleteJournalEntry : IJournalEntry, IEquatable<CompleteJournalEntry>
+    public class CompleteJournalEntry : JournalEntryBase
     {
         private readonly IJournalReader _reader;
 
@@ -27,17 +27,15 @@ namespace JournalCli.Core
 
         public bool IsReadMe() => ReadMeDate != "None" && !string.IsNullOrWhiteSpace(ReadMeDate);
 
-        public string EntryName { get; }
+        public override string EntryName { get; }
 
-        public IReadOnlyCollection<string> Tags { get; }
+        public override IReadOnlyCollection<string> Tags { get; }
 
-        public LocalDate EntryDate { get; }
-
-        public override string ToString() => EntryName;
+        public override LocalDate EntryDate { get; }
 
         public string Body { get; }
 
-        public IJournalReader GetReader() => _reader;
+        public override IJournalReader GetReader() => _reader;
 
         private string WrapBody(string body, int bodyWrap)
         {
@@ -64,36 +62,5 @@ namespace JournalCli.Core
 
             return wrapped.ToString();
         }
-
-        public bool Equals(CompleteJournalEntry other)
-        {
-            if (ReferenceEquals(null, other))
-                return false;
-            if (ReferenceEquals(this, other))
-                return true;
-            return EntryName == other.EntryName && Body == other.Body;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj))
-                return false;
-            if (ReferenceEquals(this, obj))
-                return true;
-
-            return obj.GetType() == GetType() && Equals((CompleteJournalEntry)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((EntryName != null ? EntryName.GetHashCode() : 0) * 397) ^ (Body != null ? Body.GetHashCode() : 0);
-            }
-        }
-
-        public static bool operator ==(CompleteJournalEntry left, CompleteJournalEntry right) => Equals(left, right);
-
-        public static bool operator !=(CompleteJournalEntry left, CompleteJournalEntry right) => !Equals(left, right);
     }
 }
