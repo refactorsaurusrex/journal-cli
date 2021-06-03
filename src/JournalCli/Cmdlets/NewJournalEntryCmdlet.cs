@@ -1,5 +1,6 @@
 ﻿using System.Management.Automation;
 using JetBrains.Annotations;
+using JournalCli.Core;
 using JournalCli.Infrastructure;
 using NodaTime;
 
@@ -11,6 +12,7 @@ namespace JournalCli.Cmdlets
     public class NewJournalEntryCmdlet : JournalCmdletBase
     {
         [Parameter]
+        [ArgumentCompleter(typeof(TagCompleter))]
         public string[] Tags { get; set; }
 
         [Parameter]
@@ -39,6 +41,7 @@ namespace JournalCli.Cmdlets
             try
             {
                 journal.CreateNewEntry(Date, Tags, Readme);
+                new JournalTagCache().Invalidate();
             }
             catch (JournalEntryAlreadyExistsException e)
             {

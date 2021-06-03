@@ -276,6 +276,7 @@ namespace JournalCli.Core
             _systemProcess.Start(entryFilePath);
         }
 
+        // TODO: Some of these parameters make no sense when you just want all entries. Should they all be optional??
         public IEnumerable<T> GetEntries<T>(ICollection<string> tags, TagOperator tagOperator, SortOrder direction, DateRange dateRange, int? limit)
             where T : class, IJournalEntry
         {
@@ -348,6 +349,15 @@ namespace JournalCli.Core
 
                 throw new InvalidOperationException($"{nameof(FirstEntryDate)} has not been set.");
             }
+        }
+
+        public ICollection<string> GetUniqueTags()
+        {
+            return GetEntries<MetaJournalEntry>(null, TagOperator.Any, SortOrder.Ascending, null, null)
+                .SelectMany(x => x.Tags)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
         }
     }
 }
