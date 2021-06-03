@@ -25,7 +25,7 @@ namespace JournalCli.Cmdlets
             _userSettings = userSettingsStore.Load();
         }
 
-        protected string Location { get; set; }
+        protected string Location { get; private set; }
 
         protected override void BeginProcessing()
         {
