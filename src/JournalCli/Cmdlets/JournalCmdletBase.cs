@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
 using System.Management.Automation;
 using JournalCli.Core;
 using JournalCli.Infrastructure;
@@ -16,6 +15,7 @@ namespace JournalCli.Cmdlets
         private readonly UserSettings _userSettings;
         private readonly IFileStore<SystemSettings> _systemSettingsStore;
         private readonly FileSystem _fileSystem = new FileSystem();
+        private int _wrapWidth;
 
         protected JournalCmdletBase()
         {
@@ -37,6 +37,8 @@ namespace JournalCli.Cmdlets
                 _systemSettings.HideWelcomeScreen = true;
                 _systemSettingsStore.Save(_systemSettings);
             }
+
+            _wrapWidth = Math.Min(Host.UI.RawUI.WindowSize.Width, 120);
         }
 
         protected override void EndProcessing() => CheckForUpdates();
@@ -70,8 +72,7 @@ namespace JournalCli.Cmdlets
 
         private protected Journal OpenJournal()
         {
-            var wrap = Math.Min(Host.UI.RawUI.WindowSize.Width, 120);
-            var ioFactory = new JournalReaderWriterFactory(_fileSystem, Location, wrap);
+            var ioFactory = new JournalReaderWriterFactory(_fileSystem, Location, _wrapWidth);
             var markdownFiles = new MarkdownFiles(_fileSystem, Location);
             return Journal.Open(ioFactory, markdownFiles, SystemProcess);
         }
@@ -91,35 +92,69 @@ namespace JournalCli.Cmdlets
                 if (Today.Date() <= _systemSettings.NextUpdateCheck)
                     return;
 
-                progressRecord = new ProgressRecord(0, "Checking For Updates", "This won't take long...");
-                WriteProgress(progressRecord);
+                var updater = new JournalCliUpdater();
 
-                var installedVersionResult = ScriptBlock.Create("Get-Module JournalCli -ListAvailable | select version").Invoke();
-                var installedVersion = (Version)installedVersionResult[0].Properties["Version"].Value;
-
-                var sb = ScriptBlock.Create("Find-Module JournalCli | select version");
-                var ps = sb.GetPowerShell();
-                var result = ps.BeginInvoke();
-
-                if (!result.AsyncWaitHandle.WaitOne(12000))
-                    throw new TimeoutException("Unable to retrieve module update information within 12 seconds.");
-
-                var availableVersionsResults = ps.EndInvoke(result).ReadAll();
-                var availableVersions = availableVersionsResults.Select(x => new Version((string)x.Properties["Version"].Value)).ToList();
-                var newVersion = availableVersions.FirstOrDefault(x => x.IsBeta() == installedVersion.IsBeta());
-
-                if (newVersion == null)
-                    throw new InvalidOperationException("Unable to locate an appropriate new version of the module. Missing registered repository?");
-
-                if (newVersion > installedVersion)
+                try
                 {
-                    if (System.Diagnostics.Debugger.IsAttached)
-                        WriteHostInverted("DEBUGGER ATTACHED: New module not installed.");
+                    progressRecord = new ProgressRecord(0, "Checking For Updates", "This won't take long...");
+                    WriteProgress(progressRecord);
+                    updater.CheckForUpdates();
+                }
+                finally
+                {
+                    if (progressRecord != null)
+                    {
+                        progressRecord.RecordType = ProgressRecordType.Completed;
+                        WriteProgress(progressRecord);
+                    }
+                }
+
+                if (updater.IsUpdateAvailable)
+                {
+                    WriteHeader(new[] { "A new version of journal-cli is available!" });
+
+                    string message;
+                    string title;
+                    if (updater.IsMajorUpgrade)
+                    {
+                        title = "***Major Upgrade***";
+                        message = $"Howdy! {updater.NewVersion.ToSemVer()} is ready for installation. However, you're currently using {updater.InstalledVersion.ToSemVer()}. " +
+                            "This means upgrading will include some breaking changes, in addition to adding new features and bug fixes. Would you like to review the release " +
+                            "notes first? Or should I go ahead and install the update now?";
+                    }
                     else
-                        ScriptBlock.Create("Update-Module JournalCli").Invoke();
-                    var message = $"v{newVersion.Major}.{newVersion.Minor}.{newVersion.Build} has been installed! Restart " +
-                        "your terminal to load the latest goodies.";
-                    ShowSplashScreen(message);
+                    {
+                        title = "***New Version***";
+                        message = $"Hey there! {updater.NewVersion.ToSemVer()} is ready for installation. You're currently using {updater.InstalledVersion.ToSemVer()}. " +
+                            "The new version will include new features and/or bug fixes. Would you like to review the release notes first? Or should I go ahead " +
+                            "and install the update now?";
+                    }
+                    
+                    var result = Choice(title, message.Wrap(_wrapWidth), 0, "&View release notes", "&Install new version", "&Remind me later");
+                    switch (result)
+                    {   
+                        case 0:
+                            SystemProcess.Start(updater.ReleaseNotesUrl);
+                            if (YesOrNo("Ready to install now?", ConsoleColor.Green, Console.BackgroundColor))
+                            {
+                                updater.InstallUpdate();
+                                ShowSuccessfulUpdateMessage(updater.NewVersion);
+                            }
+                            else
+                            {
+                                WriteHost("It's cool. I'll remind you later...", ConsoleColor.Yellow);
+                            }
+                            break;
+                        case 1:
+                            updater.InstallUpdate();
+                            ShowSuccessfulUpdateMessage(updater.NewVersion);
+                            break;
+                        case 2:
+                            WriteHost("Roger that. I'll remind you later...", ConsoleColor.Yellow);
+                            break;
+                        default:
+                            throw new InvalidOperationException("Unexpected choice returned.");
+                    }
                 }
 
                 _systemSettings.NextUpdateCheck = Today.PlusDays(7);
@@ -127,16 +162,15 @@ namespace JournalCli.Cmdlets
             }
             catch (Exception e)
             {
-                Log.Error(e, "Attempt to perform module update check failed.");
+                WriteWarning("Unexpected error encountered while checking for updates. Check the logs for more information.");
+                Log.Error(e, "Attempt to perform module update check failed");
             }
-            finally
-            {
-                if (progressRecord != null)
-                {
-                    progressRecord.RecordType = ProgressRecordType.Completed;
-                    WriteProgress(progressRecord);
-                }
-            }
+        }
+
+        private void ShowSuccessfulUpdateMessage(Version newVersion)
+        {
+            var message = $"{newVersion.ToSemVer()} has been installed! Restart your terminal to load the latest goodies.";
+            ShowSplashScreen(message);
         }
 
         private void ShowSplashScreen(string message)

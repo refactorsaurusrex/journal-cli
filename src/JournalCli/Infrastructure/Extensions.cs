@@ -62,5 +62,7 @@ namespace JournalCli.Infrastructure
         }
 
         public static bool IsBeta(this Version version) => version.Major == 0 && version.Minor == 0;
+
+        public static string ToSemVer(this Version version) => $"v{version.Major}.{version.Minor}.{version.Build}";
     }
 }
