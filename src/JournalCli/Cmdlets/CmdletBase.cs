@@ -125,25 +125,16 @@ namespace JournalCli.Cmdlets
         /// <summary>
         /// Presents the user with an ordered list of options to choose from and returns the index of the selection.
         /// </summary>
-        /// <param name="caption">The title to display.</param>
+        /// <param name="title">The title to display.</param>
         /// <param name="message">The message body to display. </param>
         /// <param name="defaultChoice">The index of the value in 'choices' which should be the default.</param>
         /// <param name="choices">A list of strings which represent choices. Insert an ampersand before a single letter of
         /// each item to be used as a shortcut key. Example: ("&amp;one", &amp;two", "t&amp;hree"), where 'O' would be
         /// the shortcut for "one", 'T' for "two", and 'H' for "three".</param>
-        protected int Choice(string caption, string message, int defaultChoice, params string[] choices)
+        protected int Choice(string title, string message, int defaultChoice, params string[] choices)
         {
-            var origBackground = Host.UI.RawUI.BackgroundColor;
-            var origForeground = Host.UI.RawUI.ForegroundColor;
-
-            Host.UI.RawUI.ForegroundColor = origBackground;
-            Host.UI.RawUI.BackgroundColor = origForeground;
-
             var choiceDescriptions = choices.Select(c => new ChoiceDescription(c) { HelpMessage = $"Choose {c.Replace("&", "")}." }).ToList();
-            var result = Host.UI.PromptForChoice(caption, message, new Collection<ChoiceDescription>(choiceDescriptions), defaultChoice);
-
-            Host.UI.RawUI.ForegroundColor = origForeground;
-            Host.UI.RawUI.BackgroundColor = origBackground;
+            var result = Host.UI.PromptForChoice(title, message, new Collection<ChoiceDescription>(choiceDescriptions), defaultChoice);
 
             return result;
         }
