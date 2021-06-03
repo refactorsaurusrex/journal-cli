@@ -83,12 +83,12 @@ namespace JournalCli.Cmdlets
             {
                 if (_systemSettings.NextUpdateCheck == null)
                 {
-                    _systemSettings.NextUpdateCheck = DateTime.Now.AddDays(7);
+                    _systemSettings.NextUpdateCheck = Today.PlusDays(7);
                     _systemSettingsStore.Save(_systemSettings);
                     return;
                 }
 
-                if (DateTime.Now <= _systemSettings.NextUpdateCheck)
+                if (Today.Date() <= _systemSettings.NextUpdateCheck)
                     return;
 
                 progressRecord = new ProgressRecord(0, "Checking For Updates", "This won't take long...");
@@ -122,7 +122,7 @@ namespace JournalCli.Cmdlets
                     ShowSplashScreen(message);
                 }
 
-                _systemSettings.NextUpdateCheck = DateTime.Now.AddDays(7);
+                _systemSettings.NextUpdateCheck = Today.PlusDays(7);
                 _systemSettingsStore.Save(_systemSettings);
             }
             catch (Exception e)

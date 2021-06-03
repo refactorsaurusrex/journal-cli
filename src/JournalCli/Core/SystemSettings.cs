@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using NodaTime;
 
 namespace JournalCli.Core
 {
-    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     internal class SystemSettings : IEquatable<SystemSettings>
     {
         public bool HideWelcomeScreen { get; set; }
 
-        public DateTime? NextUpdateCheck { get; set; }
+        public LocalDate? NextUpdateCheck { get; set; }
 
         public bool Equals(SystemSettings other)
         {
@@ -32,7 +32,9 @@ namespace JournalCli.Core
         {
             unchecked
             {
+                // ReSharper disable NonReadonlyMemberInGetHashCode
                 return (HideWelcomeScreen.GetHashCode() * 397) ^ NextUpdateCheck.GetHashCode();
+                // ReSharper restore NonReadonlyMemberInGetHashCode
             }
         }
 
