@@ -16,6 +16,7 @@ namespace JournalCli.Cmdlets
     public class GetJournalIndexCmdlet : JournalCmdletBase
     {
         [Parameter]
+        [ArgumentCompleter(typeof(TagCompleter))]
         public string[] Tags { get; set; }
 
         [Parameter]

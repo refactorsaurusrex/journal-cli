@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Management.Automation;
 using JetBrains.Annotations;
+using JournalCli.Core;
 
 namespace JournalCli.Cmdlets
 {
@@ -13,9 +14,11 @@ namespace JournalCli.Cmdlets
         public SwitchParameter DryRun { get; set; }
 
         [Parameter(Mandatory = true)]
+        [ArgumentCompleter(typeof(TagCompleter))]
         public string OldName { get; set; }
 
         [Parameter(Mandatory = true)]
+        [ArgumentCompleter(typeof(TagCompleter))]
         public string NewName { get; set; }
 
         protected override void EndProcessing()

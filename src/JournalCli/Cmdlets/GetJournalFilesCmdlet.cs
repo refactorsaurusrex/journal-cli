@@ -21,6 +21,7 @@ namespace JournalCli.Cmdlets
         public LocalDate To { get; set; } = Today.Date();
 
         [Parameter]
+        [ArgumentCompleter(typeof(TagCompleter))]
         public string[] Tags { get; set; }
 
         [Parameter]

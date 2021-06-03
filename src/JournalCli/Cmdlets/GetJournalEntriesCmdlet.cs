@@ -19,6 +19,7 @@ namespace JournalCli.Cmdlets
     {
         [Parameter(ParameterSetName = "Default")]
         [Parameter(ParameterSetName = "ReadMe")]
+        [ArgumentCompleter(typeof(TagCompleter))]
         public string[] Tags { get; set; }
 
         [Parameter(ParameterSetName = "Default")]
