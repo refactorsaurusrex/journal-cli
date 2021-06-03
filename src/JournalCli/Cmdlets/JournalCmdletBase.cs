@@ -11,28 +11,31 @@ namespace JournalCli.Cmdlets
 {
     public abstract class JournalCmdletBase : CmdletBase
     {
-        private const string Error = "Journal location was not provided and no default location exists. One or the other is required";
-        private readonly UserSettings _settings;
-        private readonly IEncryptedStore<UserSettings> _encryptedStore;
+        private const string Error = "Journal not found! Use 'Set-JournalSettings' to set the path for your journal.";
+        private readonly SystemSettings _systemSettings;
+        private readonly UserSettings _userSettings;
+        private readonly IFileStore<SystemSettings> _systemSettingsStore;
+        private readonly FileSystem _fileSystem = new FileSystem();
 
         protected JournalCmdletBase()
         {
-            _encryptedStore = EncryptedStoreFactory.Create<UserSettings>();
-            _settings = UserSettings.Load(_encryptedStore);
+            _systemSettingsStore = new FileStore<SystemSettings>(_fileSystem);
+            _systemSettings = _systemSettingsStore.Load();
+            var userSettingsStore = new FileStore<UserSettings>(_fileSystem);
+            _userSettings = userSettingsStore.Load();
         }
 
-        [Parameter]
-        public string Location { get; set; }
+        protected string Location { get; set; }
 
         protected override void BeginProcessing()
         {
             ResolveJournalLocation();
 
-            if (!_settings.HideWelcomeScreen)
+            if (!_systemSettings.HideWelcomeScreen)
             {
                 ShowSplashScreen("Welcome! I hope you love using JournalCli. For help and other information, visit https://journalcli.me. Send feedback to hi@journalcli.me.");
-                _settings.HideWelcomeScreen = true;
-                _settings.Save(_encryptedStore);
+                _systemSettings.HideWelcomeScreen = true;
+                _systemSettingsStore.Save(_systemSettings);
             }
         }
 
@@ -44,10 +47,10 @@ namespace JournalCli.Cmdlets
             {
                 if (string.IsNullOrEmpty(Location))
                 {
-                    if (string.IsNullOrEmpty(_settings.DefaultJournalRoot))
+                    if (string.IsNullOrEmpty(_userSettings.DefaultJournalRoot))
                         throw new PSInvalidOperationException(Error);
 
-                    Location = _settings.DefaultJournalRoot;
+                    Location = _userSettings.DefaultJournalRoot;
                 }
                 else
                 {
@@ -67,10 +70,9 @@ namespace JournalCli.Cmdlets
 
         private protected Journal OpenJournal()
         {
-            var fileSystem = new FileSystem();
             var wrap = Math.Min(Host.UI.RawUI.WindowSize.Width, 120);
-            var ioFactory = new JournalReaderWriterFactory(fileSystem, Location, wrap);
-            var markdownFiles = new MarkdownFiles(fileSystem, Location);
+            var ioFactory = new JournalReaderWriterFactory(_fileSystem, Location, wrap);
+            var markdownFiles = new MarkdownFiles(_fileSystem, Location);
             return Journal.Open(ioFactory, markdownFiles, SystemProcess);
         }
 
@@ -79,14 +81,14 @@ namespace JournalCli.Cmdlets
             ProgressRecord progressRecord = null;
             try
             {
-                if (_settings.NextUpdateCheck == null)
+                if (_systemSettings.NextUpdateCheck == null)
                 {
-                    _settings.NextUpdateCheck = DateTime.Now.AddDays(7);
-                    _settings.Save(_encryptedStore);
+                    _systemSettings.NextUpdateCheck = DateTime.Now.AddDays(7);
+                    _systemSettingsStore.Save(_systemSettings);
                     return;
                 }
 
-                if (DateTime.Now <= _settings.NextUpdateCheck)
+                if (DateTime.Now <= _systemSettings.NextUpdateCheck)
                     return;
 
                 progressRecord = new ProgressRecord(0, "Checking For Updates", "This won't take long...");
@@ -120,8 +122,8 @@ namespace JournalCli.Cmdlets
                     ShowSplashScreen(message);
                 }
 
-                _settings.NextUpdateCheck = DateTime.Now.AddDays(7);
-                _settings.Save(_encryptedStore);
+                _systemSettings.NextUpdateCheck = DateTime.Now.AddDays(7);
+                _systemSettingsStore.Save(_systemSettings);
             }
             catch (Exception e)
             {
