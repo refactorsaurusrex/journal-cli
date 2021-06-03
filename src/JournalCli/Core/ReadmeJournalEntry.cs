@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace JournalCli.Core
 {
-    public class ReadmeJournalEntry : IJournalEntry
+    public class ReadmeJournalEntry : JournalEntryBase
     {
         private readonly IJournalReader _reader;
 
@@ -21,10 +21,9 @@ namespace JournalCli.Core
 
         public LocalDate ReadmeDate { get; }
         public IReadOnlyCollection<string> Headers { get; }
-        public string EntryName { get; }
-        public IReadOnlyCollection<string> Tags { get; }
-        public LocalDate EntryDate { get; }
-        public override string ToString() => EntryName;
-        public IJournalReader GetReader() => _reader;
+        public override string EntryName { get; }
+        public override IReadOnlyCollection<string> Tags { get; }
+        public override LocalDate EntryDate { get; }
+        public override IJournalReader GetReader() => _reader;
     }
 }
