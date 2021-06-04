@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO.Abstractions;
-using System.Text;
 using YamlDotNet.Serialization;
 
 namespace JournalCli.Infrastructure
