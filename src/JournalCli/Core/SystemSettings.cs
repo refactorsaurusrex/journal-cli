@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using NodaTime;
 
 namespace JournalCli.Core
