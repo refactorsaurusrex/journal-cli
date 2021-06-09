@@ -9,6 +9,7 @@ namespace JournalCli.Core
     {
         public void CheckForUpdates()
         {
+            // TEST: I'm not sure this script is correct. Shouldn't it sort and then take the first?
             var installedVersionResult = ScriptBlock.Create("Get-Module JournalCli -ListAvailable | select version").Invoke();
             InstalledVersion = (Version)installedVersionResult[0].Properties["Version"].Value;
 

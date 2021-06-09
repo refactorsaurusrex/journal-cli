@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Amazon.Extensions.S3.Encryption" Version="2.0.1" />
     <PackageReference Include="AuthenticatedEncryption" Version="2.0.0" />
     <PackageReference Include="Chronic.Core" Version="0.4.0" />
     <PackageReference Include="JetBrains.Annotations" Version="2021.1.0" />
@@ -40,6 +41,11 @@
     <PackageReference Include="System.Runtime.Caching" Version="5.0.0" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="5.0.0" />
     <PackageReference Include="YamlDotNet" Version="11.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\SecretStoreConfiguration.ps1" />
+    <EmbeddedResource Include="Scripts\SecretStoreConfiguration.ps1" />
   </ItemGroup>
 
 </Project>

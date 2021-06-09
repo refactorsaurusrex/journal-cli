@@ -8,17 +8,16 @@ namespace JournalCli.Infrastructure
         where T : class, new()
     {
         private readonly IFileSystem _fileSystem;
+        private readonly string _storageLocation;
 
         public FileStore(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var path = fileSystem.Path.Combine(appData, "JournalCli");
-            StorageLocation = path;
-            FilePath = _fileSystem.Path.ChangeExtension(_fileSystem.Path.Combine(StorageLocation, typeof(T).Name), ".yaml");
+            _storageLocation = path;
+            FilePath = _fileSystem.Path.ChangeExtension(_fileSystem.Path.Combine(_storageLocation, typeof(T).Name), ".yaml");
         }
-
-        protected readonly string StorageLocation;
 
         public string FilePath { get; }
 
@@ -27,7 +26,7 @@ namespace JournalCli.Infrastructure
             var serializer = new SerializerBuilder().Build();
             var yaml = serializer.Serialize(target);
 
-            _fileSystem.Directory.CreateDirectory(StorageLocation);
+            _fileSystem.Directory.CreateDirectory(_storageLocation);
             _fileSystem.File.WriteAllText(FilePath, yaml);
         }
 

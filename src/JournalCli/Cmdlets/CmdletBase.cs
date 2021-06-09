@@ -6,6 +6,7 @@ using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Reflection;
+using System.Text;
 using JournalCli.Infrastructure;
 using Serilog;
 
@@ -28,6 +29,35 @@ namespace JournalCli.Cmdlets
         }
 
         protected string LogsDirectory { get; }
+
+        protected string CollectSecret(string prompt, ConsoleColor color)
+        {
+            WriteHost(prompt, color);
+            
+            var secret = new StringBuilder();
+            var nextKey = Console.ReadKey(true);
+            while (nextKey.Key != ConsoleKey.Enter)
+            {
+                if (nextKey.Key == ConsoleKey.Backspace)
+                {
+                    if (secret.Length > 0)
+                    {
+                        secret.Remove(secret.Length - 1, 1);
+                        Console.Write(nextKey.KeyChar);
+                        Console.Write(" ");
+                        Console.Write(nextKey.KeyChar);
+                    }
+                }
+                else
+                {
+                    secret.Append(nextKey.KeyChar);
+                    Console.Write("*");
+                }
+                nextKey = Console.ReadKey(true);
+            }
+
+            return secret.ToString();
+        }
 
         protected string ResolvePath(string path) => GetUnresolvedProviderPathFromPSPath(path);
 
@@ -64,6 +94,8 @@ namespace JournalCli.Cmdlets
             else
                 Host.UI.Write(message);
         }
+        
+        // protected void WriteHost(object obj) => Host.UI.WriteLine(obj);
 
         /// <summary>
         /// Prints a message to the PowerShell host with the specified fore- and background colors.
