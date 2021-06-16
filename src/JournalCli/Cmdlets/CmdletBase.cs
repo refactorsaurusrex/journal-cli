@@ -94,8 +94,8 @@ namespace JournalCli.Cmdlets
             else
                 Host.UI.Write(message);
         }
-        
-        // protected void WriteHost(object obj) => Host.UI.WriteLine(obj);
+
+        protected string ReadHost() => Host.UI.ReadLine();
 
         /// <summary>
         /// Prints a message to the PowerShell host with the specified fore- and background colors.

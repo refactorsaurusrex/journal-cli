@@ -38,7 +38,7 @@ namespace JournalCli.Core
 
         }
 
-        public void CreateBucket()
+        public void CreateOrVerifyBucket()
         {
             // Be sure to create a "Default" directory in the bucket to allow for named journals in the future.
             // _s3Client.Putbucket
