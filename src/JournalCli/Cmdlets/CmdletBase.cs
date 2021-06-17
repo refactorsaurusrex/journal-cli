@@ -14,8 +14,14 @@ namespace JournalCli.Cmdlets
 {
     public abstract class CmdletBase : PSCmdlet
     {
+        protected const char Checkbox = '\x2705';
+        protected const ConsoleColor Question = ConsoleColor.Green;
+        protected const ConsoleColor Statement = ConsoleColor.Yellow;
+        protected const ConsoleColor Info = ConsoleColor.Cyan;
         private readonly ISystemProcess _systemProcess = SystemProcessFactory.Create();
         private readonly Lazy<string> _assemblyName = new(() => Assembly.GetExecutingAssembly().FullName);
+        // ReSharper disable once InconsistentNaming
+        protected readonly string NL = Environment.NewLine;
 
         protected CmdletBase()
         {

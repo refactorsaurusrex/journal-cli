@@ -7,8 +7,10 @@ namespace JournalCli.Core
     public class SyncSettings : IEquatable<SyncSettings>
     {
         public string AwsProfileName { get; set; }
-        
+
         public string BucketName { get; set; }
+
+        public string AwsRegion { get; set; }
 
         public bool Equals(SyncSettings other)
         {
@@ -21,15 +23,17 @@ namespace JournalCli.Core
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((SyncSettings)obj);
+            return obj.GetType() == GetType() && Equals((SyncSettings)obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return ((AwsProfileName != null ? AwsProfileName.GetHashCode() : 0) * 397) ^ (BucketName != null ? BucketName.GetHashCode() : 0);
+                var hashCode = (AwsProfileName != null ? AwsProfileName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (BucketName != null ? BucketName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (AwsRegion != null ? AwsRegion.GetHashCode() : 0);
+                return hashCode;
             }
         }
 

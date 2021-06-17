@@ -1,7 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
+using System.Xml.Schema;
+using Amazon;
 using Amazon.Extensions.S3.Encryption;
 using Amazon.Extensions.S3.Encryption.Primitives;
+using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace JournalCli.Core
 {
@@ -19,7 +28,8 @@ namespace JournalCli.Core
             var encryptionMaterials = new EncryptionMaterialsV2(rsa, AsymmetricAlgorithmType.RsaOaepSha1);
             var config = new AmazonS3CryptoConfigurationV2(SecurityProfile.V2)
             {
-                StorageMode = CryptoStorageMode.ObjectMetadata
+                StorageMode = CryptoStorageMode.ObjectMetadata,
+                RegionEndpoint = RegionEndpoint.GetBySystemName(settings.AwsRegion)
             };
 
             // TEST: Validate flow if profile name is missing or wrong
@@ -34,14 +44,60 @@ namespace JournalCli.Core
             // 2. Missing from S3? Upload. Missing from disk, download. Entry is in both places? Will have to ask user what to do. 
             // 3. Allow user to abort entire process if conflicts are found.
             // 4. Remember, entries are versioned in S3 but not on disk, so uploading is always safer than overwriting on disk.
-            
-
         }
 
-        public void CreateOrVerifyBucket()
+        public async Task<string> CreateBucket()
         {
             // Be sure to create a "Default" directory in the bucket to allow for named journals in the future.
-            // _s3Client.Putbucket
+            // This should be logged.
+            var bucketName = $"journal-cli-{Guid.NewGuid()}";
+            var putBucketRequest = new PutBucketRequest
+            {
+                UseClientRegion = true,
+                BucketName = bucketName
+            };
+            var putBucketResponse = await _s3Client.PutBucketAsync(putBucketRequest);
+
+            // TODO: What code to expect?
+            // if (putBucketResponse.HttpStatusCode != HttpStatusCode.Created)
+            //     throw new Exception();
+
+            var putEncryptionRequest = new PutBucketEncryptionRequest
+            {
+                BucketName = bucketName,
+                ServerSideEncryptionConfiguration = new ServerSideEncryptionConfiguration
+                {
+                    ServerSideEncryptionRules = new List<ServerSideEncryptionRule>
+                    {
+                        new()
+                        {
+                            // TODO: BucketKeyEnabled or not BucketKeyEnabled, that is the question
+                            BucketKeyEnabled = true,
+                            ServerSideEncryptionByDefault = new ServerSideEncryptionByDefault
+                            {
+                                ServerSideEncryptionAlgorithm = new ServerSideEncryptionMethod("SSE-S3")
+                            }
+                        }
+                    }
+                }
+            };
+            
+            var putEncryptionResponse = await _s3Client.PutBucketEncryptionAsync(putEncryptionRequest);
+            // TODO: What code to expect?
+            
+            var putVersioningRequest = new PutBucketVersioningRequest()
+            {
+                BucketName = bucketName,
+                VersioningConfig = new S3BucketVersioningConfig()
+                {
+                    Status = VersionStatus.Enabled
+                }
+            };
+
+            var putBucketVersioningResponse = await _s3Client.PutBucketVersioningAsync(putVersioningRequest);
+            // TODO: What code to expect?
+            
+            return bucketName;
         }
         
         // Add ability to list versions of specific files and show diff

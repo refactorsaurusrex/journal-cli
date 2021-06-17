@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using JournalCli.Core;
 using NodaTime;
 
@@ -17,6 +18,8 @@ namespace JournalCli.Infrastructure
         public static bool ContainsAny<T>(this IEnumerable<T> target, IEnumerable<T> matches) => matches.Any(target.Contains);
 
         public static string ToJournalEntryFileName(this LocalDate date) => date.ToString(Journal.FileNameWithExtensionPattern.PatternText, CultureInfo.CurrentCulture);
+        
+        public static string WildCardsToRegex(this string value) => "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + ".*$";
 
         public static string Wrap(this string text, int width = 120)
         {
