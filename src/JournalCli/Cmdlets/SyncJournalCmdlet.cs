@@ -57,9 +57,6 @@ namespace JournalCli.Cmdlets
             
             switch (ParameterSetName)
             {
-                // default:
-                //     InstallSecretModulesIfMissing();
-                //     break;
                 case "Initialize":
                     InstallSecretModulesIfMissing();
                     SaveNewPrivateKey(settings);
@@ -82,7 +79,7 @@ namespace JournalCli.Cmdlets
                     break;
             }
 
-            // Always print status and warnings here
+            // TODO: Always print status and warnings here
         }
 
         private void SaveS3BucketName(SyncSettings settings)

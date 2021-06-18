@@ -17,7 +17,7 @@ namespace JournalCli.Core
     public class JournalSynchronizer
     {
         private readonly SyncSettings _settings;
-        private AmazonS3EncryptionClientV2 _s3Client;
+        private readonly AmazonS3EncryptionClientV2 _s3Client;
 
         public JournalSynchronizer(string privateKey, SyncSettings settings)
         {
@@ -34,12 +34,20 @@ namespace JournalCli.Core
 
             // TEST: Validate flow if profile name is missing or wrong
             new SharedCredentialsFile().TryGetProfile(settings.AwsProfileName, out var profile);
+
+            if (profile == null)
+                throw new InvalidOperationException($"Unable to locate the AWS profile named '{settings.AwsProfileName}'.");
+            
             var credentials = profile.GetAWSCredentials(null);
             _s3Client = new AmazonS3EncryptionClientV2(credentials, config, encryptionMaterials);
         }
 
         public void Sync(bool force = false)
         {
+            // TODO: In anticipation of "named" journals, be sure to create root-level directories in S3 that represent a named journal. 
+            // The first named directory should just be "default".
+            
+            
             // 1. Pull everything from S3, merge in memory with local entries on disk
             // 2. Missing from S3? Upload. Missing from disk, download. Entry is in both places? Will have to ask user what to do. 
             // 3. Allow user to abort entire process if conflicts are found.
@@ -48,21 +56,18 @@ namespace JournalCli.Core
 
         public async Task<string> CreateBucket()
         {
-            // Be sure to create a "Default" directory in the bucket to allow for named journals in the future.
-            // This should be logged.
             var bucketName = $"journal-cli-{Guid.NewGuid()}";
-            var putBucketRequest = new PutBucketRequest
+            var bucketRequest = new PutBucketRequest
             {
                 UseClientRegion = true,
                 BucketName = bucketName
             };
-            var putBucketResponse = await _s3Client.PutBucketAsync(putBucketRequest);
-
-            // TODO: What code to expect?
-            // if (putBucketResponse.HttpStatusCode != HttpStatusCode.Created)
-            //     throw new Exception();
-
-            var putEncryptionRequest = new PutBucketEncryptionRequest
+            
+            var bucketResponse = await _s3Client.PutBucketAsync(bucketRequest);
+            if (bucketResponse.HttpStatusCode != HttpStatusCode.OK)
+                throw new InvalidOperationException($"Failed to create new bucket '{bucketName}'. Received status code '{bucketResponse.HttpStatusCode}'.");
+            
+            var encryptionRequest = new PutBucketEncryptionRequest
             {
                 BucketName = bucketName,
                 ServerSideEncryptionConfiguration = new ServerSideEncryptionConfiguration
@@ -71,21 +76,20 @@ namespace JournalCli.Core
                     {
                         new()
                         {
-                            // TODO: BucketKeyEnabled or not BucketKeyEnabled, that is the question
-                            BucketKeyEnabled = true,
                             ServerSideEncryptionByDefault = new ServerSideEncryptionByDefault
                             {
-                                ServerSideEncryptionAlgorithm = new ServerSideEncryptionMethod("SSE-S3")
+                                ServerSideEncryptionAlgorithm = ServerSideEncryptionMethod.AES256
                             }
                         }
                     }
                 }
             };
             
-            var putEncryptionResponse = await _s3Client.PutBucketEncryptionAsync(putEncryptionRequest);
-            // TODO: What code to expect?
+            var encryptionResponse = await _s3Client.PutBucketEncryptionAsync(encryptionRequest);
+            if (encryptionResponse.HttpStatusCode != HttpStatusCode.OK)
+                throw new InvalidOperationException($"Failed to apply server-side encryption to bucket '{bucketName}'. Received status code '{encryptionResponse.HttpStatusCode}'.");
             
-            var putVersioningRequest = new PutBucketVersioningRequest()
+            var versioningRequest = new PutBucketVersioningRequest()
             {
                 BucketName = bucketName,
                 VersioningConfig = new S3BucketVersioningConfig()
@@ -94,8 +98,9 @@ namespace JournalCli.Core
                 }
             };
 
-            var putBucketVersioningResponse = await _s3Client.PutBucketVersioningAsync(putVersioningRequest);
-            // TODO: What code to expect?
+            var versioningResponse = await _s3Client.PutBucketVersioningAsync(versioningRequest);
+            if (versioningResponse.HttpStatusCode != HttpStatusCode.OK)
+                throw new InvalidOperationException($"Failed to enable object versioning for bucket '{bucketName}'. Received status code '{versioningResponse.HttpStatusCode}'.");
             
             return bucketName;
         }
