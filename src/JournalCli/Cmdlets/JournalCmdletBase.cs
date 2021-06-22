@@ -212,12 +212,19 @@ namespace JournalCli.Cmdlets
                 if (newVersion > installedVersion)
                 {
                     if (System.Diagnostics.Debugger.IsAttached)
+                    {
                         WriteHostInverted("DEBUGGER ATTACHED: New module not installed.");
+                    }
                     else
-                        ScriptBlock.Create("Update-Module JournalCli").Invoke();
-                    var message = $"v{newVersion.Major}.{newVersion.Minor}.{newVersion.Build} has been installed! Restart " +
-                        "your terminal to load the latest goodies.";
-                    ShowSplashScreen(message);
+                    {
+                        WriteWarning("journal-cli auto updates have been disabled!");
+                        WriteHost("");
+                        WriteHost(("Hello, friend! JournalCli v2.0 is now available! However, it has undergone significant interface changes, " +
+                                   "so automatic updates have been disabled for all current v1.0 users. I highly encourage manually upgrading " +
+                                   "to v2.0, but please be prepared for some significant usage changes. Take a look at the new and improved " +
+                                   "documentation website at https://journalcli.me for more information. To upgrade now, run 'Update-Module JournalCli'. " +
+                                   "As always, feel free to send feedback to hi@journalcli.me.").Wrap(), Console.BackgroundColor, ConsoleColor.Green);
+                    }
                 }
 
                 _settings.NextUpdateCheck = DateTime.Now.AddDays(7);
