@@ -10,6 +10,7 @@ namespace JournalCli.Tests
         [Fact]
         public async Task CreateBucket_CreatesNewBucket()
         {
+            await Task.Delay(100);
             throw new Exception("enable mocking this");
             // var key = JournalSynchronizer.CreatePrivateKey();
             // var settings = new SyncSettings
