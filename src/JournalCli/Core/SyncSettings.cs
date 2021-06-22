@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Amazon.Runtime;
 
 namespace JournalCli.Core
 {
@@ -11,6 +12,13 @@ namespace JournalCli.Core
         public string BucketName { get; set; }
 
         public string AwsRegion { get; set; }
+
+        public bool IsValid()
+        {
+            return !string.IsNullOrWhiteSpace(AwsProfileName) &&
+                   !string.IsNullOrWhiteSpace(BucketName) &&
+                   !string.IsNullOrWhiteSpace(AwsRegion);
+        }
 
         public bool Equals(SyncSettings other)
         {

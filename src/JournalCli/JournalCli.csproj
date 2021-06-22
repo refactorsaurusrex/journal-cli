@@ -45,7 +45,6 @@
 
   <ItemGroup>
     <None Remove="Scripts\SecretStoreConfiguration.ps1" />
-    <EmbeddedResource Include="Scripts\SecretStoreConfiguration.ps1" />
   </ItemGroup>
 
 </Project>

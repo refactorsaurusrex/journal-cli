@@ -33,7 +33,7 @@ namespace JournalCli.Infrastructure
                 if (lines.Last().Length + word.Length >= width - 1) // Minus 1, to allow for newline char
                     lines.Add(word);
                 else
-                    lines[lines.Count - 1] += delimiter + word;
+                    lines[^1] += delimiter + word;
                 return lines;
             });
 
