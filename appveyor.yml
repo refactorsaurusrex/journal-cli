@@ -8,7 +8,7 @@ deploy_script:
 - pwsh: '& ".\deploy.ps1"'
 environment:
   psgallery:
-    secure: Hlkt9LvEqlXZk4TY5rlpVj6fiSeLV7nmMwV4mjAinWphJUUeR6ZhIaYT0/L31YF/
+    secure: +dUmZH/YuY+PjvSIZQQ4MzUy2UBjtmMrzTmgm2sIONkyECjh648Tg9G9ud8rKJ4C
   myget:
     secure: 6qd8BqNgZXIUnFbQJ90Xmr7W43u3qud1E3c16cuDcjZa6AO+ujq7zyS8d6JN89OJ
 skip_commits:
