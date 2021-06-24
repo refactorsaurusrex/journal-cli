@@ -19,7 +19,7 @@ namespace JournalCli.Core
 
         private static string WildCardToRegex(string value)
         {
-            return "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + "$";
+            return "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + ".*$";
         }
     }
 }
