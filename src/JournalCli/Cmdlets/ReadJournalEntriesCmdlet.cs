@@ -22,15 +22,20 @@ namespace JournalCli.Cmdlets
 
         [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "ReadMe")]
         public ReadmeJournalEntry ReadMeEntry { get; set; }
+        
+        [Parameter(ValueFromPipeline = true, Position = 0, ParameterSetName = "Names")]
+        public string[] EntryNames { get; set; }
 
         [Parameter(ParameterSetName = "Index")]
         [Parameter(ParameterSetName = "Meta")]
         [Parameter(ParameterSetName = "ReadMe")]
+        [Parameter(ParameterSetName = "Names")]
         public SwitchParameter Reverse { get; set; }
 
         [Parameter(ParameterSetName = "Index")]
         [Parameter(ParameterSetName = "Meta")]
         [Parameter(ParameterSetName = "ReadMe")]
+        [Parameter(ParameterSetName = "Names")]
         public JournalView View { get; set; } = JournalView.MultiPage;
 
         protected override void ProcessRecord()
@@ -47,6 +52,9 @@ namespace JournalCli.Cmdlets
                     break;
                 case "ReadMe":
                     ProcessReadMeEntries();
+                    break;
+                case "Names":
+                    ProcessEntryNames();
                     break;
             }
         }
@@ -103,6 +111,16 @@ namespace JournalCli.Cmdlets
         {
             foreach (var entry in Index.Entries)
             {
+                _filteredIndex.Add(entry);
+            }
+        }
+        
+        private void ProcessEntryNames()
+        {
+            var journal = OpenJournal();
+            foreach (var name in EntryNames)
+            {
+                var entry = journal.GetEntryFromName(name).GetReader().ToJournalEntry<CompleteJournalEntry>();
                 _filteredIndex.Add(entry);
             }
         }
