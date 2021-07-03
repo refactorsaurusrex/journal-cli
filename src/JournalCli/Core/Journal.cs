@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
@@ -155,20 +156,21 @@ namespace JournalCli.Core
             if (journalWriter.EntryExists(entryFilePath))
                 throw new JournalEntryAlreadyExistsException(entryFilePath);
 
-            var parser = string.IsNullOrWhiteSpace(readme) ? null : new ReadmeParser(readme, entryDate);
-            var frontMatter = new JournalFrontMatter(tags, parser);
+            var readmeExpression = new ReadmeParser(readme).ToExpression(entryDate);
+            var frontMatter = new JournalFrontMatter(tags, readmeExpression);
             var header = $"# {entryDate}";
             journalWriter.Create(entryFilePath, frontMatter, header);
             _systemProcess.Start(entryFilePath);
         }
 
-        public void AppendEntryContent(LocalDate entryDate, string[] body, string heading, string[] tags)
+        public void AppendEntryContent(LocalDate entryDate, string[] body, string heading, string[] tags, string readme, out IEnumerable<string> warnings)
         {
             var journalWriter = _readerWriterFactory.CreateWriter();
             var entryFilePath = journalWriter.GetJournalEntryFilePath(entryDate);
 
             IJournalFrontMatter frontMatter;
             JournalEntryBody journalBody;
+            var readmeParser = new ReadmeParser(readme);
             if (journalWriter.EntryExists(entryFilePath))
             {
                 var journalReader = _readerWriterFactory.CreateReader(entryFilePath);
@@ -176,10 +178,21 @@ namespace JournalCli.Core
                 frontMatter = journalReader.FrontMatter;
                 frontMatter.AppendTags(tags);
                 journalBody = new JournalEntryBody(journalReader.RawBody);
+
+                warnings = readmeParser.IsValid
+                    ? new List<string>
+                    {
+                        "This journal entry already has a Readme date applied. Readme dates cannot be overwritten using this method. " +
+                        "If you want to edit the Readme date, open the entry and either change it manually, or delete it entirely and run this " +
+                        "method again."
+                    }
+                    : new List<string>();
             }
             else
             {
-                frontMatter = new JournalFrontMatter(tags);
+                warnings = new List<string>();
+                var readmeExpression = readmeParser.ToExpression(entryDate);
+                frontMatter = new JournalFrontMatter(tags, readmeExpression);
                 journalBody = new JournalEntryBody();
             }
 
@@ -249,7 +262,7 @@ namespace JournalCli.Core
             var aggregatedTags = entries.SelectMany(x => x.Tags).Distinct();
             var content = string.Join(Environment.NewLine, entries.Select(x => x.Body));
 
-            var frontMatter = new JournalFrontMatter(aggregatedTags);
+            var frontMatter = new JournalFrontMatter(aggregatedTags, ReadmeExpression.Empty());
             journalWriter.CreateCompiled(frontMatter, entryFilePath, content);
             _systemProcess.Start(entryFilePath);
         }
@@ -271,7 +284,7 @@ namespace JournalCli.Core
             var aggregatedTags = convertedEntries.SelectMany(x => x.Tags).Distinct();
             var content = string.Join(Environment.NewLine, convertedEntries.Select(x => x.Body));
 
-            var frontMatter = new JournalFrontMatter(aggregatedTags);
+            var frontMatter = new JournalFrontMatter(aggregatedTags, ReadmeExpression.Empty());
             journalWriter.CreateCompiled(frontMatter, entryFilePath, content);
             _systemProcess.Start(entryFilePath);
         }

@@ -13,8 +13,7 @@ namespace JournalCli.Cmdlets
         private readonly SystemSettings _systemSettings;
         private readonly UserSettings _userSettings;
         private readonly IFileStore<SystemSettings> _systemSettingsStore;
-        private readonly FileSystem _fileSystem = new FileSystem();
-        private int _wrapWidth;
+        private readonly FileSystem _fileSystem = new();
 
         protected JournalCmdletBase()
         {
@@ -25,6 +24,8 @@ namespace JournalCli.Cmdlets
         }
 
         protected string Location { get; private set; }
+
+        protected int WrapWidth { get; private set; }
 
         protected override void BeginProcessing()
         {
@@ -37,7 +38,7 @@ namespace JournalCli.Cmdlets
                 _systemSettingsStore.Save(_systemSettings);
             }
 
-            _wrapWidth = Math.Min(Host.UI.RawUI.WindowSize.Width, 120);
+            WrapWidth = Math.Min(Host.UI.RawUI.WindowSize.Width, 120);
         }
 
         protected override void EndProcessing() => CheckForUpdates();
@@ -71,7 +72,7 @@ namespace JournalCli.Cmdlets
 
         private protected Journal OpenJournal()
         {
-            var ioFactory = new JournalReaderWriterFactory(_fileSystem, Location, _wrapWidth);
+            var ioFactory = new JournalReaderWriterFactory(_fileSystem, Location, WrapWidth);
             var markdownFiles = new MarkdownFiles(_fileSystem, Location);
             return Journal.Open(ioFactory, markdownFiles, SystemProcess);
         }
@@ -129,7 +130,7 @@ namespace JournalCli.Cmdlets
                             "and install the update now?";
                     }
                     
-                    var result = Choice(title, message.Wrap(_wrapWidth), 0, "&View release notes", "&Install new version", "&Remind me later");
+                    var result = Choice(title, message.Wrap(WrapWidth), 0, "&View release notes", "&Install new version", "&Remind me later");
                     switch (result)
                     {   
                         case 0:

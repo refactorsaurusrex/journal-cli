@@ -77,7 +77,7 @@ namespace JournalCli.Tests
             journal.CreateNewEntry(new LocalDate(2019, 7, 19), null, "2 years");
 
             var entryText = fileSystem.GetFile("J:\\Current\\2019\\07 July\\2019.07.19.md").TextContents;
-            entryText.Should().Contain("readme: 2 years");
+            entryText.Should().Contain("readme: 7/19/2021");
             entryText.Should().NotContain("tags:");
         }
 

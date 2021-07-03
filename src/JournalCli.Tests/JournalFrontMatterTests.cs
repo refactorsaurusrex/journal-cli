@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions.TestingHelpers;
 using FluentAssertions;
 using JournalCli.Core;
@@ -30,6 +31,22 @@ namespace JournalCli.Tests
         }
 
         [Theory]
+        [InlineData("---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 1 year\r\n---", "7/10/2021", "7/10/2022")]
+        [InlineData("---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 12 days\r\n---", "7/30/2021", "8/11/2021")]
+        [InlineData("---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 4 months\r\n---", "2/28/2021", "6/28/2021")]
+        [InlineData("---\r\nTags:\r\n  - one\r\n  - two\r\nReadme: 3 weeks\r\n---", "7/10/2021", "7/31/2021")]
+        public void This_ParsesLegacyReadmeValues_WhenPresent(string yaml, string entryDate, string readmeDate)
+        {
+            var journalDate = entryDate.ToLocalDate();
+            var frontMatter = new JournalFrontMatter(yaml, journalDate);
+
+            frontMatter.Tags.Should().Contain(new List<string> { "one", "two" });
+            frontMatter.Readme.Should().Be(readmeDate);
+            frontMatter.ReadmeDate.Should().Be(readmeDate.ToLocalDate());
+            frontMatter.IsEmpty().Should().BeFalse();
+        }
+
+        [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData("---\r\n\r\n---\r\n")]
@@ -58,11 +75,12 @@ namespace JournalCli.Tests
         }
 
         [Fact]
+        [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull")]
         public void This_DoesNotThrowExceptions_WhenTagsAndReadmeParserAreNull()
         {
             IEnumerable<string> tags = null;
-            ReadmeParser readmeParser = null;
-            var frontMatter = new JournalFrontMatter(tags, readmeParser);
+            ReadmeExpression readmeExpression = null;
+            var frontMatter = new JournalFrontMatter(tags, readmeExpression);
 
             frontMatter.Tags.Should().BeNull();
             frontMatter.Readme.Should().BeNull();
@@ -111,7 +129,7 @@ namespace JournalCli.Tests
         [Theory]
         [InlineData("Tags:\r\n  - one\r\n  - two", "---\r\ntags:\r\n  - one\r\n  - two\r\n---\r\n")]
         [InlineData("Tags:\r\n  - one\r\n  - two\r\nReadme: 8-1-2017", "---\r\ntags:\r\n  - one\r\n  - two\r\nreadme: 8/1/2017\r\n---\r\n")]
-        [InlineData("Tags:\r\n  - Thing\r\nReadme: 2 years", "---\r\ntags:\r\n  - Thing\r\nreadme: 2 years\r\n---\r\n")]
+        [InlineData("Tags:\r\n  - Thing\r\nReadme: 9/8/2021", "---\r\ntags:\r\n  - Thing\r\nreadme: 9/8/2021\r\n---\r\n")]
         public void ToString_ReturnsValidFrontMatter_Always(string input, string expectedResult)
         {
             var journalDate = new LocalDate(2019, 9, 8);
@@ -143,7 +161,7 @@ namespace JournalCli.Tests
             };
             yield return new object[]
             {
-                "---\r\nTags:\r\n  - Thing\r\nReadme: 2 years\r\n---", "tags:\r\n  - Thing\r\nreadme: 2 years", "2 years", new List<string> { "Thing" }
+                "---\r\nTags:\r\n  - Thing\r\nReadme: 9/8/2021\r\n---", "tags:\r\n  - Thing\r\nreadme: 9/8/2021", "9/8/2021", new List<string> { "Thing" }
             };
         }
     }

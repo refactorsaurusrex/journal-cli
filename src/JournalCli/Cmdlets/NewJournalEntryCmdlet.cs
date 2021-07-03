@@ -16,6 +16,7 @@ namespace JournalCli.Cmdlets
         public string[] Tags { get; set; }
 
         [Parameter]
+        [ValidateReadme]
         public string Readme { get; set; }
 
         [Parameter]

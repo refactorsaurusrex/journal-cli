@@ -56,11 +56,8 @@ namespace JournalCli.Infrastructure
 
             currentTags[oldItemIndex] = newTag;
 
-            var parser = string.IsNullOrEmpty(journalReader.FrontMatter.Readme) ? 
-                null : 
-                new ReadmeParser(journalReader.FrontMatter.Readme, journalReader.EntryDate);
-
-            var frontMatter = new JournalFrontMatter(currentTags, parser);
+            var readmeExpression = new ReadmeParser(journalReader.FrontMatter.Readme).ToExpression(journalReader.EntryDate);
+            var frontMatter = new JournalFrontMatter(currentTags, readmeExpression);
             var newEntry = frontMatter.ToString(asFrontMatter: true) + journalReader.RawBody;
             _fileSystem.File.WriteAllText(journalReader.FilePath, newEntry);
         }

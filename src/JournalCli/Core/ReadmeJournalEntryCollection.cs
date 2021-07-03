@@ -27,10 +27,8 @@ namespace JournalCli.Core
             if (string.IsNullOrEmpty(reader.FrontMatter.Readme))
                 return;
 
-            var parser = new ReadmeParser(reader.FrontMatter.Readme, reader.EntryDate);
-
-            if (_includeFuture && parser.ExpirationDate > Today.Date() || // Include readme's which expire after today, if requested.
-                parser.ExpirationDate <= Today.Date() && parser.ExpirationDate >= _earliestDate)  // Include readme's between earliestDate and today.
+            if (_includeFuture && reader.FrontMatter.ReadmeDate > Today.Date() || // Include readme's which expire after today, if requested.
+                reader.FrontMatter.ReadmeDate <= Today.Date() && reader.FrontMatter.ReadmeDate >= _earliestDate)  // Include readme's between earliestDate and today.
             {
                 var readme = new ReadmeJournalEntry(reader);
                 _readMeEntries.Add(readme);

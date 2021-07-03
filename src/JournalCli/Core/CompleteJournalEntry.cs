@@ -19,8 +19,8 @@ namespace JournalCli.Core
             EntryName = reader.EntryName;
             EntryDate = reader.EntryDate;
             ReadMeDate = reader.FrontMatter.ReadmeDate.HasValue ? 
-                reader.FrontMatter.ReadmeDate.Value.ToString() : 
-                "None";
+                         reader.FrontMatter.ReadmeDate.Value.ToString() : 
+                         "None";
         }
 
         public string ReadMeDate { get; }

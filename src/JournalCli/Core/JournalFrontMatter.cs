@@ -48,20 +48,12 @@ namespace JournalCli.Core
 
         private JournalFrontMatter() { }
 
-        public JournalFrontMatter(IEnumerable<string> tags, ReadmeParser readmeParser = null)
+        public JournalFrontMatter(IEnumerable<string> tags, ReadmeExpression readmeExpression)
         {
             Tags = tags?.Distinct().OrderBy(x => x).ToList();
-
-            if (readmeParser == null)
-            {
-                Readme = null;
-                ReadmeDate = null;
-            }
-            else
-            {
-                Readme = readmeParser.FrontMatterValue;
-                ReadmeDate = readmeParser.ExpirationDate;
-            }
+            readmeExpression ??= ReadmeExpression.Empty();
+            Readme = readmeExpression.FormattedExpirationDate;
+            ReadmeDate = readmeExpression.ExpirationDate;
         }
 
         public JournalFrontMatter(string yamlFrontMatter, LocalDate? journalEntryDate)
@@ -115,9 +107,9 @@ namespace JournalCli.Core
                 if (readMeKey != null && journalEntryDate != null)
                 {
                     var readme = (YamlScalarNode)yamlStream.Documents[0].RootNode[readMeKey];
-                    var parser = new ReadmeParser(readme.Value, journalEntryDate.Value);
-                    Readme = parser.FrontMatterValue;
-                    ReadmeDate = parser.ExpirationDate;
+                    var expression = new ReadmeParser(readme.Value).ToExpression(journalEntryDate.Value);
+                    Readme = expression.FormattedExpirationDate;
+                    ReadmeDate = expression.ExpirationDate;
                 }
             }
         }
@@ -150,7 +142,7 @@ namespace JournalCli.Core
 
         public string ToString(bool asFrontMatter)
         {
-            var target = IsEmpty() ? new JournalFrontMatter(new[] { "(untagged)" }) : this;
+            var target = IsEmpty() ? new JournalFrontMatter(new[] { "(untagged)" }, ReadmeExpression.Empty()) : this;
             var serializer = new SerializerBuilder().ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults).Build();
             var yaml = serializer.Serialize(target).Replace("- ", "  - ").Trim();
             return asFrontMatter ? $"{BlockIndicator}{Environment.NewLine}{yaml}{Environment.NewLine}{BlockIndicator}{Environment.NewLine}" : yaml;

@@ -10,6 +10,18 @@ namespace JournalCli.Infrastructure
 {
     internal static class Extensions
     {
+        public static LocalDate? ToLocalDate(this string value)
+        {
+            try
+            {
+                return LocalDate.FromDateTime(DateTime.Parse(value.Replace('\\', '/')));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public static T ToEnum<T>(this string value) where T : Enum => (T)Enum.Parse(typeof(T), value, true);
 
         public static bool ContainsAll<T>(this IEnumerable<T> target, IEnumerable<T> matches) => matches.All(target.Contains);

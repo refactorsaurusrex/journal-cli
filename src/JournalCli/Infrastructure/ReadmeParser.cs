@@ -1,68 +1,70 @@
-﻿using System;
-using System.Globalization;
+using System;
 using System.Text.RegularExpressions;
 using NodaTime;
 
 namespace JournalCli.Infrastructure
 {
-    internal class ReadmeParser
+    public class ReadmeParser : IReadmeParser
     {
-        public ReadmeParser(string readmeText, LocalDate journalDate)
+        public enum TimePeriod
+        {
+            None,
+            Days,
+            Weeks,
+            Months,
+            Years
+        }
+        
+        public ReadmeParser(string readmeText)
         {
             if (string.IsNullOrWhiteSpace(readmeText))
-                throw new ArgumentException($"'{nameof(readmeText)}' cannot be parsed if it is null or empty.", nameof(readmeText));
+                return;
 
-            if (readmeText.Contains(" "))
+            var parsed = readmeText.ToLocalDate();
+            if (parsed.HasValue)
             {
-                var readmeArray = readmeText.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                var duration = int.Parse(readmeArray[0]);
-
-                LocalDate expiration;
-                string period;
-
-                if (Regex.IsMatch(readmeArray[1], @"days?"))
-                {
-                    expiration = journalDate.PlusDays(duration);
-                    period = duration == 1 ? "day" : "days";
-                }
-                else if (Regex.IsMatch(readmeArray[1], @"weeks?"))
-                {
-                    expiration = journalDate.PlusWeeks(duration);
-                    period = duration == 1 ? "week" : "weeks";
-                }
-                else if (Regex.IsMatch(readmeArray[1], @"months?"))
-                {
-                    expiration = journalDate.PlusMonths(duration);
-                    period = duration == 1 ? "month" : "months";
-                }
-                else if (Regex.IsMatch(readmeArray[1], @"years?"))
-                {
-                    expiration = journalDate.PlusYears(duration);
-                    period = duration == 1 ? "year" : "years";
-                }
-                else
-                {
-                    throw new NotSupportedException();
-                }
-
-                ExpirationDate = expiration;
-                FormattedExpirationDate = expiration.ToString("d", CultureInfo.CurrentCulture);
-                FrontMatterValue = $"{duration} {period}";
+                ExactDate = parsed.Value;
+                IsValid = true;
+                return;
             }
-            else
+
+            if (!readmeText.Contains(" ")) return;
+
+            var readmeArray = readmeText.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            if (!int.TryParse(readmeArray[0], out var duration))
+                return;
+
+            PeriodDuration = duration;
+            if (Regex.IsMatch(readmeArray[1], @"days?"))
             {
-                readmeText = readmeText.Replace('\\', '/'); // Just in case these were used.
-                var dt = DateTime.Parse(readmeText);
-                ExpirationDate = LocalDate.FromDateTime(dt);
-                FrontMatterValue = FormattedExpirationDate = ExpirationDate.ToString("d", CultureInfo.CurrentCulture);
+                Period = TimePeriod.Days;
+                IsValid = true;
+            }
+            else if (Regex.IsMatch(readmeArray[1], @"weeks?"))
+            {
+                Period = TimePeriod.Weeks;
+                IsValid = true;
+            }
+            else if (Regex.IsMatch(readmeArray[1], @"months?"))
+            {
+                Period = TimePeriod.Months;
+                IsValid = true;
+            }
+            else if (Regex.IsMatch(readmeArray[1], @"years?"))
+            {
+                Period = TimePeriod.Years;
+                IsValid = true;
             }
         }
 
-        public LocalDate ExpirationDate { get; }
+        public bool IsValid { get; }
+        
+        public TimePeriod Period { get; }
+        
+        public LocalDate? ExactDate { get; }
 
-        public string FormattedExpirationDate { get; }
+        public int PeriodDuration { get; }
 
-        // TEST: Test that this is correct according to a variety of cultures
-        public string FrontMatterValue { get; }
+        public ReadmeExpression ToExpression(LocalDate relativeTo) => new(this, relativeTo);
     }
 }

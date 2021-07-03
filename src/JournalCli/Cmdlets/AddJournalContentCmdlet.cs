@@ -23,6 +23,10 @@ namespace JournalCli.Cmdlets
 
         [Parameter(Position = 1)]
         public string[] Tags { get; set; }
+        
+        [Parameter]
+        [ValidateReadme]
+        public string Readme { get; set; }
 
         protected override void EndProcessing()
         {
@@ -46,7 +50,12 @@ namespace JournalCli.Cmdlets
             }
 
             var journal = OpenJournal();
-            journal.AppendEntryContent(Date, Body, Header, Tags);
+            journal.AppendEntryContent(Date, Body, Header, Tags, Readme, out var warnings);
+
+            foreach (var warning in warnings)
+            {
+                WriteWarning(warning.Wrap(WrapWidth));
+            }
         }
     }
 }

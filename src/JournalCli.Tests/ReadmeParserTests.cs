@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using FakeItEasy;
 using FluentAssertions;
 using JournalCli.Infrastructure;
 using NodaTime;
@@ -10,6 +11,32 @@ namespace JournalCli.Tests
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class ReadmeParserTests
     {
+        [Fact]
+        public void EmptyExpression_ReturnsNullProperties_Always()
+        {
+            var exp = ReadmeExpression.Empty();
+            exp.ExpirationDate.Should().BeNull();
+            exp.FormattedExpirationDate.Should().BeNull();
+        }
+        
+        [Fact]
+        public void ExpirationDate_IsNull_WhenReadmeParserIsNotValid()
+        {
+            var readme = A.Fake<IReadmeParser>();
+            A.CallTo(() => readme.IsValid).Returns(false);
+            var exp = readme.ToExpression(new LocalDate(2011, 1, 1));
+            exp.ExpirationDate.Should().BeNull();
+        }
+        
+        [Fact]
+        public void FormattedExpirationDate_IsNull_WhenReadmeParserIsNotValid()
+        {
+            var readme = A.Fake<IReadmeParser>();
+            A.CallTo(() => readme.IsValid).Returns(false);
+            var exp = readme.ToExpression(new LocalDate(2011, 1, 1));
+            exp.FormattedExpirationDate.Should().BeNull();
+        }
+        
         [Theory]
         [InlineData("9/7/2019", "9/7/2019")]
         [InlineData("9/7/19", "9/7/2019")]
@@ -22,6 +49,7 @@ namespace JournalCli.Tests
         [InlineData("09-07-19", "9/7/2019")]
         [InlineData("09.7.19", "9/7/2019")]
         [InlineData("1 year", "4/25/2020")]
+        [InlineData("5 years", "4/25/2024")]
         [InlineData("6 months", "10/25/2019")]
         [InlineData("56 days", "6/20/2019")]
         [InlineData("27 week", "10/31/2019")]
@@ -31,9 +59,11 @@ namespace JournalCli.Tests
         {
             // Eventually, perhaps, this will need to be adjust to allow for non-American formats. 
             var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
-            var parser = new ReadmeParser(readmeValue, journalDate);
-            parser.FormattedExpirationDate.Should().BeEquivalentTo(expectedResult);
-            parser.ExpirationDate.Should().Be(LocalDate.FromDateTime(DateTime.Parse(expectedResult)));
+            var parser = new ReadmeParser(readmeValue);
+            parser.IsValid.Should().BeTrue();
+            var exp = parser.ToExpression(journalDate);
+            exp.FormattedExpirationDate.Should().BeEquivalentTo(expectedResult);
+            exp.ExpirationDate.Should().Be(LocalDate.FromDateTime(DateTime.Parse(expectedResult)));
         }
 
         [Theory]
@@ -44,29 +74,17 @@ namespace JournalCli.Tests
         [InlineData("this is a test")]
         [InlineData("!@#$%^")]
         [InlineData("2.8 years")]
-        public void This_ThrowsFormatException_WhenReadmeFormatIsInvalid(string invalidReadme)
-        {
-            var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
-            Assert.Throws<FormatException>(() => new ReadmeParser(invalidReadme, journalDate));
-        }
-
-        [Theory]
         [InlineData("1 thing")]
         [InlineData("13 horses")]
-        public void This_ThrowsNotSupportedException_WhenInvalidDurationProvided(string invalidReadme)
-        {
-            var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
-            Assert.Throws<NotSupportedException>(() => new ReadmeParser(invalidReadme, journalDate));
-        }
-
-        [Theory]
+        [InlineData("blah")]
+        [InlineData("Merry christmas!")]
         [InlineData("")]
         [InlineData("   ")]
         [InlineData(null)]
-        public void This_ThrowsArgumentException_WhenReadmeIsNullEmptyOrWhitespace(string invalidReadme)
+        public void This_IsNotValid_WhenReadmeFormatIsInvalid(string invalidReadme)
         {
-            var journalDate = LocalDate.FromDateTime(DateTime.Parse("4-25-2019"));
-            Assert.Throws<ArgumentException>(() => new ReadmeParser(invalidReadme, journalDate));
+            var parser = new ReadmeParser(invalidReadme);
+            parser.IsValid.Should().BeFalse();
         }
     }
 }
