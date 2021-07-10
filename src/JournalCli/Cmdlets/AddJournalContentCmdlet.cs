@@ -40,7 +40,7 @@ namespace JournalCli.Cmdlets
 
             var hour = Now.Time().Hour;
 
-            if (hour >= 0 && hour <= 4)
+            if (hour is >= 0 and <= 4)
             {
                 var dayPrior = Date.Minus(Period.FromDays(1));
                 var question = $"Edit entry for '{dayPrior}' or '{Date}'?";

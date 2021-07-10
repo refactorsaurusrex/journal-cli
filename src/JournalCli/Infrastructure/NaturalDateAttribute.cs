@@ -10,7 +10,7 @@ namespace JournalCli.Infrastructure
     public class NaturalDateAttribute : ArgumentTransformationAttribute
     {
         private readonly RoundTo _round;
-        private readonly Parser _parser = new Parser(new Options { Context = Pointer.Type.Past });
+        private readonly Parser _parser = new(new Options { Context = Pointer.Type.Past });
         private readonly LocalDatePattern _yearPattern = LocalDatePattern.CreateWithCurrentCulture("yyyy");
         private readonly LocalDatePattern _fullMonthYearPattern = LocalDatePattern.CreateWithCurrentCulture("MMMM yyyy");
         private readonly LocalDatePattern _shortMonthYearPattern = LocalDatePattern.CreateWithCurrentCulture("MMM yyyy");

@@ -4,7 +4,7 @@ using NodaTime.Extensions;
 
 namespace JournalCli.Infrastructure
 {
-    internal class Today
+    internal static class Today
     {
         public static LocalDate Date() => SystemClock.Instance.InTzdbSystemDefaultZone().GetCurrentLocalDateTime().Date;
 
