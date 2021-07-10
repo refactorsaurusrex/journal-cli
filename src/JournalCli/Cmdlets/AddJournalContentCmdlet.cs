@@ -16,6 +16,7 @@ namespace JournalCli.Cmdlets
         public LocalDate Date { get; set; } = Today.Date();
 
         [Parameter]
+        [ValidateHeader]
         public string Header { get; set; }
 
         [Parameter(Position = 0)]
@@ -31,9 +32,6 @@ namespace JournalCli.Cmdlets
         protected override void EndProcessing()
         {
             base.EndProcessing();
-
-            if (!string.IsNullOrWhiteSpace(Header))
-                HeaderValidator.ValidateOrThrow(Header);
 
             if (!string.IsNullOrWhiteSpace(Header) && (Body == null || !Body.Any()))
                 throw new PSArgumentException("Header cannot be used without Body. Please specify a Body and try again.");
