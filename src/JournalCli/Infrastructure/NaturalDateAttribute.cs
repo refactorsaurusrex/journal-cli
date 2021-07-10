@@ -19,7 +19,8 @@ namespace JournalCli.Infrastructure
 
         public override object Transform(EngineIntrinsics engineIntrinsics, object inputData)
         {
-            var input = inputData.ToString();
+            var input = inputData.ToString().Replace('\\', '/');
+            
             try
             {
                 var yearResult = _yearPattern.Parse(input);
