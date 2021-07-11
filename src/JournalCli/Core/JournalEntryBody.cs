@@ -77,6 +77,9 @@ namespace JournalCli.Core
 
         public void AddOrAppendToCustomHeader(string header, ICollection<string> lines)
         {
+            if (!HeaderValidator.IsValid(header))
+                throw new ArgumentException(HeaderValidator.ErrorMessage);
+            
             if (lines == null || !lines.Any())
                 throw new ArgumentException($"'{nameof(lines)}' cannot be null or empty.");
 

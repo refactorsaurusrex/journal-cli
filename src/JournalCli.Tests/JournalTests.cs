@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using FakeItEasy;
@@ -46,6 +47,48 @@ namespace JournalCli.Tests
             journal.CreateNewEntry(new LocalDate(2019, 7, 19), tags, readme);
 
             fileSystem.GetFile("J:\\Current\\2019\\07 July\\2019.07.19.md").TextContents.Should().Be("---\r\ntags:\r\n  - (untagged)\r\n---\r\n# Friday, July 19, 2019\r\n");
+        }
+
+        [Fact]
+        public void AddNewJournalContent_ReturnsWarning_IfReadmeAlreadyExists()
+        {
+            const string rootDirectory = "J:\\Current";
+            var entryDate = new LocalDate(2021, 7, 20);
+            var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(entryDate.Month);
+            var currentPath = $@"J:\Current\{entryDate.Year}\{entryDate.Month:00} {monthName}";
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(currentPath);
+            var filePath = fileSystem.Path.Combine(currentPath, entryDate.ToJournalEntryFileName());
+            fileSystem.AddFile(filePath, new MockFileData(TestEntries.WithTagsAndReadme));
+            
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = A.Fake<IMarkdownFiles>();
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+            
+            journal.AppendEntryContent(entryDate, new[] { "This is a body" }, "# Headering", new[] { "one", "two" }, "1 year", out var warnings);
+            warnings.Count().Should().Be(1);
+        }
+        
+        [Fact]
+        public void AddNewJournalContent_ReturnsNoWarnings_IfReadmeDoesNotAlreadyExists()
+        {
+            const string rootDirectory = "J:\\Current";
+            var entryDate = new LocalDate(2021, 7, 20);
+            var monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(entryDate.Month);
+            var currentPath = $@"J:\Current\{entryDate.Year}\{entryDate.Month:00} {monthName}";
+            var fileSystem = new MockFileSystem();
+            fileSystem.AddDirectory(currentPath);
+            var filePath = fileSystem.Path.Combine(currentPath, entryDate.ToJournalEntryFileName());
+            fileSystem.AddFile(filePath, new MockFileData(TestEntries.WithTags1));
+            
+            var ioFactory = new JournalReaderWriterFactory(fileSystem, rootDirectory, BodyWrapWidth);
+            var systemProcess = A.Fake<ISystemProcess>();
+            var markdownFiles = A.Fake<IMarkdownFiles>();
+            var journal = Journal.Open(ioFactory, markdownFiles, systemProcess);
+            
+            journal.AppendEntryContent(entryDate, new[] { "This is a body" }, "# Headering", new[] { "one", "two" }, "1 year", out var warnings);
+            warnings.Count().Should().Be(1);
         }
 
         [Fact]

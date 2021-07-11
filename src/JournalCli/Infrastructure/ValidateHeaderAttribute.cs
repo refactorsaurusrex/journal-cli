@@ -8,7 +8,7 @@ namespace JournalCli.Infrastructure
         {
             var header = arguments.ToString();
             if (!HeaderValidator.IsValid(header))
-                throw new PSArgumentException("Header must start with between 1 and 6 '#' characters, followed by a single space and the header text.");
+                throw new PSArgumentException(HeaderValidator.ErrorMessage);
         }
     }
 }
